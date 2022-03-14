@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="extended_purchase_order_form" model="ir.ui.view">
+        <field name="name">extended.purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='purchase_delivery_invoice']" position="before">
+                <page string="Included PO" name="included_po" attrs="{'invisible': [('included_po_ids', '=', [])]}">
+                    <field name="included_po_ids" readonly="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

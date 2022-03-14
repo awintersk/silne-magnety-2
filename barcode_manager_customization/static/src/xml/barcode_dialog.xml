@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+
+    <t t-name="barcode_manager_customization.barcode_dialog" owl="1">
+        <div class="barcode-dialog-content" t-on-secondary-body-validate="_validate" t-on-secondary-body-change="_onSecondaryDialogChange">
+            <div class="row" t-if="props.product &amp;&amp; props.product.id">
+                <div class="col-12 col-lg-4">
+                    <img class="barcode-dialog-content__image"
+                         t-att-alt="props.product.display_name"
+                         t-attf-src="/web/image/product.product/{{props.product.id}}/image_1024"/>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <div class="tableFixHead">
+                        <table class="table">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th t-attf-class="{{selectedQty > props.product.totalQty ? 'text-danger': ''}}">
+                                        Qty (<t t-esc="selectedQty"/> / <t t-esc="props.product.totalQty"/>)
+                                    </th>
+                                    <th/>
+                                    <th/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.items" t-as="item" t-key="item.id">
+                                    <td>
+                                        <b t-esc="item.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="item.partnerName"/>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-row align-items-center">
+                                            <input class="form-control"
+                                                   type="number"
+                                                   min="0"
+                                                   t-att-max="item.qtyToDeliver"
+                                                   placeholder="0"
+                                                   t-att-disabled="activePrintButton(item)"
+                                                   t-model.number="item.qty"/>
+                                            <span class="px-2">/</span>
+                                            <span t-esc="item.qtyToDeliver"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button t-attf-class="btn w-100 {{activeValidateButton(item) ? 'btn-primary': 'btn-light'}}"
+                                                title="Validate"
+                                                t-att-disabled="!activeValidateButton(item)"
+                                                t-on-click="_onValidate(item)">
+                                            <i class="fa fa-check"/>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button t-attf-class="btn w-100 {{activePrintButton(item) ? 'btn-primary': 'btn-light'}}"
+                                                title="Print"
+                                                t-on-click="_onPrintLabel(item)"
+                                                t-att-disabled="!activePrintButton(item)">
+                                            <i class="fa fa-print"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-7 mt-4 mt-lg-3 mx-lg-4">
+                    <span t-if="state.measurements" class="d-flex flex-column flex-md-row">
+                        <strong class="pr-2">Measurements:</strong>
+                        <p class="pb-0" t-raw="formattedProductMeasurements"/>
+                    </span>
+                </div>
+            </div>
+            <div class="barcode-dialog-content__footer mt-2 mt-lg-4 px-2">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox"
+                           id="dont_show_again"
+                           class="custom-control-input"
+                           t-on-change="_onChangeShowAgain"
+                           t-model="state.dont_show_again"/>
+                    <label for="dont_show_again" class="custom-control-label">Don't show again</label>
+                </div>
+                <button t-on-click="closeDialog(props.product.id)" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="barcode_manager_customization.barcode_delivery_dialog">
+        <div class="barcode-picking-dialog">
+            <div class="col-12 col-lg-7 px-0 px-lg-2">
+                <div class="tableFixHead">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="widget.actionState.productList" t-as="product">
+                                <td>
+                                    <b t-esc="product.product_id.name"/>
+                                </td>
+                                <td>
+                                    <span t-esc="product.customerName"/>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <span t-esc="product.quantity"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr class="w-100 bg-light d-block d-lg-none"/>
+            <div class="col-12 col-lg-5 px-0 px-lg-2">
+                <div class="barcode-picking-dialog__pallet-selector">
+                    <strong class="pr-2">
+                        <t t-if="widget.isMode('delivery')">Pallet:</t>
+                        <t t-if="widget.isMode('internal')">Box:</t>
+                    </strong>
+                    <div class="d-flex flex-column w-100">
+                        <select id="package_select" class="form-control">
+                            <option selected="" disabled="" value="0">
+                                Please select
+                                <t t-if="widget.isMode('delivery')">pallet</t>
+                                <t t-if="widget.isMode('internal')">box</t>
+                            </option>
+                            <t t-foreach="widget.actionState.packageList" t-as="item">
+                                <option t-att-value="item.id" t-esc="item.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary ml-2"
+                            t-attf-title="Create new {{widget.isMode('delivery') ? 'pallet': 'box'}}"
+                            data-event="create_package">
+                        <i class="fa fa-plus"/>
+                    </button>
+                </div>
+                <div class="barcode-picking-dialog__print-container" style="display: none;">
+                    <button class="btn btn-outline-primary" data-event="print_pdf" disabled="">
+                        <i class="fa fa-print pr-1"/> Print (PDF)
+                    </button>
+                    <button class="btn btn-outline-primary" data-event="print_zpl" disabled="">
+                        <i class="fa fa-print pr-1"/> Print (ZPL)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="barcode_manager_customization.receipt_secondary_body" owl="1">
+        <Dialog title="'Are you sure about the validation of this product?'"
+                contentClass="'nt-dialog'"
+                fullscreen="true"
+                size="dialogSize"
+                t-on-dialog-closed="onClose">
+            <table class="table mb-0 pb-2">
+                <tr class="thead-light">
+                    <th>Sale Order</th>
+                    <td t-esc="props.item.name"/>
+                </tr>
+                <tr class="thead-light">
+                    <th>Product</th>
+                    <td t-esc="props.product.display_name"/>
+                </tr>
+                <tr class="thead-light">
+                    <th>Qty</th>
+                    <td><t t-esc="props.item.qty"/> units</td>
+                </tr>
+                <tr class="thead-light h-100">
+                    <th>Package №</th>
+                    <td class="pr-3 vertical-align-middle">
+                        <select class="o_input" t-model.number="state.boxIntId">
+                            <option value="-1" selected="1"/>
+                            <option value="0">New package</option>
+                            <option t-foreach="state.packageItems" t-as="item" t-key="item.id" t-att-value="item.id" t-esc="item.name"/>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="thead-light" t-att-hidden="state.boxIntId &lt; 0">
+                    <th>Package Type</th>
+                    <td class="vertical-align-middle">
+                        <select class="o_input" t-model.number="state.packageTypeIntId" t-att-disabled="!packageTypeActive">
+                            <t t-foreach="state.packageTypeItems" t-as="typeItem" t-key="typeItem.id">
+                                <option t-att-value="typeItem.id" t-esc="typeItem.name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-primary mr-auto mr-md-0" t-on-click.prevent="onClose">Close</button>
+                <button class="btn btn-secondary ml-auto ml-md-2" t-on-click.prevent="onValidate">Validate</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="barcode_manager_customization.receipt_internal_body" owl="1">
+        <Dialog contentClass="'nt-dialog'" title="'Move to package'" fullscreen="true" size="dialogSize" t-on-dialog-closed="onClose">
+            <table class="table mb-0">
+                <tr class="thead-light">
+                    <th>Product</th>
+                    <td t-esc="props.linesId.display_name"/>
+                </tr>
+                <tr class="thead-light">
+                    <th>Qty</th>
+                    <td>
+                        <input class="o_input d-inline-flex"
+                               t-model.number="state.qty"
+                               min="0"
+                               t-att-max="props.linesId.product_uom_qty"
+                               step="0.01"
+                               type="number"
+                               t-att-disabled="state.isMoved"
+                               style="max-width: 70px"/>
+                        / <t t-esc="props.linesId.product_uom_qty"/> units
+                    </td>
+                </tr>
+                <tr class="thead-light">
+                    <th>Gr. weight</th>
+                    <td>
+                        <input class="o_input"
+                               style="outline: none;"
+                               type="number"
+                               min="0"
+                               max="9999"
+                               step="0.01"
+                               t-att-disabled="state.isMoved"
+                               t-model.number="state.shipping_weight"/>
+                    </td>
+                </tr>
+                <tr class="thead-light">
+                    <th>Package №</th>
+                    <td class="pr-3">
+                        <select class="o_input" t-model.number="state.boxIntId" t-att-disabled="state.isMoved">
+                            <option t-att-selected="state.boxIntId === 0" value="0">New package</option>
+                            <t t-foreach="state.packageItems" t-as="item" t-key="item.id">
+                                <option t-att-selected="state.boxIntId === item.id" t-att-value="item.id" t-esc="item.name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="thead-light">
+                    <th style="min-width: 120px;">Package Type</th>
+                    <td>
+                        <select class="o_input" t-model.number="state.packageTypeIntId"
+                                t-att-disabled="!packageTypeActive || state.isMoved">
+                            <t t-foreach="state.packageTypeItems" t-as="typeItem" t-key="typeItem.id">
+                                <option t-att-value="typeItem.id" t-esc="typeItem.name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-primary mr-2" t-on-click.prevent="onClose">Close</button>
+                <button class="btn btn-secondary mr-2"
+                        t-on-click.prevent="moveToPackage"
+                        t-att-disabled="!_isValidData"
+                        t-if="!state.isMoved">
+                    Move
+                </button>
+                <button class="btn btn-secondary"
+                        t-on-click.prevent="savePackageWeight"
+                        t-if="state.boxIntId &gt; 0 &amp;&amp; !state.isMoved">
+                    Save Package Weight
+                </button>
+                <button class="btn btn-secondary" t-on-click="_onPrint" t-if="state.isMoved">
+                    Print box label
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

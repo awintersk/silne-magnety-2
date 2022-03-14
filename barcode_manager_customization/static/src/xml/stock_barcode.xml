@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <t t-extend="stock_barcode_header_widget">
+        <t t-jquery=".navbar-nav:nth-child(2)" t-operation="attributes">
+            <attribute name="class">navbar-nav align-items-center</attribute>
+        </t>
+        <t t-jquery="button.o_show_information" t-operation="before">
+            <div class="nt-move-line-header mr-4">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control nt-move-line-header__search-input"
+                           id="search_by_sku"
+                           placeholder="SKU"
+                           title="SKU search field"/>
+                    <div class="input-group-prepend">
+                        <div class="input-group-text nt-move-line-header__search-button">
+                            <i class="fa fa-search"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+        <t t-jquery="button.o_show_information" t-operation="inner">
+            <i class="fa fa-info-circle" title="Info"/>
+            <span t-esc="widget.orderCount" title="Total SO"/>
+        </t>
+    </t>
+
+    <t t-extend="stock_barcode_lines_widget">
+        <t t-jquery="button.o_add_line" t-operation="replace">
+            <button class="btn btn-secondary text-uppercase o_create_backorder"><i class="fa fa-plus mr-2"/>Create Backorder</button>
+        </t>
+        <t t-jquery="button.o_put_in_pack" t-operation="attributes">
+            <attribute name="t-att-disabled">widget._isPutInPackDisabled() || undefined</attribute>
+        </t>
+    </t>
+
+</templates>

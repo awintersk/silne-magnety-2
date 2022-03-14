@@ -1,0 +1,56 @@
+.picking-kanban-purchase-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.nt-move-line-header {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+
+  &__search-button {
+    background-color: transparent;
+    color: white;
+  }
+
+  &__search-input {
+    background-color: $o-enterprise-color;
+    color: white;
+
+    &:focus {
+      color: inherit;
+      background-color: inherit;
+      box-shadow: none;
+      border-color: white;
+    }
+
+    &::placeholder {
+      color: lightgrey !important;
+    }
+
+    &::-moz-placeholder {
+      color: lightgrey !important;
+    }
+
+    &::-ms-input-placeholder {
+      color: lightgrey !important;
+    }
+  }
+
+  @media screen and (min-width: 576px) {
+    display: flex;
+  }
+}
+
+.nt-dialog {
+  .modal-body {
+    padding: 0;
+  }
+}
+
+.vertical-align-middle {
+  vertical-align: middle !important;
+}
