@@ -42,6 +42,7 @@
         'product',
         'sale',
         'delivery',
+        'sale_purchase_stock',
     ],
 
     'data': [

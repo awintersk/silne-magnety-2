@@ -65,12 +65,6 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-12 col-lg-7 mt-4 mt-lg-3 mx-lg-4">
-                    <span t-if="state.measurements" class="d-flex flex-column flex-md-row">
-                        <strong class="pr-2">Measurements:</strong>
-                        <p class="pb-0" t-raw="formattedProductMeasurements"/>
-                    </span>
-                </div>
             </div>
             <div class="barcode-dialog-content__footer mt-2 mt-lg-4 px-2">
                 <div class="custom-control custom-checkbox">

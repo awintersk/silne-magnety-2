@@ -2,14 +2,13 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
     'use strict'
 
     const {_t} = require('web.core')
-    const {Component, useState, utils, mount} = owl
+    const {Component, useState, mount} = owl
     const {SecondaryBody} = require('barcode_manager_customization.secondary_body')
 
     /**
      * @typedef {{
      *   dont_show_again: Boolean,
      *   items: Array<BarcodeDialogComponentItem>,
-     *   measurements: String,
      * }} BarcodeReceiptDialogState
      * /
 
@@ -22,24 +21,7 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
             this.state = useState({
                 items: Object.assign([], this.props.items),
                 dont_show_again: false,
-                measurements: '',
             })
-        }
-
-        async willStart() {
-            /**@type{{nt_measurements: String}}*/
-            const [record] = await this.rpc({
-                model: 'product.template',
-                method: 'read',
-                args: [this.props.product.id, ['nt_measurements']],
-            })
-            if (record) {
-                this.state.measurements = record.nt_measurements || ''
-            }
-        }
-
-        get formattedProductMeasurements() {
-            return utils.escape(this.state.measurements).replace(/\n/g, '<br>')
         }
 
         /**
