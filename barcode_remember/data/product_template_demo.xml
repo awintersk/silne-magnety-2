@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="demo_gift_product_template" model="product.template">
+        <field name="name">Gift</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="True"/>
+        <field name="is_gift" eval="True"/>
+        <field name="list_price" eval="0.0"/>
+        <field name="type">product</field>
+        <field name="image_1920" type="base64" file="barcode_remember/static/src/img/gift-present-prize-icon-24.png"/>
+    </record>
+
+</odoo>

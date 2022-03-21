@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+
+    <t t-inherit="stock_barcode.stock_barcode_header_widget" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_show_information')]" position="attributes">
+            <attribute name="class" remove="mr-4" add="mr-2" separator=" "></attribute>
+        </xpath>
+        <xpath expr="//nav[last()]" position="before">
+            <div class="d-flex mx-2" t-if="widget.mode.includes('internal')">
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeWarranty ? 'Include' : ''}} Warranty">
+                    <i t-attf-class="fa fa-file{{!widget.includeWarranty ? '-o' : ''}}"/>
+                </span>
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Include' : ''}} Gift">
+                    <i t-attf-class="fa fa-heart{{!widget.includeGift ? '-o' : ''}}"/>
+                </span>
+            </div>
+        </xpath>
+    </t>
+
+</templates>
