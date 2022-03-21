@@ -2,18 +2,32 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
     'use strict'
 
     const patchMixin = require('web.patchMixin')
-    const Dialog = require('web.OwlDialog');
+    const Dialog = require('web.OwlDialog')
+    const {bus} = require('web.core')
     const {Component, tags, useState} = owl
 
     /**
      * @typedef {Object} RememberGiftDialogState
-     * @property {Array} productList
-     * @property {Object} productId
+     * @property {RememberGiftDialogProduct[]} productList
+     * @property {RememberGiftDialogProduct} productId
      */
 
+    /**
+     * @typedef {Object} RememberGiftDialogProduct
+     * @property {String} name
+     * @property {Number} id
+     * @property {String} [barcode]
+     */
+
+    if (odoo.debug === '1' && !window.barcodeScanner) {
+        window.barcodeScanner = {scan: barcode => bus.trigger('barcode_scanned', barcode)}
+    }
+
+    /**
+     * @property {RememberGiftDialogState} state
+     */
     class RememberGiftDialog extends Component {
         setup() {
-            /**@type{RememberGiftDialogState}*/
             this.state = useState({
                 productList: [],
                 productId: {},
@@ -26,6 +40,7 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
                 method: 'search_read',
                 args: [[['is_gift', '=', true], ['sale_ok', '=', true]]],
                 kwargs: {
+                    fields: ['name', 'barcode'],
                     limit: 100,
                 }
             })
@@ -36,6 +51,11 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
 
         mounted() {
             this.trigger('listen_to_barcode_scanned', {'listen': false});
+            bus.on('barcode_scanned', this, this._onBarcodeScannedHandler);
+        }
+
+        get notification() {
+            return this.env.services.notification
         }
 
         _onCloseDialog() {
@@ -43,12 +63,34 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
         }
 
         _onAddLine() {
-            this.trigger('add_gift_product', {id: 0})
+            this.trigger('add_gift_product', {id: this.state.productId.id})
             this.destroy()
+        }
+
+        /**
+         * @param {String} barcode
+         * @private
+         */
+        _onBarcodeScannedHandler(barcode) {
+            const productId = this.state.productList.find(item => item.barcode === barcode)
+            if (productId) {
+                this.state.productId = productId
+                this.trigger('add_gift_product', {id: productId.id})
+                this.notification.notify({
+                    title: `Selected product with barcode"${barcode}"`,
+                    type: 'success'
+                })
+            } else {
+                this.notification.notify({
+                    title: `Product with barcode "${barcode} not found"`,
+                    type: 'danger'
+                })
+            }
         }
 
         destroy() {
             this.trigger('listen_to_barcode_scanned', {'listen': true});
+            bus.off('barcode_scanned', this, this._onBarcodeScannedHandler);
             super.destroy()
         }
     }
