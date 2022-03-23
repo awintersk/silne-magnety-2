@@ -7,12 +7,20 @@
         </xpath>
         <xpath expr="//nav[last()]" position="before">
             <div class="d-flex mx-2" t-if="widget.mode.includes('internal')">
-                <span class="barcode-remember-info" t-attf-title="{{widget.includeWarranty ? 'Include' : ''}} Warranty">
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeWarranty ? 'Included' : ''}} Warranty">
                     <i t-attf-class="fa fa-file{{!widget.includeWarranty ? '-o' : ''}}"/>
                 </span>
-                <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Include' : ''}} Gift">
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Included' : ''}} Gift">
                     <i t-attf-class="fa fa-heart{{!widget.includeGift ? '-o' : ''}}"/>
                 </span>
+            </div>
+        </xpath>
+    </t>
+
+    <t t-inherit="stock_barcode.stock_barcode_lines_template" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_barcode_line_details')]" position="inside">
+            <div t-if="line.is_gift_product" title="Gift">
+                <i class="fa fa-fw fa-gift"/>
             </div>
         </xpath>
     </t>

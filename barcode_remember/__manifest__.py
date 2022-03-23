@@ -37,6 +37,7 @@
     'depends': [
         'base',
         'product',
+        'sale',
         'stock_barcode',
     ],
 

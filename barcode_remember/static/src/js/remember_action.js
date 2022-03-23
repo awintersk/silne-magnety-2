@@ -1,7 +1,7 @@
 odoo.define('barcode_remember.remember_action', function (require) {
     'use strict'
 
-    const ClientAction = require('stock_barcode.ClientAction')
+    const ClientAction = require('stock_barcode.picking_client_action')
 
     ClientAction.include({
         custom_events: Object.assign({}, ClientAction.prototype.custom_events, {
@@ -32,8 +32,16 @@ odoo.define('barcode_remember.remember_action', function (require) {
             return response
         },
 
-        _onAddGiftProduct({data}) {
-            console.log(data)
+        async _onAddGiftProduct({data}) {
+            await this._rpc({
+                model: 'stock.picking',
+                method: 'add_gift_line',
+                args: [[this.initialState.id]],
+                kwargs: {
+                    product: Number(data.id)
+                }
+            })
+            this.trigger_up('reload')
         },
     })
 

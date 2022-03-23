@@ -15,12 +15,15 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
     /**
      * @typedef {Object} RememberGiftDialogProduct
      * @property {String} name
-     * @property {Number} id
+     * @property {Number, String} id
      * @property {String} [barcode]
      */
 
     if (odoo.debug === '1' && !window.barcodeScanner) {
-        window.barcodeScanner = {scan: barcode => bus.trigger('barcode_scanned', barcode)}
+        const scan = barcode => {
+            bus.trigger('barcode_scanned', barcode)
+        }
+        window.barcodeScanner = {scan}
     }
 
     /**
@@ -36,7 +39,7 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
 
         async willStart() {
             this.state.productList = await this.rpc({
-                model: 'product.template',
+                model: 'product.product',
                 method: 'search_read',
                 args: [[['is_gift', '=', true], ['sale_ok', '=', true]]],
                 kwargs: {
@@ -75,7 +78,6 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
             const productId = this.state.productList.find(item => item.barcode === barcode)
             if (productId) {
                 this.state.productId = productId
-                this.trigger('add_gift_product', {id: productId.id})
                 this.notification.notify({
                     title: `Selected product with barcode"${barcode}"`,
                     type: 'success'
@@ -106,11 +108,9 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
                  style="object-fit: contain;"/>
              <br/>
             <b>Scan product barcode or use bellow button</b>
-            <select class="o_input py-1 px-2 mt-3" t-model.number="state.productId.id">
+            <select class="o_input py-1 px-2 mt-3" t-model="state.productId.id">
                 <t t-foreach="state.productList" t-as="productId" t-key="productId.id">
-                    <option t-att-value="productId.id"
-                            t-esc="productId.name"
-                            t-att-selected="productId.id === state.productId.id"/>
+                    <option t-att-value="productId.id" t-esc="productId.name"/>
                 </t>
             </select>
         </div>

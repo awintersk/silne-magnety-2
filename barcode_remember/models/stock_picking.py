@@ -37,3 +37,10 @@ class StockPicking(models.Model):
         response = super(StockPicking, self)._get_move_line_ids_fields_to_read()
         response.append('is_gift_product')
         return response
+
+    def add_gift_line(self, product: int) -> int:
+        order_line_id = self.env['sale.order.line'].create({
+            'product_id': product,
+            'order_id': self.sale_id.id
+        })
+        return order_line_id.id
