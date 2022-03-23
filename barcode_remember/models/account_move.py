@@ -20,6 +20,29 @@
 #
 ################################################################################
 
-from . import product_template
-from . import stock_picking
-from . import account_move
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    @api.model
+    def create(self, values):
+        if values.get('invoice_line_ids'):
+            self._exclude_gift_from_invoice_line(values)
+            if not values['invoice_line_ids']:
+                raise ValidationError(_('Invoice contains only gift product'))
+        return super(AccountMove, self).create(values)
+
+    def _exclude_gift_from_invoice_line(self, values: dict) -> dict:
+        product_env = self.env['product.product']
+        values['invoice_line_ids'] = [
+            line for line in values['invoice_line_ids']
+            if not product_env.browse(line[2]['product_id']).is_gift
+        ]
+        return values

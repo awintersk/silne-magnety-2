@@ -39,8 +39,21 @@ class StockPicking(models.Model):
         return response
 
     def add_gift_line(self, product: int) -> int:
-        order_line_id = self.env['sale.order.line'].create({
-            'product_id': product,
-            'order_id': self.sale_id.id
-        })
-        return order_line_id.id
+        order_line_env = self.env['sale.order.line']
+        order_id = self.sale_id
+
+        order_line_gift = order_line_env.search_count([
+            ('order_id', '=', order_id.id),
+            ('product_id.is_gift', '=', True)
+        ])
+
+        if not order_line_gift:
+            order_line_id = order_line_env.create({
+                'product_id': product,
+                'order_id': order_id.id
+            })
+            order_line_id.product_id_change()
+
+            return order_line_id.id
+
+        return 0
