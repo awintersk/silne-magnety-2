@@ -7,9 +7,6 @@
         </xpath>
         <xpath expr="//nav[last()]" position="before">
             <div class="d-flex mx-2" t-if="widget.mode.includes('internal')">
-                <span class="barcode-remember-info" t-attf-title="{{widget.includeWarranty ? 'Included' : ''}} Warranty">
-                    <i t-attf-class="fa fa-file{{!widget.includeWarranty ? '-o' : ''}}"/>
-                </span>
                 <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Included' : ''}} Gift">
                     <i t-attf-class="fa fa-heart{{!widget.includeGift ? '-o' : ''}}"/>
                 </span>
