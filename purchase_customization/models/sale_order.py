@@ -18,6 +18,26 @@
 #
 ################################################################################
 
-from . import sale_order
-from . import purchase_order
-from . import woo_payment_gateway
+from odoo import _, api, fields, models
+from math import ceil
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.depends('order_line.price_total', 'payment_gateway_id.rounding')
+    def _amount_all(self):
+
+        def round_to_base(x, base):
+            return base * ceil(x / base)
+
+        super()._amount_all()
+        for order in self.filtered('payment_gateway_id.rounding'):
+            base = order.payment_gateway_id.rounding
+            amount_tax = round_to_base(order.amount_tax, base)
+            amount_untaxed = round_to_base(order.amount_untaxed, base)
+            order.update({
+                'amount_untaxed': amount_untaxed,
+                'amount_tax': amount_tax,
+                'amount_total': amount_untaxed + amount_tax,
+            })

@@ -27,9 +27,11 @@
     'depends': [
         'purchase',
         'purchase_stock',
+        'woo_commerce_ept',
     ],
     'data': [
         'views/purchase_order_views.xml',
+        'views/woo_payment_gateway_views.xml',
     ],
     'license': "AGPL-3",
     'installable': True,
