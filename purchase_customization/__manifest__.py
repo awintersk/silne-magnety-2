@@ -30,6 +30,8 @@
         'woo_commerce_ept',
     ],
     'data': [
+        'views/account_move_templates.xml',
+        'views/account_move_views.xml',
         'views/purchase_order_views.xml',
         'views/woo_payment_gateway_views.xml',
     ],
