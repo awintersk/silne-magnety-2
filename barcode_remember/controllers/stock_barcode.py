@@ -29,10 +29,10 @@ class RememberStockBarcodeController(StockBarcodeController):
     @route('/barcode_remember/warning/country', type='json', methods=['POST'], auth='user')
     def barcode_warranty_language(self, picking: int):
         picking_id = request.env['stock.picking'].browse(picking)
-        partner_id = picking_id.sale_id.partner_id
-        country_id = partner_id.country_id
-        language_id = request.env['res.lang'].search([('code', '=', partner_id.lang)])
-        return {
-            'country': country_id.read(['name', 'image_url'])[0] if country_id else {},
-            'language': language_id.read(['name'])[0] if language_id else {},
-        }
+        if picking_id.sale_id:
+            country_id = picking_id.sale_id.partner_id.country_id
+            return {
+                'country': country_id.read(['name', 'image_url'])[0] if country_id else {},
+            }
+        else:
+            return {'country': {}}

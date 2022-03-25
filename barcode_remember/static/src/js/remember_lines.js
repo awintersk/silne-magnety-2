@@ -16,11 +16,13 @@ odoo.define('barcode_remember.remember_lines', function (require) {
             this._super.apply(this, arguments)
             this.res_id = parent.initialState.id
             this.containGiftProduct = this.page.lines.some(item => item.is_gift_product)
+            this.containLangWarningProduct = this.page.lines.some(item => item.is_lang_warning_product)
         },
 
         async _renderLines() {
             await this._super.apply(this, arguments)
             this.containGiftProduct = this.page.lines.some(item => item.is_gift_product)
+            this.containLangWarningProduct = this.page.lines.some(item => item.is_lang_warning_product)
         },
 
         /**
@@ -29,11 +31,15 @@ odoo.define('barcode_remember.remember_lines', function (require) {
          */
         async _onClickValidatePage(event) {
             event.stopPropagation()
+            const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
             if (!this.containGiftProduct) {
-                await new ComponentWrapper(this, GiftDialog, {}).mount(this.el)
+                await dialog(GiftDialog, {})
+                return undefined
+            } else if (!this.containLangWarningProduct) {
+                await dialog(LanguageWarningDialog, {pickingID: this.res_id})
                 return undefined
             } else {
-                await new ComponentWrapper(this, LanguageWarningDialog, {pickingID: this.res_id}).mount(this.el)
+                this._super.apply(this, arguments)
             }
         },
     })

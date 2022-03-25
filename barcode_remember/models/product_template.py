@@ -20,10 +20,20 @@
 #
 ################################################################################
 
-from odoo import models, fields
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     is_gift = fields.Boolean(default=False)
+    is_lang_warning = fields.Boolean(
+        default=False,
+        string='Is Language Warning',
+    )
+
+    @api.constrains('is_gift', 'is_lang_warning')
+    def _check_options(self):
+        if self.is_gift and self.is_lang_warning:
+            raise ValidationError(_('Only one option can be active. "Is Gift" or "Is Language Warning"'))

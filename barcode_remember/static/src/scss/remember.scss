@@ -9,3 +9,12 @@
     margin-left: 5px;
   }
 }
+
+.barcode-remember-options {
+  display: flex;
+  flex-direction: row;
+
+  & > * + * {
+    margin-left: 4px;
+  }
+}

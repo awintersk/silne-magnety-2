@@ -11,6 +11,10 @@
                     <field name="is_gift"/>
                     <label for="is_gift"/>
                 </div>
+                <div>
+                    <field name="is_lang_warning"/>
+                    <label for="is_lang_warning"/>
+                </div>
             </xpath>
         </field>
     </record>

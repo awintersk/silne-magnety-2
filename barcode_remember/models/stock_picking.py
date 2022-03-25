@@ -20,13 +20,19 @@
 #
 ################################################################################
 
-from odoo import fields, models, api
+import logging
+
+from odoo import fields, models, api, _
+from odoo.exceptions import ValidationError, UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
     is_gift_product = fields.Boolean(related='product_id.is_gift')
+    is_lang_warning_product = fields.Boolean(related='product_id.is_lang_warning')
 
 
 class StockPicking(models.Model):
@@ -35,19 +41,36 @@ class StockPicking(models.Model):
     @api.model
     def _get_move_line_ids_fields_to_read(self):
         response = super(StockPicking, self)._get_move_line_ids_fields_to_read()
-        response.append('is_gift_product')
+        response.extend(['is_gift_product', 'is_lang_warning_product'])
         return response
 
-    def add_gift_line(self, product: int) -> int:
+    def _add_special_product(self, product, field):
+        """
+        :param int product:
+        :param str field:
+        :return: int
+        """
+        special_fields = ('is_gift', 'is_lang_warning')
+
+        if field not in special_fields:
+            raise ValidationError(_('Option is not valid. Option: %s') % field)
+
         order_line_env = self.env['sale.order.line']
+        product_env = self.env['product.product']
         order_id = self.sale_id
+        exists_domain = [('order_id', '=', order_id.id)]
 
-        order_line_gift = order_line_env.search_count([
-            ('order_id', '=', order_id.id),
-            ('product_id.is_gift', '=', True)
-        ])
+        if not product_env.browse(product).qty_available:
+            raise UserError(_('Product has zero available qty'))
 
-        if not order_line_gift:
+        if field == 'is_gift':
+            exists_domain.append(('product_id.is_gift', '=', True))
+        elif field == 'is_lang_warning':
+            exists_domain.append(('product_id.is_lang_warning', '=', True))
+
+        order_line_exists = order_line_env.search_count(exists_domain)
+
+        if not order_line_exists:
             order_line_id = order_line_env.create({
                 'product_id': product,
                 'order_id': order_id.id
@@ -57,3 +80,9 @@ class StockPicking(models.Model):
             return order_line_id.id
 
         return 0
+
+    def add_gift_line(self, product: int) -> int:
+        return self._add_special_product(product, 'is_gift')
+
+    def add_product_warning_line(self, product: int) -> int:
+        return self._add_special_product(product, 'is_lang_warning')

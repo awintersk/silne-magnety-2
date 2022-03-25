@@ -11,4 +11,14 @@
         <field name="image_1920" type="base64" file="barcode_remember/static/src/img/gift-present-prize-icon-24.png"/>
     </record>
 
+    <record id="demo_warning_product_template" model="product.template">
+        <field name="name">Warning</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="is_lang_warning" eval="True"/>
+        <field name="list_price" eval="0.0"/>
+        <field name="type">product</field>
+        <field name="image_1920" type="base64" file="barcode_remember/static/src/img/foreign-language.png"/>
+    </record>
+
 </odoo>

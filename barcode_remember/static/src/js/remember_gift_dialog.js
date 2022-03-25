@@ -90,10 +90,9 @@ odoo.define('barcode_remember.remember_gift_dialog', function (require) {
             }
         }
 
-        destroy() {
+        willUnmount() {
             this.trigger('listen_to_barcode_scanned', {'listen': true});
             bus.off('barcode_scanned', this, this._onBarcodeScannedHandler);
-            super.destroy()
         }
     }
 
