@@ -27,5 +27,5 @@ class WooPaymentGateway(models.Model):
 	rounding = fields.Float(string='Rounding Factor', digits=(12, 6))
 
 	_sql_constraints = [
-        ('rounding_gt_zero', 'CHECK (rounding>0)', 'The rounding factor must be greater than 0!')
+        ('rounding_gt_zero', 'CHECK (rounding >= 0)', 'The rounding factor must be greater than 0!')
     ]
