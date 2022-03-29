@@ -52,3 +52,25 @@ class WooProductTemplateEpt(models.Model):
                 product.write({
                     'attribute_line_ids': attribute_list
                 })
+
+    def get_product_attribute(self, template, instance, common_log_id, model_id):
+        attributes, is_variable = super(WooProductTemplateEpt, self).get_product_attribute(template, instance, common_log_id, model_id)
+        if len(template.product_variant_ids) == 1:
+            for attribute in attributes:
+                attribute.update({
+                    'variation': False
+                })
+                is_variable = False
+        return attributes, is_variable
+
+    def prepare_product_data(self, woo_template, publish, update_price,
+                             update_image, basic_detail, common_log_id, model_id):
+        data = super(WooProductTemplateEpt, self).prepare_product_data(
+            woo_template, publish, update_price, update_image,
+            basic_detail, common_log_id, model_id)
+        if len(woo_template.product_tmpl_id.product_variant_ids) == 1:
+            data.update({
+                'variations': [],
+                'default_attributes': [],
+            })
+        return data
