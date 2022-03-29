@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,24 +18,26 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Integration",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import _, api, fields, models
+from math import ceil
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.depends('order_line.price_total', 'payment_gateway_id.rounding')
+    def _amount_all(self):
+
+        def round_to_base(x, base):
+            return base * ceil(x / base)
+
+        super()._amount_all()
+        for order in self.filtered('payment_gateway_id.rounding'):
+            base = order.payment_gateway_id.rounding
+            amount_tax = round_to_base(order.amount_tax, base)
+            amount_untaxed = round_to_base(order.amount_untaxed, base)
+            order.update({
+                'amount_untaxed': amount_untaxed,
+                'amount_tax': amount_tax,
+                'amount_total': amount_untaxed + amount_tax,
+            })
