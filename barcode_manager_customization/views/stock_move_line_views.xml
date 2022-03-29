@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="extended_stock_move_line_product_selector" model="ir.ui.view">
+        <field name="name">extended.stock.move.line.product.selector</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock_barcode.stock_move_line_product_selector"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('row')][last()]" position="after">
+                <div class="row">
+                    <div class="col-12 d-flex align-items-center my-2">
+                        <i class="fa fa-lg fa-barcode mr-3" title="Product Barcode"/>
+                        <field name="product_barcode" class="my-0" placeholder="Product Barcode"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

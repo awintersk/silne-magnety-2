@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_label_picking_template_zpl" model="ir.actions.report">
+            <field name="name">Picking-Barcode (ZPL)</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-text</field>
+            <field name="report_name">barcode_manager_customization.label_picking_template_view_zpl</field>
+            <field name="report_file">barcode_manager_customization.label_picking_template_view_zpl</field>
+            <field name="binding_model_id" ref="model_stock_picking"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="label_picking_template_view_zpl">
+            <t t-foreach="docs" t-as="picking" t-translation="off">
+^XA
+^FO100,50
+^A0N,44,33^FD<t t-esc="picking.origin"/>^FS
+^FO100,100^BY3
+^BCN,100,Y,N,N
+^FD<t t-esc="picking.name"/>^FS
+^XZ
+            </t>
+        </template>
+
+    </data>
+</odoo>
