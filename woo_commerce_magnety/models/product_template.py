@@ -34,9 +34,12 @@ class ProductTemplate(models.Model):
     def _pull_product_weight_from_attribute(self):
         self.ensure_one()
 
+        get_param = self.env['ir.config_parameter'].get_param
+        weight_name = get_param('woo_commerce_magnety.product_weight_attribute_name')
+
         attribute_value_id = self.env['product.attribute.value'].search([
             ('id', 'in', self.attribute_line_ids.value_ids.ids),
-            ('attribute_id.name', '=', 'Hmotnosť'),
+            ('attribute_id.name', '=', weight_name),
         ], limit=1)
 
         if not attribute_value_id:

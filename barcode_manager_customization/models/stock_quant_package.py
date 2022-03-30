@@ -73,7 +73,10 @@ class StockQuantPackage(models.Model):
 
     name = fields.Char(default=lambda self: self._default_name())
     weight = fields.Float(compute='_compute_weight')
-    packaging_weight = fields.Float(related='packaging_id.weight')
+    packaging_weight = fields.Float(
+        related='packaging_id.weight',
+        string='Packaging Weight',
+    )
 
     @property
     def _picking_id_from_context(self):
