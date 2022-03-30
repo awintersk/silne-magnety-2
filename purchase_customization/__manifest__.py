@@ -30,6 +30,7 @@
         'woo_commerce_ept',
     ],
     'data': [
+        'data/ir_exports.xml',
         'views/account_move_templates.xml',
         'views/account_move_views.xml',
         'views/product_template_views.xml',
