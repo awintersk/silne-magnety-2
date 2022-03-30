@@ -1,0 +1,140 @@
+.barcode-dialog-content {
+
+  &__image {
+    object-fit: contain;
+    width: 100%;
+    max-height: 200px;
+    padding-bottom: 8px;
+    display: none;
+  }
+
+  input[type="number"] {
+    -moz-appearance: none;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-top: solid 1px $gray-300;
+    padding-top: 5px;
+  }
+
+  .tableFixHead {
+    overflow-y: auto;
+    width: 100%;
+    max-height: calc(100vh - 340px);
+    border-bottom: solid 1px $gray-300;
+    min-height: 95px;
+
+    table {
+      margin-bottom: 0;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    tbody {
+    }
+
+    td {
+      vertical-align: middle;
+    }
+
+    td, th {
+      &:nth-child(1) {
+        width: 15%;
+      }
+
+      &:nth-child(2) {
+        display: none;
+      }
+
+      &:nth-child(3) {
+        width: 25%;
+
+        input {
+          max-width: 60%;
+        }
+      }
+
+      &:nth-child(4) {
+        width: 10%;
+      }
+
+      &:nth-child(5) {
+        width: 10%;
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+  }
+
+  @media screen and (min-height: 480px) {
+    &__image {
+      display: block;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    &__image {
+      max-height: 500px;
+    }
+
+    .tableFixHead {
+      max-height: calc(100vh - 260px);
+
+      td, th {
+        &:nth-child(2) {
+          width: 40%;
+          display: table-cell;
+        }
+      }
+    }
+  }
+}
+
+.barcode-picking-dialog {
+  display: flex;
+  flex-direction: column;
+
+  &__print-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 10px;
+    margin-top: 1rem;
+  }
+
+  &__pallet-selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0.5rem;
+
+    input {
+      outline: none;
+    }
+  }
+
+  @media screen and (min-width: 992px) {
+    flex-direction: row;
+
+    &__pallet-selector {
+      margin-top: 0;
+    }
+  }
+}

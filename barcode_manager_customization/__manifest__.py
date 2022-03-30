@@ -1,7 +1,8 @@
+# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,23 +20,47 @@
 ################################################################################
 
 {
-    'name': "Purchase Integration",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
+    'name': "Barcode Customization",
+
+    'summary': """
+    """,
+
+    'description': """
+    """,
+
+    'author': "SmartTek",
+    'website': "https://smartteksas.com",
+
+    'category': 'Purchases',
+    'version': '14.0.0.2',
+
     'depends': [
+        'base',
         'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
+        'stock',
+        'stock_barcode',
+        'product',
+        'sale',
+        'delivery',
+        'sale_purchase_stock',
     ],
+
     'data': [
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
+        'security/ir.model.access.csv',
+        'report/report_picking.xml',
+
+        'data/sequence_data.xml',
+        'data/config_parameter_data.xml',
+
+        'views/assets.xml',
+        'views/purchase_views.xml',
+        'views/stock_picking_views.xml',
+        'views/stock_move_line_views.xml',
+        'views/product_packaging_views.xml',
     ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
+
+    'qweb': [
+        'static/src/xml/stock_barcode.xml',
+        'static/src/xml/barcode_dialog.xml',
+    ]
 }

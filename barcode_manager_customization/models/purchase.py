@@ -1,7 +1,8 @@
+# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,24 +19,16 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Integration",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import fields, models
+
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    included_po_ids = fields.One2many('purchase.order', 'parent_id')
+    parent_id = fields.Many2one('purchase.order')
+    package_count = fields.Integer(default=0, copy=False)
+
+    def next_package_name(self):
+        self.package_count += 1
+        return f'{self.name}-{self.package_count:02}'

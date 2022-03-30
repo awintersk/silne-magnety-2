@@ -1,7 +1,9 @@
+# -*- coding: UTF-8 -*-
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,24 +20,19 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Integration",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo.http import request, route
+from odoo.addons.stock_barcode.controllers.main import StockBarcodeController
+
+
+class RememberStockBarcodeController(StockBarcodeController):
+
+    @route('/barcode_remember/warning/country', type='json', methods=['POST'], auth='user')
+    def barcode_warranty_language(self, picking: int):
+        picking_id = request.env['stock.picking'].browse(picking)
+        if picking_id.sale_id:
+            country_id = picking_id.sale_id.partner_id.country_id
+            return {
+                'country': country_id.read(['name', 'image_url'])[0] if country_id else {},
+            }
+        else:
+            return {'country': {}}

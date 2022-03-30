@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="magn_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-as='amount_by_group']" position="after">
+            <tr t-if="o.amount_tax" class="border-black o_subtotal" style="">
+                <td><strong>Total Tax</strong></td>
+                <td class="text-right">
+                    <span t-field="o.amount_tax"/>
+                </td>
+            </tr>
+        </xpath>
+    </template>
+
+</odoo>
