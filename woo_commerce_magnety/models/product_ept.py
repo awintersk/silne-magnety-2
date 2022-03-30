@@ -74,3 +74,30 @@ class WooProductTemplateEpt(models.Model):
                 'default_attributes': [],
             })
         return data
+
+    def simple_product_sync(self,
+                            woo_instance,
+                            product_response,
+                            common_log_book_id,
+                            product_queue_id,
+                            product_data_queue_line,
+                            template_updated,
+                            skip_existing_products,
+                            order_queue_line):
+        woo_template_id = super(WooProductTemplateEpt, self).simple_product_sync(
+            woo_instance,
+            product_response,
+            common_log_book_id,
+            product_queue_id,
+            product_data_queue_line,
+            template_updated,
+            skip_existing_products,
+            order_queue_line
+        )
+
+        product_tmpl_id = woo_template_id.product_tmpl_id if woo_template_id else None
+
+        if product_tmpl_id and not product_response.get('weight'):
+            product_tmpl_id._pull_product_weight_from_attribute()
+
+        return woo_template_id
