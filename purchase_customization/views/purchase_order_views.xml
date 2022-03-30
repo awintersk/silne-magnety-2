@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="purchase_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.view.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <field name="currency_id" position="after">
+                <field name="status"
+                       attrs="{'readonly': [('state', 'in', ('done', 'cancel'))]}"/>
+            </field>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="attrs">{
+                    'readonly': [
+                        '|', ('state', 'in', ('done', 'cancel')),
+                             ('status', 'in', ('ordered_transport', 'in_transit', 'docs_sent', 'done'))
+                    ]
+                }</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="attrs">{
+                    'readonly': [
+                        '|', ('state', 'in', ('done', 'cancel')),
+                             ('status', 'in', ('ordered_transport', 'in_transit', 'docs_sent', 'done'))
+                    ]
+                }</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.view.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="status" widget="badge"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
