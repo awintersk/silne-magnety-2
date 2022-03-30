@@ -62,6 +62,9 @@ class ProductTemplate(models.Model):
             _logger.warning(msg % self.name)
             return False
 
+        if not measure:
+            measure = 'kg'
+
         measure_map = self.product_attribute_weight_measure_map()
         self.write({
             'weight': weight / measure_map.get(measure.lower(), 1)
