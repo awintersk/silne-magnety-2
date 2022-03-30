@@ -87,7 +87,7 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
                 model: 'product.packaging',
                 method: 'search_read',
                 domain: [['packing_type', '=', 'box']],
-                fields: ['name', 'packing_type']
+                fields: ['name', 'packing_type', 'weight']
             })]
         }
 

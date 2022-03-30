@@ -19,11 +19,15 @@
 #
 ################################################################################
 
+import logging
+
 from typing import List, Tuple
 
 from odoo import fields, models, api, _
 from odoo.tools import float_compare, float_is_zero, defaultdict, float_round
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class Move(models.Model):
@@ -168,6 +172,7 @@ class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
     product_barcode = fields.Char(related='product_id.barcode', readonly=False)
+    product_weight = fields.Float(related='product_id.weight')
 
     def _new_package(self, type_int_id, weight):
         package_values = {}
@@ -232,3 +237,103 @@ class StockMoveLine(models.Model):
         for rec in self:
             rec.split_and_put_in_pack(rec.qty_done if use_qty_done else rec.product_uom_qty, package_int_id)
         return True
+
+    def split_move_line_for_order(self, qty, order_int_id, package_int_id=None, package_type_int_id=None):
+        """
+        Used for barcode customization
+        :type qty float
+        :type order_int_id int
+        :type package_int_id int
+        :type package_type_int_id int
+        :rtype: dict
+        """
+        new_move_ids = None
+        location_env = self.env['stock.location']
+        picking_env = self.env['stock.picking']
+        package_env = self.env['stock.quant.package']
+
+        location_id = location_env.search([('barcode', '=', 'WH-OUTPUT')])
+
+        if not location_id:
+            _logger.warning(location_id)
+            return {}
+
+        order_picking_id = picking_env.search([
+            ('sale_id', '=', order_int_id),
+            ('location_dest_id', '=', location_id.id),
+            ('state', 'in', ('waiting', 'confirmed', 'assigned'))
+        ], limit=1)
+
+        if not order_picking_id:
+            _logger.warning(order_picking_id)
+            return {}
+
+        normalized_qty = self.product_uom_id._compute_quantity(qty, self.product_uom_id, rounding_method='HALF_UP')
+
+        new_picking_id = self.picking_id.copy({
+            'name': '/',
+            'move_lines': [],
+            'move_line_ids': [],
+            'purchase_id': self.picking_id.purchase_id.id
+        })
+
+        if package_int_id is None:
+            package_id = package_env
+        elif package_int_id > 0:
+            package_id = package_env.browse(package_int_id)
+        elif package_int_id == 0:
+            package_values = {}
+            if package_type_int_id:
+                package_values['packaging_id'] = package_type_int_id
+            package_id = package_env.with_context(picking_id=order_picking_id.id).create(package_values)
+        else:
+            package_id = package_env
+
+        if self.product_uom_qty == normalized_qty:
+            self.move_id.picking_id = new_picking_id.id
+            self.write(dict(
+                picking_id=new_picking_id.id,
+                qty_done=normalized_qty,
+            ))
+            if package_id:
+                self.write({'result_package_id': package_id.id})
+        elif self.product_uom_qty > normalized_qty:
+            split_move = self.move_id._split(normalized_qty)
+            self.product_uom_qty -= normalized_qty
+
+            new_move_ids = self.env['stock.move'].create([{
+                **move_data,
+                'picking_id': new_picking_id.id,
+                'quantity_done': normalized_qty,
+            } for move_data in split_move])
+
+            if package_id:
+                new_move_ids.move_line_ids.write({'result_package_id': package_id.id})
+
+            new_move_ids._action_confirm(merge=False)
+        ctx = self.env.context.copy()
+
+        ctx.update({
+            'dest_ids': new_move_ids.move_dest_ids if new_move_ids else self.move_id.move_dest_ids,
+            'dest_id': order_picking_id.move_ids_without_package.
+                filtered(lambda move: move.product_id.id == self.product_id.id)
+        })
+        new_picking_id.action_confirm()
+        new_picking_id.with_context(ctx).button_validate()
+
+        if package_id:
+            response_package = {'id': package_id.id, 'name': package_id.name}
+        else:
+            response_package = {'id': 0, 'name': _('Without box')}
+
+        response = {
+            'confirmed': True,
+            'reload': True,
+            'orderPickingId': order_picking_id.id,
+            'packageId': response_package
+        }
+
+        if sum(self.picking_id.move_line_ids.mapped('product_uom_qty')) == 0:
+            response['reload'] = False
+
+        return response

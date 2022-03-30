@@ -216,7 +216,13 @@
                     </td>
                 </tr>
                 <tr class="thead-light">
-                    <th>Gr. weight</th>
+                    <th>Expected weight</th>
+                    <td>
+                        <input class="o_input w-100" style="outline: none;" disabled="true" t-att-value="state.weight"/>
+                    </td>
+                </tr>
+                <tr class="thead-light">
+                    <th>Actual weight</th>
                     <td>
                         <input class="o_input"
                                style="outline: none;"
