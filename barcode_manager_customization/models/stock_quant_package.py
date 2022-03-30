@@ -27,7 +27,7 @@ from odoo import fields, models, _, api
 class ProductPackaging(models.Model):
     _inherit = 'product.packaging'
 
-    weight = fields.Float(defalt=0, help='Package weight without products')
+    weight = fields.Float(default=0, help='Package weight without products')
 
 
 class StockQuantPackage(models.Model):
