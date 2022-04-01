@@ -19,7 +19,7 @@
 ################################################################################
 
 {
-    'name': "Purchase Integration",
+    'name': "Purchase Customization",
     'version': '14.0.1.0.1',
     'category': 'Inventory/Purchase',
     'author': 'Smart Tek Solutions and Services',
