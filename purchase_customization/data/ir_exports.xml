@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_hs_export_template" model="ir.exports">
+        <field name="name">HS report</field>
+        <field name="resource">purchase.order</field>
+        <field name="export_fields" eval="[
+            [0, 0, {'name': name}]
+            for name in [
+                'name',
+                'partner_id',
+                'order_line/product_id',
+                'order_line/product_id/default_code',
+                'order_line/hs_code',
+                'order_line/hs_description',
+                'order_line/product_qty',
+                'order_line/net_weight',
+        ]]"/>
+    </record>
+
+</odoo>
