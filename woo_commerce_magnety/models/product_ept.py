@@ -52,3 +52,52 @@ class WooProductTemplateEpt(models.Model):
                 product.write({
                     'attribute_line_ids': attribute_list
                 })
+
+    def get_product_attribute(self, template, instance, common_log_id, model_id):
+        attributes, is_variable = super(WooProductTemplateEpt, self).get_product_attribute(template, instance, common_log_id, model_id)
+        if len(template.product_variant_ids) == 1:
+            for attribute in attributes:
+                attribute.update({
+                    'variation': False
+                })
+                is_variable = False
+        return attributes, is_variable
+
+    def prepare_product_data(self, woo_template, publish, update_price,
+                             update_image, basic_detail, common_log_id, model_id):
+        data = super(WooProductTemplateEpt, self).prepare_product_data(
+            woo_template, publish, update_price, update_image,
+            basic_detail, common_log_id, model_id)
+        if len(woo_template.product_tmpl_id.product_variant_ids) == 1:
+            data.update({
+                'variations': [],
+                'default_attributes': [],
+            })
+        return data
+
+    def simple_product_sync(self,
+                            woo_instance,
+                            product_response,
+                            common_log_book_id,
+                            product_queue_id,
+                            product_data_queue_line,
+                            template_updated,
+                            skip_existing_products,
+                            order_queue_line):
+        woo_template_id = super(WooProductTemplateEpt, self).simple_product_sync(
+            woo_instance,
+            product_response,
+            common_log_book_id,
+            product_queue_id,
+            product_data_queue_line,
+            template_updated,
+            skip_existing_products,
+            order_queue_line
+        )
+
+        product_tmpl_id = woo_template_id.product_tmpl_id if woo_template_id else None
+
+        if product_tmpl_id and not product_response.get('weight'):
+            product_tmpl_id._pull_product_weight_from_attribute()
+
+        return woo_template_id
