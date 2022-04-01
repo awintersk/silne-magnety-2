@@ -18,8 +18,10 @@
 #
 ################################################################################
 
-from . import account_move
-from . import sale_order
-from . import product_supplierinfo
-from . import purchase_order
-from . import woo_payment_gateway
+from odoo import _, api, fields, models
+
+
+class ProductSupplierinfo(models.Model):
+    _inherit = 'product.supplierinfo'
+
+    product_note = fields.Text(string='Vendor Product Note')
