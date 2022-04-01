@@ -18,37 +18,53 @@ class WooProductTemplateEpt(models.Model):
         res = super(WooProductTemplateEpt, self).sync_products(product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products, **kwargs)
         for product_data_queue_line in product_data_queue_lines:
             data, product_queue_id, product_data_queue_line, sync_category_and_tags = self.prepare_product_response(order_queue_line, product_data_queue_line)
+            woo_product_template_id, template_title = data.get("id"), data.get("name")
+            woo_template = self.with_context(active_test=False).search(
+                [("woo_tmpl_id", "=", woo_product_template_id), ("woo_instance_id", "=", woo_instance.id)], limit=1)
+            categ = data['categories'][0]
+            woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', categ['id'])], limit=1)
+            if woo_category.category_id:
+                woo_template.product_tmpl_id.categ_id = woo_category.category_id
             if data["attributes"]:
-                woo_product_template_id, template_title = data.get("id"), data.get("name")
-                woo_template = self.with_context(active_test=False).search(
-                    [("woo_tmpl_id", "=", woo_product_template_id), ("woo_instance_id", "=", woo_instance.id)], limit=1)
                 woo_template.sync_attributes(data["attributes"])
         return res
 
     @api.model
     def sync_attributes(self, attributes):
+        WooAttribute = self.env['woo.product.attribute.ept']
+        Attribute = self.env['product.attribute.value']
         product = self.product_tmpl_id
         if product:
             attribute_list = []
             for attr in attributes:
                 if not attr['variation']:
-                    attribute = self.env['woo.product.attribute.ept'].search([
+                    attribute = WooAttribute.search([
                         ('woo_attribute_id', '=', attr['id'])
-                    ], limit=1)
+                    ], limit=1).attribute_id
+                    exist_attribute = product.attribute_line_ids.mapped('attribute_id').ids
                     if attribute:
-                        attribute = attribute.attribute_id
-                        value = self.env['product.attribute.value'].search([
+                        value = Attribute.search([
                             ('attribute_id', '=', attribute.id),
                             ('name', 'in', attr['options']),
-                        ])
-                        data = {
-                            'product_tmpl_id': product.id,
-                            'attribute_id': attribute.id,
-                            'value_ids': [(6, 0, value.ids)]
-                        }
-                        attribute_list.append((0, 0, data))
+                        ], limit=1)
+                        if attribute.id not in exist_attribute:
+                            data = {
+                                'product_tmpl_id': product.id,
+                                'attribute_id': attribute.id,
+                                'value_ids': [(6, 0, value.ids)]
+                            }
+                            attribute_list.append((0, 0, data))
+                        else:
+                            attribute_for_update = product.attribute_line_ids.filtered(
+                                lambda x: x.attribute_id == attribute.id
+                                          and x.value_ids[0].name not in value.mapped('name'))
+                            if attribute_for_update:
+                                data = {
+                                    'value_ids': [(6, 0, value.ids)]
+                                }
+                                attribute_list.append((1, attribute_for_update[0].id, data))
+
             if attribute_list:
-                attribute_list.insert(0, (5, 0))
                 product.write({
                     'attribute_line_ids': attribute_list
                 })
