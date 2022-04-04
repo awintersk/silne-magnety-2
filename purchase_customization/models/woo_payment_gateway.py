@@ -22,10 +22,6 @@ from odoo import _, api, fields, models
 
 
 class WooPaymentGateway(models.Model):
-	_inherit = "woo.payment.gateway"
+    _inherit = "woo.payment.gateway"
 
-	rounding = fields.Float(string='Rounding Factor', digits=(12, 6))
-
-	_sql_constraints = [
-        ('rounding_gt_zero', 'CHECK (rounding >= 0)', 'The rounding factor must be greater than 0!')
-    ]
+    rounding_id = fields.Many2one('account.cash.rounding', string='Rounding')

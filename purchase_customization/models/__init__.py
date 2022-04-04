@@ -18,7 +18,6 @@
 #
 ################################################################################
 
-from . import account_move
 from . import sale_order
 from . import purchase_order
 from . import woo_payment_gateway

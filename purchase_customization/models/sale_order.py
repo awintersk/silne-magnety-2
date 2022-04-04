@@ -19,25 +19,32 @@
 ################################################################################
 
 from odoo import _, api, fields, models
-from math import ceil
+from math import ceil, floor
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.depends('order_line.price_total', 'payment_gateway_id.rounding')
+    @api.depends(
+        'order_line.price_total',
+        'payment_gateway_id.rounding_id.rounding',
+        'payment_gateway_id.rounding_id.rounding_method',
+    )
     def _amount_all(self):
-
-        def round_to_base(x, base):
-            return base * ceil(x / base)
-
         super()._amount_all()
-        for order in self.filtered('payment_gateway_id.rounding'):
-            base = order.payment_gateway_id.rounding
-            amount_tax = round_to_base(order.amount_tax, base)
-            amount_untaxed = round_to_base(order.amount_untaxed, base)
+        for order in self.filtered('payment_gateway_id.rounding_id'):
+            rounding = order.payment_gateway_id.rounding_id
             order.update({
-                'amount_untaxed': amount_untaxed,
-                'amount_tax': amount_tax,
-                'amount_total': amount_untaxed + amount_tax,
+                'amount_total': rounding.round(order.amount_total),
             })
+
+    def _create_invoices(self, grouped=False, final=False, date=None):
+        moves = super()._create_invoices(grouped, final, date)
+        # Add cash rounding to invoices from woocommerce gateway
+        moves_to_round = moves.filtered(
+            lambda r: r.invoice_line_ids.sale_line_ids.order_id.payment_gateway_id.rounding_id
+        )
+        for move in moves_to_round:
+            move.invoice_cash_rounding_id = move.invoice_line_ids. \
+                sale_line_ids.order_id.payment_gateway_id.rounding_id[:1]
+        return moves
