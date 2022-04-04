@@ -43,6 +43,11 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
 
     /**
      * @extends SecondaryBody
+     * @property {{
+     *     moveLineIds: Object[],
+     *     linesId: Object,
+     *     pickingIntId: Number,
+     * }} props
      */
     class BarcodeInternalDialog extends SecondaryBody {
         setup() {
@@ -280,12 +285,25 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
          * @private
          */
         _computeExpectedWeight({weight}) {
-            const {state} = this
+            const {
+                packageTypeItems,
+                packageTypeIntId,
+                boxIntId,
+                qty
+            } = this.state
+
             if (weight === undefined) {
-                const packagingId = state.packageTypeItems.find(el => el.id === +state.packageTypeIntId)
+                const packagingId = packageTypeItems.find(el => el.id === +packageTypeIntId)
                 weight = packagingId && packagingId.id ? packagingId.weight : 0
             }
-            return round(weight + this.productWeight * state.qty, 4)
+
+            for (let lineId of this.props.moveLineIds) {
+                const {product_weight} = lineId
+                if (lineId.result_package_id[0] === Number(boxIntId) && product_weight) {
+                    weight += product_weight
+                }
+            }
+            return round(weight + this.productWeight * qty, 4)
         }
 
         _onChangePackageTypeIntId() {
@@ -301,7 +319,15 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
 
     Object.assign(BarcodeInternalDialog, {
         template: 'barcode_manager_customization.receipt_internal_body',
-        components: {Dialog}
+        components: {Dialog},
+        props: {
+            moveLineIds: {
+                type: Array,
+                element: Object,
+            },
+            linesId: Object,
+            pickingIntId: Number,
+        },
     })
 
     return {BarcodeInternalDialog}
