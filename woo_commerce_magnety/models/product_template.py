@@ -35,12 +35,17 @@ class ProductTemplate(models.Model):
         self.ensure_one()
 
         get_param = self.env['ir.config_parameter'].get_param
-        weight_name = get_param('woo_commerce_magnety.product_weight_attribute_name')
-
-        attribute_value_id = self.env['product.attribute.value'].search([
-            ('id', 'in', self.attribute_line_ids.value_ids.ids),
-            ('attribute_id.name', '=', weight_name),
-        ], limit=1)
+        weight_name_items = get_param('woo_commerce_magnety.product_weight_attribute_name')
+        attribute_value_id = None
+        value_ids = self.attribute_line_ids.value_ids
+        
+        for name in weight_name_items.split(','):
+            attribute_value_id = self.env['product.attribute.value'].search([
+                ('id', 'in', value_ids.ids),
+                ('attribute_id.name', '=', name.strip()),
+            ], limit=1)
+            if attribute_value_id:
+                break
 
         if not attribute_value_id:
             return False
