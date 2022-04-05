@@ -124,13 +124,11 @@ class StockQuantPackage(models.Model):
         return response
 
     def action_generate_currier_document(self) -> dict:
-        self.ensure_one()
         self._generate_currier_document()
         self.invalidate_cache(['document_ids'])
         return self.action_documents()
 
     def action_documents(self) -> dict:
-        self.ensure_one()
         return {
             'name': _('Documents'),
             'domain': [('id', 'in', self.document_ids.ids)],
