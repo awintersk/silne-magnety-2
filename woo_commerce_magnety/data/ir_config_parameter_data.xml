@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<odoo>
+<odoo noupdate="1">
 
     <record id="product_weight_attribute_name" model="ir.config_parameter">
         <field name="key">woo_commerce_magnety.product_weight_attribute_name</field>
-        <field name="value">Hmotnosť</field>
+        <field name="value">Hmotnosť,Hmotnost</field>
     </record>
 
 </odoo>
