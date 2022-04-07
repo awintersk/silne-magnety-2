@@ -28,8 +28,35 @@ class PurchaseOrderLine(models.Model):
     hs_description = fields.Text(related='product_id.hs_description')
     net_weight = fields.Float(string='Net Weight', compute='_compute_net_weight', store=True)
     net_weight_uom_name = fields.Char(string='Net Weight UOM', related='product_id.weight_uom_name')
+    vendor_product_name = fields.Char(
+        string='Vendor Product Name',
+        compute='_compute_vendor_info',
+    )
+    vendor_product_code = fields.Char(
+        string='Vendor Product Code',
+        compute='_compute_vendor_info',
+    )
+    vendor_product_note = fields.Text(
+        string='Vendor Product Text',
+        compute='_compute_vendor_info',
+    )
 
     @api.depends('product_qty', 'product_id.weight')
     def _compute_net_weight(self):
         for line in self:
             line.net_weight = line.product_qty * line.product_id.weight
+
+    @api.depends('product_id.seller_ids.product_name', 'product_id.seller_ids.product_code')
+    def _compute_vendor_info(self):
+        for line in self.filtered('product_id'):
+            seller = line.product_id._select_seller(
+                partner_id=line.partner_id,
+                quantity=line.product_qty,
+                date=line.order_id.date_order and line.order_id.date_order.date(),
+                uom_id=line.product_uom,
+            )
+            line.write({
+                'vendor_product_name': seller.product_name or line.product_id.name,
+                'vendor_product_code': seller.product_code or line.product_id.default_code,
+                'vendor_product_note': seller.product_note,
+            })

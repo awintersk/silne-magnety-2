@@ -9,8 +9,11 @@
             for name in [
                 'name',
                 'partner_id',
-                'order_line/product_id',
+                'order_line/product_id/name',
                 'order_line/product_id/default_code',
+                'order_line/vendor_product_name',
+                'order_line/vendor_product_code',
+                'order_line/vendor_product_note',
                 'order_line/hs_code',
                 'order_line/hs_description',
                 'order_line/product_qty',
