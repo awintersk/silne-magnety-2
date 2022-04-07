@@ -26,3 +26,15 @@ from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    package_ids = fields.Many2many('stock.quant.package')
+
+    # --------- #
+    #  Actions  #
+    # --------- #
+
+    def action_generate_packing_document(self) -> dict:
+        action = self.env['ir.actions.act_window']._for_xml_id('packing_list.packing_list_action')
+        return dict(action, context={
+            'sale_ids': self.ids,
+        })

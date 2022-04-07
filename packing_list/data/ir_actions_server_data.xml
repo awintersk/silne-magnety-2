@@ -1,13 +1,24 @@
 <odoo>
 
-    <record id="package_currier_document" model="ir.actions.server">
-        <field name="name">Generate Currier Document</field>
+    <record id="package_packing_document" model="ir.actions.server">
+        <field name="name">Generate Packing Document</field>
         <field name="model_id" ref="model_stock_quant_package"/>
         <field name="binding_model_id" ref="model_stock_quant_package"/>
         <field name="binding_view_types">form,list</field>
         <field name="state">code</field>
         <field name="code">
-            action = records.action_generate_currier_document()
+            action = records.action_generate_packing_document()
+        </field>
+    </record>
+
+    <record id="sale_package_packing_document" model="ir.actions.server">
+        <field name="name">Generate Packing Document</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_generate_packing_document()
         </field>
     </record>
 

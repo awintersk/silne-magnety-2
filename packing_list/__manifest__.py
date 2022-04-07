@@ -41,18 +41,25 @@
         'documents',
         'report_xlsx',
         'w_open_many2many_tags',
+        'barcode_manager_customization',
     ],
 
     'demo': [
     ],
 
     'data': [
+        'security/ir.model.access.csv',
+
         'data/documents_folder_data.xml',
         'data/ir_actions_server_data.xml',
 
         'views/stock_quant_package_views.xml',
+
+        'wizard/packing_list_wizard_views.xml',
     ],
 
     'qweb': [
-    ]
+    ],
+
+    'post_init_hook': '_post_init'
 }

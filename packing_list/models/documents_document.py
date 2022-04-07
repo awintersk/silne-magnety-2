@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -19,28 +20,10 @@
 #
 ################################################################################
 
-from . import models
-from . import excel_tools
-from . import wizard
-
-from odoo import SUPERUSER_ID
-from odoo.api import Environment
+from odoo import models, fields
 
 
-def _post_init(cr, registry):
-    env = Environment(cr, SUPERUSER_ID, {})
+class DocumentsDocument(models.Model):
+    _inherit = 'documents.document'
 
-    package_ids = env['stock.quant.package'].search([
-        ('quant_ids', '!=', False),
-    ], order='create_date desc', limit=1000)
-
-    package_ids._compute_sale_ids()
-
-    for package_id in package_ids:
-        if package_id.packaging_id.packing_type != 'pallet':
-            continue
-        package_id.document_ids = env['documents.document'].search([
-            ('name', '=like', f'%%{package_id.name}%%'),
-            ('name', '=like', 'Package Currier%%'),
-            ('res_model', '=', 'stock.quant.package')
-        ])
+    package_ids = fields.Many2many('stock.quant.package')

@@ -21,3 +21,5 @@
 ################################################################################
 
 from . import stock_quant_package
+from . import documents_document
+from . import sale_order

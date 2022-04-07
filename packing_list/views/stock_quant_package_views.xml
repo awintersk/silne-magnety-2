@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+    <record id="view_quant_package_inherit_tree" model="ir.ui.view">
+        <field name="name">view.quant.package.inherit.tree</field>
+        <field name="model">stock.quant.package</field>
+        <field name="inherit_id" ref="stock.view_quant_package_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="sale_ids" string="Sales" widget="open_many2many_tags"/>
+                <field name="document_ids" widget="open_many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
 
     <record id="view_quant_package_inherit_form" model="ir.ui.view">
         <field name="name">view.quant.package.inherit.form</field>
@@ -33,6 +44,7 @@
             <xpath expr="//t[@t-name='kanban-box']" position="before">
                 <field name="document_ids"/>
                 <field name="sale_ids"/>
+                <field name="packaging_type"/>
             </xpath>
             <xpath expr="//div[hasclass('o_kanban_record_top')]" position="attributes">
                 <attribute name="class" add="d-flex align-items-center justify-content-between" separator=" "/>
@@ -40,14 +52,14 @@
             <xpath expr="//div[hasclass('o_kanban_record_top')]" position="inside">
                 <button name="action_documents"
                         type="object"
-                        title="Printed"
+                        title="Generated"
                         class="btn btn-link py-0 px-1 ml-2"
                         attrs="{'invisible': [('document_ids', '=', [])]}">
                     <i class="fa fa-file"/>
                 </button>
-                <button title="Not printed"
+                <button title="Not generated"
                         class="btn btn-link py-0 px-1 ml-2"
-                        attrs="{'invisible': [('document_ids', '!=', [])]}">
+                        attrs="{'invisible': ['|', ('document_ids', '!=', []), ('packaging_type', '!=', 'pallet')]}">
                     <i class="fa fa-file-o"/>
                 </button>
             </xpath>
@@ -75,6 +87,20 @@
                         <field name="quant_ids"/>
                     </div>
                 </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_quant_package_inherit_search" model="ir.ui.view">
+        <field name="name"></field>
+        <field name="model">stock.quant.package</field>
+        <field name="inherit_id" ref="stock.quant_package_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <filter string='Packaging Type'
+                        name="packaging_type"
+                        domain="[]"
+                        context="{'group_by' : 'packaging_type'}"/>
             </xpath>
         </field>
     </record>

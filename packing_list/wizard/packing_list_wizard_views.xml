@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="packing_list_wizard_form" model="ir.ui.view">
+        <field name="name">packing.list.wizard.form</field>
+        <field name="model">packing.list.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <h1 attrs="{'invisible': [('name', '!=', False)]}">
+                    Not contain valid lines
+                </h1>
+                <group>
+                    <h2><field name="name"/></h2>
+                </group>
+                <field name="package_ids" attrs="{'invisible': [('package_ids', '=', [])]}">
+                    <tree>
+                        <field name="name"/>
+                        <field name="create_date"/>
+                        <field name="packaging_id"/>
+                        <field name="sale_ids" widget="open_many2many_tags"/>
+                        <field name="shipping_weight"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_generate"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('name', '=', False)]}"
+                            string="Generate"/>
+                    <button special="cancel" class="btn btn-secondary" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="packing_list_action" model="ir.actions.act_window">
+        <field name="name">Packing List Document</field>
+        <field name="res_model">packing.list.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
