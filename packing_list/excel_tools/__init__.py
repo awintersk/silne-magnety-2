@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -19,40 +20,4 @@
 #
 ################################################################################
 
-{
-    'name': "Packing List",
-
-    'summary': """
-    """,
-
-    'description': """
-    """,
-
-    'author': "SmartTek",
-    'website': "https://smartteksas.com",
-
-    'category': 'Inventory/Delivery',
-    'version': '14.0.0.3',
-
-    'depends': [
-        'base',
-        'stock',
-        'delivery',
-        'documents',
-        'report_xlsx',
-        'w_open_many2many_tags',
-    ],
-
-    'demo': [
-    ],
-
-    'data': [
-        'data/documents_folder_data.xml',
-        'data/ir_actions_server_data.xml',
-
-        'views/stock_quant_package_views.xml',
-    ],
-
-    'qweb': [
-    ]
-}
+from . import xlsx_manager

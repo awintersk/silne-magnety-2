@@ -41,12 +41,12 @@
                 <button name="action_documents"
                         type="object"
                         title="Printed"
-                        class="btn btn-link p-0 ml-2"
+                        class="btn btn-link py-0 px-1 ml-2"
                         attrs="{'invisible': [('document_ids', '=', [])]}">
                     <i class="fa fa-file"/>
                 </button>
                 <button title="Not printed"
-                        class="btn btn-link p-0 ml-2"
+                        class="btn btn-link py-0 px-1 ml-2"
                         attrs="{'invisible': [('document_ids', '!=', [])]}">
                     <i class="fa fa-file-o"/>
                 </button>
