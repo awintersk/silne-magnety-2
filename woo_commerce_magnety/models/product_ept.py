@@ -75,6 +75,27 @@ class WooProductTemplateEpt(models.Model):
             })
         return data
 
+    def prepare_product_update_data(self, template, update_image, update_basic_detail, data):
+        flag, data = super(WooProductTemplateEpt, self).prepare_product_update_data(template, update_image, update_basic_detail, data)
+        attributes = []
+        if template.product_tmpl_id.attribute_line_ids and len(template.product_tmpl_id.product_variant_ids) == 1:
+            position = 0
+            for attribute_line in template.product_tmpl_id.attribute_line_ids:
+                options = []
+                for option in attribute_line.value_ids:
+                    options.append(option.name)
+                variation = False
+                if attribute_line.attribute_id.create_variant in ['always', 'dynamic']:
+                    variation = True
+                attribute_data = {
+                    'name': attribute_line.attribute_id.name, 'slug': attribute_line.attribute_id.name.lower(),
+                    'position': position, 'visible': True, 'variation': variation, 'options': options
+                }
+                position += 1
+                attributes.append(attribute_data)
+        data['attributes'] = attributes
+        return flag, data
+
     def simple_product_sync(self,
                             woo_instance,
                             product_response,
