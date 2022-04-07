@@ -21,7 +21,13 @@
 ################################################################################
 
 
-from odoo import fields, models, _
+from odoo import fields, models, _, api
+
+
+class ProductPackaging(models.Model):
+    _inherit = 'product.packaging'
+
+    weight = fields.Float(default=0, help='Package weight without products')
 
 
 class StockQuantPackage(models.Model):
@@ -66,7 +72,19 @@ class StockQuantPackage(models.Model):
         return response
 
     name = fields.Char(default=lambda self: self._default_name())
+    weight = fields.Float(compute='_compute_weight')
+    packaging_weight = fields.Float(
+        related='packaging_id.weight',
+        string='Packaging Weight',
+    )
 
     @property
     def _picking_id_from_context(self):
         return self.env['stock.picking'].browse(self._context.get('picking_id', 0)).exists()
+
+    @api.depends('packaging_id.weight', 'quant_ids')
+    def _compute_weight(self):
+        super(StockQuantPackage, self)._compute_weight()
+        for rec_id in self:
+            if rec_id.packaging_id:
+                rec_id.weight = rec_id.weight + rec_id.packaging_id.weight
