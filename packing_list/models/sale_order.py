@@ -20,7 +20,6 @@
 #
 ################################################################################
 
-
 from odoo import models, fields
 
 
@@ -38,3 +37,14 @@ class SaleOrder(models.Model):
         return dict(action, context={
             'sale_ids': self.ids,
         })
+
+    # --------- #
+    #  Private  #
+    # --------- #
+
+    def _get_delivery_boxes_ids(self):
+        return self.picking_ids.filtered(
+            lambda rec: rec.location_dest_id.barcode == 'WH-OUTPUT' and rec.state != 'cancel'
+        ).mapped(
+            lambda rec: rec.move_line_ids.package_id
+        )

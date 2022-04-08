@@ -32,7 +32,7 @@
     'website': "https://smartteksas.com",
 
     'category': 'Inventory/Delivery',
-    'version': '14.0.0.3',
+    'version': '14.0.0.4',
 
     'depends': [
         'base',

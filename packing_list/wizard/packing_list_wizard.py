@@ -146,27 +146,29 @@ class PackingListWizard(models.TransientModel):
             })
             xlsx_data.write_headers()
             for sale_id in self.package_ids.sale_ids:
-                partner_id = sale_id.partner_id
+                partner_id = sale_id.partner_shipping_id or sale_id.partner_id
                 sale_partner_id = sale_id.user_id.partner_id
+                package_box_ids = self.sale_ids._get_delivery_boxes_ids()
+                package_weight = sum(package_box_ids.mapped('shipping_weight'))
                 xlsx_data.write_dict({
                     'dobierka': sale_id.amount_total,
                     'meno_prijemcu': partner_id.name,
-                    'ulica_prijemcu': partner_id.street or partner_id.street2,
+                    'ulica_prijemcu': partner_id.street,
                     'mesto_prijemcu': partner_id.city,
                     'psc_prijemcu': partner_id.zip,
-                    'stat_prijemcu': '',
+                    'stat_prijemcu': partner_id.country_id.code,
                     'telefon_prijemcu': partner_id.phone or partner_id.mobile,
                     'meno_odosielatela': sale_partner_id.name,
-                    'ulica_odosielatela': sale_partner_id.street or sale_partner_id.street2,
+                    'ulica_odosielatela': sale_partner_id.street,
                     'mesto_odosielatela': sale_partner_id.city,
                     'psc_odosielatela': sale_partner_id.zip,
-                    'stat_odosielatela': sale_partner_id.country_id.name,
+                    'stat_odosielatela': sale_partner_id.country_id.code,
                     'telefon_odosielatela': sale_partner_id.phone or sale_partner_id.mobile,
                     'variabilny_symbol': '',
                     'referencne_cislo': '',
-                    'pocet_balikov': '',
+                    'pocet_balikov': len(package_box_ids),
                     'sms_cislo': sale_partner_id.phone or sale_partner_id.mobile,
                     'email_prijemcu': partner_id.email_normalized,
-                    'vaha': sum(sale_id.order_line.product_id.mapped('weight')),
+                    'vaha': package_weight,
                 })
         return xlsx_data.content
