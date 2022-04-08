@@ -37,8 +37,6 @@ def _post_init(cr, registry):
     package_ids.update_order_data()
 
     for package_id in package_ids:
-        if package_id.packaging_id.packing_type != 'pallet':
-            continue
         package_id.document_ids = env['documents.document'].search([
             ('name', '=like', f'%%{package_id.name}%%'),
             ('name', '=like', 'Package Currier%%'),
