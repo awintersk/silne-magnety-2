@@ -26,6 +26,22 @@
                     ]
                 }</attribute>
             </xpath>
+            <xpath expr="//field[@name='order_line']/form/group" position="inside">
+                <group>
+                    <label for="net_weight"/>
+                    <div class="o_row" name="net_weight">
+                        <field name="net_weight"/>
+                        <span><field name="net_weight_uom_name"/></span>
+                    </div>
+                    <field name="hs_code"/>
+                    <field name="hs_description"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="before">
+                <field name="hs_code" optional="hide"/>
+                <field name="hs_description" optional="hide"/>
+                <field name="net_weight" optional="hide"/>
+            </xpath>
         </field>
     </record>
 

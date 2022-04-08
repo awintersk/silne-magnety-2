@@ -162,6 +162,6 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         lineId: Number,
     }
 
-    return {BarcodeReceiptDialog, SecondaryBody}
+    return {BarcodeReceiptDialog}
 
 });

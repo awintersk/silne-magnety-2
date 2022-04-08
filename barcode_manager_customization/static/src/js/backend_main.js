@@ -170,9 +170,10 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         async _onBarcodeScannedInternal(barcode) {
+            const moveLineIds = this.currentState.move_line_ids
 
             /**@type{Object<*>|undefined}*/
-            const linesId = this.currentState.move_line_ids.find(rec => {
+            const linesId = moveLineIds.find(rec => {
                 const getID = rec => rec ? rec[0] : null
                 if (rec.product_barcode !== barcode) return false;
                 if (rec.qty_done >= rec.product_uom_qty) return false
@@ -191,7 +192,8 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             await this._save()
 
             const internalBody = new ComponentWrapper(this, BarcodeInternalDialog, {
-                linesId: linesId,
+                linesId,
+                moveLineIds,
                 pickingIntId: this.currentState.id,
             })
 

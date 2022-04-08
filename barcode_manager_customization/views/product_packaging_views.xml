@@ -13,6 +13,13 @@
                     </group>
                 </group>
             </xpath>
+            <xpath expr="//label[@for='max_weight']" position="before">
+                <label for="weight"/>
+                <div class="o_row" name="weight">
+                    <field name="weight"/>
+                    <span><field name="weight_uom_name"/></span>
+                </div>
+            </xpath>
         </field>
     </record>
 

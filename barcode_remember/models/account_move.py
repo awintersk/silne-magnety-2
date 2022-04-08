@@ -43,7 +43,7 @@ class AccountMove(models.Model):
         product_env = self.env['product.product']
 
         def get_product(line):
-            return product_env.browse(line[2]['product_id'])
+            return product_env.browse(line[2].get('product_id', 0)).exists()
 
         values['invoice_line_ids'] = [
             line for line in values['invoice_line_ids']
