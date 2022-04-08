@@ -26,9 +26,11 @@
     'website': "https://smartteksas.com/",
     'depends': [
         'account',
+        'woo_commerce_magnety',
     ],
     'data': [
         'views/account_move_views.xml',
+        'views/woo_payment_gateway_views.xml',
     ],
     'license': "AGPL-3",
     'installable': True,

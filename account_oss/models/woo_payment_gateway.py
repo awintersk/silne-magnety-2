@@ -18,5 +18,10 @@
 #
 ################################################################################
 
-from . import account_move
-from . import woo_payment_gateway
+from odoo import _, api, fields, models
+
+
+class WooPaymentGateway(models.Model):
+    _inherit = "woo.payment.gateway"
+
+    with_oss = fields.Boolean(string='With OSS', default=False)

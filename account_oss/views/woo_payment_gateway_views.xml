@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="woo_payment_gateway_view_form_inherit" model="ir.ui.view">
+        <field name="name">woo.payment.gateway.view.form</field>
+        <field name="model">woo.payment.gateway</field>
+        <field name="inherit_id" ref="woo_commerce_ept.view_woo_payment_gateway_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="inside">
+                <group name="oss_config">
+                    <field name="with_oss"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
