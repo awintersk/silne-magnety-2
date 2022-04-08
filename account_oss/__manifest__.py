@@ -20,7 +20,7 @@
 
 {
     'name': "Account OSS",
-    'version': '14.0.1.0.1',
+    'version': '14.0.1.0.2',
     'category': 'Accounting/Accounting',
     'author': 'Smart Tek Solutions and Services',
     'website': "https://smartteksas.com/",
