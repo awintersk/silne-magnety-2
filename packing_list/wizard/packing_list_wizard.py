@@ -57,16 +57,16 @@ class PackingListWizard(models.TransientModel):
         sale_int_ids = self._context.get('sale_ids', [])
         package_int_ids = self._context.get('package_ids', [])
 
+        valid_order_state = ('sale', 'done')
+
         if sale_int_ids:
             package_ids = package_env.search([
-                ('packaging_id.packing_type', '=', 'pallet'),
-                ('sale_ids.state', 'in', ('sale', 'done')),
+                ('sale_ids.state', 'in', valid_order_state),
                 ('sale_ids', 'in', sale_int_ids),
             ])
         elif package_int_ids:
             package_ids = package_env.search([
-                ('packaging_id.packing_type', '=', 'pallet'),
-                ('sale_ids.state', 'in', ('sale', 'done')),
+                ('sale_ids.state', 'in', valid_order_state),
                 ('id', 'in', package_int_ids)
             ])
         else:
@@ -148,8 +148,7 @@ class PackingListWizard(models.TransientModel):
             for sale_id in self.package_ids.sale_ids:
                 partner_id = sale_id.partner_shipping_id or sale_id.partner_id
                 sale_partner_id = sale_id.user_id.partner_id
-                package_box_ids = self.sale_ids._get_delivery_boxes_ids()
-                package_weight = sum(package_box_ids.mapped('shipping_weight'))
+                package_weight = sum(sale_id.package_ids.mapped('shipping_weight'))
                 xlsx_data.write_dict({
                     'dobierka': sale_id.amount_total,
                     'meno_prijemcu': partner_id.name,
@@ -166,7 +165,7 @@ class PackingListWizard(models.TransientModel):
                     'telefon_odosielatela': sale_partner_id.phone or sale_partner_id.mobile,
                     'variabilny_symbol': '',
                     'referencne_cislo': '',
-                    'pocet_balikov': len(package_box_ids),
+                    'pocet_balikov': len(sale_id.package_ids),
                     'sms_cislo': sale_partner_id.phone or sale_partner_id.mobile,
                     'email_prijemcu': partner_id.email_normalized,
                     'vaha': package_weight,

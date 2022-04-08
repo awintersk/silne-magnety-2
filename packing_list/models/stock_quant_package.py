@@ -41,6 +41,11 @@ class StockQuantPackage(models.Model):
         related='packaging_id.packing_type',
         store=True,
     )
+    carrier_ids = fields.Many2many(
+        comodel_name='delivery.carrier',
+        compute='_compute_carrier_ids',
+        store=True,
+    )
 
     # --------- #
     #  Compute  #
@@ -51,12 +56,26 @@ class StockQuantPackage(models.Model):
         for pack_id in self:
             pack_id.document_count = len(pack_id.document_ids)
 
-    @api.depends('quant_ids.quantity')
+    @api.depends('quant_ids.quantity', 'quant_ids.location_id')
     def _compute_sale_ids(self):
-        move_line_env = self.env['stock.move.line']
+        sale_order_env = self.env['sale.order']
+        picking_int_ids = self._context.get('button_validate_picking_ids', [])
         for pack_id in self:
-            move_line_ids = move_line_env.search([('result_package_id', '=', pack_id.id)])
-            pack_id.sale_ids = move_line_ids.move_id.sale_line_id.order_id
+            order_domain = [('picking_ids.state', '!=', 'cancel')]
+            if picking_int_ids:
+                order_domain += [('picking_ids', 'in', picking_int_ids)]
+            else:
+                order_domain += [('picking_ids.move_line_ids.result_package_id', '=', pack_id.id)]
+            pack_id.sale_ids = sale_order_env.search(order_domain)
+
+    @api.depends('quant_ids.location_id', 'sale_ids')
+    def _compute_carrier_ids(self):
+        picking_env = self.env['stock.picking']
+        for pack_id in self:
+            pack_id.carrier_ids = picking_env.search([
+                ('sale_id', 'in', pack_id.sale_ids.ids),
+                ('state', '!=', 'cancel'),
+            ]).carrier_id
 
     # --------- #
     #  Actions  #
@@ -79,3 +98,11 @@ class StockQuantPackage(models.Model):
         return dict(action, context={
             'package_ids': self.ids,
         })
+
+    # -------- #
+    #  Public  #
+    # -------- #
+
+    def update_order_data(self):
+        self._compute_sale_ids()
+        self._compute_carrier_ids()

@@ -34,7 +34,7 @@ def _post_init(cr, registry):
         ('quant_ids', '!=', False),
     ], order='create_date desc', limit=1000)
 
-    package_ids._compute_sale_ids()
+    package_ids.update_order_data()
 
     for package_id in package_ids:
         if package_id.packaging_id.packing_type != 'pallet':

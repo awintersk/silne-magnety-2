@@ -29,8 +29,14 @@
                 </button>
             </xpath>
             <xpath expr="//group[last()]" position="inside">
-                <group attrs="{'invisible': [('sale_ids', '=', [])]}">
-                    <field name="sale_ids" widget="open_many2many_tags" string="Sale Orders"/>
+                <group>
+                    <field name="sale_ids"
+                           widget="open_many2many_tags"
+                           string="Sale Orders"
+                           attrs="{'invisible': [('sale_ids', '=', [])]}"/>
+                    <field name="carrier_ids"
+                           widget="many2many_tags"
+                           attrs="{'invisible': [('carrier_ids', '=', [])]}"/>
                 </group>
             </xpath>
         </field>
@@ -59,7 +65,7 @@
                 </button>
                 <button title="Not generated"
                         class="btn btn-link py-0 px-1 ml-2"
-                        attrs="{'invisible': ['|', ('document_ids', '!=', []), ('packaging_type', '!=', 'pallet')]}">
+                        attrs="{'invisible': [('document_ids', '!=', [])]}">
                     <i class="fa fa-file-o"/>
                 </button>
             </xpath>
@@ -67,6 +73,9 @@
                 <div class="row">
                     <div class="col-12" attrs="{'invisible': [('sale_ids', '=', [])]}">
                         <field name="sale_ids" widget="many2many_tags"/>
+                    </div>
+                    <div class="col-12">
+                        <field name="carrier_ids" widget="many2many_tags"/>
                     </div>
                 </div>
                 <div class="row mt-2">

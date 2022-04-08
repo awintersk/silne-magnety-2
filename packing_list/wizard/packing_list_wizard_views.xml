@@ -17,7 +17,7 @@
                         <field name="name"/>
                         <field name="create_date"/>
                         <field name="packaging_id"/>
-                        <field name="sale_ids" widget="open_many2many_tags"/>
+                        <field name="sale_ids" widget="open_many2many_tags" string="Orders"/>
                         <field name="shipping_weight"/>
                     </tree>
                 </field>
