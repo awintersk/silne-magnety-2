@@ -31,16 +31,29 @@ odoo.define('barcode_remember.remember_lines', function (require) {
          */
         async _onClickValidatePage(event) {
             event.stopPropagation()
+            if (this.mode === 'internal') {
+                const is_warning_open = await this._openWarningDialog()
+                if (is_warning_open) {
+                    return undefined
+                }
+            }
+            this._super.apply(this, arguments)
+        },
+
+        /**
+         * @returns {Promise<Boolean>}
+         * @private
+         */
+        async _openWarningDialog() {
             const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
             if (!this.containGiftProduct) {
                 await dialog(GiftDialog, {})
-                return undefined
+                return true
             } else if (!this.containLangWarningProduct) {
                 await dialog(LanguageWarningDialog, {pickingID: this.res_id})
-                return undefined
-            } else {
-                this._super.apply(this, arguments)
+                return true
             }
+            return false
         },
     })
 
