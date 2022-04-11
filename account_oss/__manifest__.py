@@ -19,27 +19,18 @@
 ################################################################################
 
 {
-    'name': "Purchase Customization",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
+    'name': "Account OSS",
+    'version': '14.0.1.0.2',
+    'category': 'Accounting/Accounting',
     'author': 'Smart Tek Solutions and Services',
     'website': "https://smartteksas.com/",
     'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
+        'account',
+        'woo_commerce_magnety',
     ],
     'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/account_move_templates.xml',
         'views/account_move_views.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
         'views/woo_payment_gateway_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
     ],
     'license': "AGPL-3",
     'installable': True,
