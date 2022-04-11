@@ -34,9 +34,9 @@
                            widget="open_many2many_tags"
                            string="Sale Orders"
                            attrs="{'invisible': [('sale_ids', '=', [])]}"/>
-                    <field name="carrier_ids"
+                    <field name="carrier_id"
                            widget="many2many_tags"
-                           attrs="{'invisible': [('carrier_ids', '=', [])]}"/>
+                           attrs="{'invisible': [('carrier_id', '=', False)]}"/>
                 </group>
             </xpath>
         </field>
@@ -47,6 +47,10 @@
         <field name="model">stock.quant.package</field>
         <field name="inherit_id" ref="stock.view_quant_package_kanban"/>
         <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="quick_create">false</attribute>
+                <attribute name="group_create">false</attribute>
+            </xpath>
             <xpath expr="//t[@t-name='kanban-box']" position="before">
                 <field name="document_ids"/>
                 <field name="sale_ids"/>
@@ -74,23 +78,25 @@
                     <div class="col-12" attrs="{'invisible': [('sale_ids', '=', [])]}">
                         <field name="sale_ids" widget="many2many_tags"/>
                     </div>
-                    <div class="col-12">
-                        <field name="carrier_ids" widget="many2many_tags"/>
-                    </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-12">
+                    <div class="col-12" attrs="{'invisible': [('carrier_id', '=', False)]}" title="Carrier">
+                        <i class="fa fa-truck fa-flip-horizontal px-1"/>
+                        <b>Carrier:</b>
+                        <field name="carrier_id"/>
+                    </div>
+                    <div class="col-12" title="Weight">
                         <i class="fa fa-balance-scale"/>
                         <b>Weight:</b>
                         <field name="shipping_weight"/>
                         <field name="weight_uom_name"/>
                     </div>
-                    <div class="col-12" attrs="{'invisible': [('packaging_id', '=', False)]}">
+                    <div class="col-12" attrs="{'invisible': [('packaging_id', '=', False)]}" title="Type">
                         <i class="fa fa-sliders px-1"/>
                         <b>Type:</b>
                         <field name="packaging_id"/>
                     </div>
-                    <div class="col-12" attrs="{'invisible': [('quant_ids', '=', [])]}">
+                    <div class="col-12" attrs="{'invisible': [('quant_ids', '=', [])]}" title="Content">
                         <i class="fa fa-dropbox px-1"/>
                         <b>Content:</b>
                         <field name="quant_ids"/>
@@ -110,6 +116,10 @@
                         name="packaging_type"
                         domain="[]"
                         context="{'group_by' : 'packaging_type'}"/>
+                <filter string="Delivery Carrier"
+                        name="delivery_carrier"
+                        domain="[]"
+                        context="{'group_by': 'carrier_id'}"/>
             </xpath>
         </field>
     </record>

@@ -41,9 +41,9 @@ class StockQuantPackage(models.Model):
         related='packaging_id.packing_type',
         store=True,
     )
-    carrier_ids = fields.Many2many(
+    carrier_id = fields.Many2one(
         comodel_name='delivery.carrier',
-        compute='_compute_carrier_ids',
+        compute='_compute_carrier_id',
         store=True,
     )
 
@@ -69,13 +69,14 @@ class StockQuantPackage(models.Model):
             pack_id.sale_ids = sale_order_env.search(order_domain)
 
     @api.depends('quant_ids.location_id', 'sale_ids')
-    def _compute_carrier_ids(self):
+    def _compute_carrier_id(self):
         picking_env = self.env['stock.picking']
         for pack_id in self:
-            pack_id.carrier_ids = picking_env.search([
+            carrier_id = picking_env.search([
                 ('sale_id', 'in', pack_id.sale_ids.ids),
                 ('state', '!=', 'cancel'),
             ]).carrier_id
+            pack_id.carrier_id = carrier_id[0] if carrier_id else False
 
     # --------- #
     #  Actions  #
@@ -105,4 +106,4 @@ class StockQuantPackage(models.Model):
 
     def update_order_data(self):
         self._compute_sale_ids()
-        self._compute_carrier_ids()
+        self._compute_carrier_id()
