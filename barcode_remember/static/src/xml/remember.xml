@@ -6,7 +6,7 @@
             <attribute name="class" remove="mr-4" add="mr-2" separator=" "></attribute>
         </xpath>
         <xpath expr="//nav[last()]" position="before">
-            <div class="d-flex mx-1" t-if="widget.mode.includes('internal')">
+            <div class="d-flex mx-1" t-if="widget.useWarningFunc">
                 <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Included' : ''}} Gift">
                     <i t-attf-class="fa fa-heart{{!widget.includeGift ? '-o' : ''}}"/>
                 </span>
