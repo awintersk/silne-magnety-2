@@ -14,9 +14,13 @@ odoo.define('barcode_remember.remember_lines', function (require) {
 
         init: function (parent, page, pageIndex, nbPages) {
             this._super.apply(this, arguments)
-            this.res_id = parent.initialState.id
+            const {initialState} = parent
+            const {model, mode} = this
+            this.res_id = initialState.id
             this.containGiftProduct = this.page.lines.some(item => item.is_gift_product)
             this.containLangWarningProduct = this.page.lines.some(item => item.is_lang_warning_product)
+            this.sequenceCode = initialState.picking_sequence_code
+            this.useWarningFunc = this.sequenceCode === 'PICK' && model === 'stock.picking' && mode === 'internal'
         },
 
         async _renderLines() {
@@ -31,16 +35,30 @@ odoo.define('barcode_remember.remember_lines', function (require) {
          */
         async _onClickValidatePage(event) {
             event.stopPropagation()
+            const _super = this._super
+            if (this.useWarningFunc) {
+                const is_warning_open = await this._openWarningDialog()
+                if (is_warning_open) {
+                    return undefined
+                }
+            }
+            _super.apply(this, arguments)
+        },
+
+        /**
+         * @returns {Promise<Boolean>}
+         * @private
+         */
+        async _openWarningDialog() {
             const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
             if (!this.containGiftProduct) {
                 await dialog(GiftDialog, {})
-                return undefined
+                return true
             } else if (!this.containLangWarningProduct) {
                 await dialog(LanguageWarningDialog, {pickingID: this.res_id})
-                return undefined
-            } else {
-                this._super.apply(this, arguments)
+                return true
             }
+            return false
         },
     })
 
