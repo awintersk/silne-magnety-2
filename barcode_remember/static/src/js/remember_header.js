@@ -9,6 +9,8 @@ odoo.define('barcode_remember.remember_header', function (require) {
             this.mode = parent.mode
             this.includeLangWarning = false
             this.includeGift = false
+            this.pickingSequenceCode = parent.initialState.picking_sequence_code
+            this.useWarningFunc = this.mode.includes('internal') && this.pickingSequenceCode.includes('PICK')
         },
 
         /**
