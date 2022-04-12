@@ -17,16 +17,24 @@ odoo.define('barcode_remember.remember_lines', function (require) {
             const {initialState} = parent
             const {model, mode} = this
             this.res_id = initialState.id
-            this.containGiftProduct = this.page.lines.some(item => item.is_gift_product)
-            this.containLangWarningProduct = this.page.lines.some(item => item.is_lang_warning_product)
             this.sequenceCode = initialState.picking_sequence_code
+            this.containGiftProduct = parent.containGiftProduct
+            this.containLangWarningProduct = parent.containLangWarningProduct
             this.useWarningFunc = this.sequenceCode === 'PICK' && model === 'stock.picking' && mode === 'internal'
+            /**@returns {{containGift: Boolean, containLang: Boolean}}*/
+            this.computeWarningDialogData = () => {
+                return {
+                    containGift: parent._containGiftProduct(parent.pages),
+                    containLang: parent._containLangWarningProduct(parent.pages)
+                }
+            }
         },
 
         async _renderLines() {
             await this._super.apply(this, arguments)
-            this.containGiftProduct = this.page.lines.some(item => item.is_gift_product)
-            this.containLangWarningProduct = this.page.lines.some(item => item.is_lang_warning_product)
+            const {containGift, containLang} = this.computeWarningDialogData()
+            this.containGiftProduct = containGift
+            this.containLangWarningProduct = containLang
         },
 
         /**
