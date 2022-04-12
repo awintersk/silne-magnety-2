@@ -20,7 +20,7 @@ odoo.define('barcode_remember.remember_action', function (require) {
          * @returns {Boolean}
          * @private
          */
-        _getContainGiftProduct(pages) {
+        _containGiftProduct(pages) {
             return pages.flatMap(item => item.lines).some(item => item.is_gift_product)
         },
 
@@ -29,14 +29,14 @@ odoo.define('barcode_remember.remember_action', function (require) {
          * @returns {Boolean}
          * @private
          */
-        _fetContainLangWarningProduct(pages) {
+        _containLangWarningProduct(pages) {
             return pages.flatMap(item => item.lines).some(item => item.is_lang_warning_product)
         },
 
         _makePages() {
             const response = this._super.apply(this, arguments)
-            this.containGiftProduct = this._getContainGiftProduct(response)
-            this.containLangWarningProduct = this._fetContainLangWarningProduct(response)
+            this.containGiftProduct = this._containGiftProduct(response)
+            this.containLangWarningProduct = this._containLangWarningProduct(response)
             this.headerWidget.updateRememberState({
                 includeGift: this.containGiftProduct,
                 includeLangWarning: this.containLangWarningProduct,

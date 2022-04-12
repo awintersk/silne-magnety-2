@@ -101,15 +101,17 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
 
             const _super = this._super
             const isProductBarcode = Boolean(this.productsByBarcode[barcode])
+            /**@type{String}*/
+            const seqCode = this.initialState.picking_sequence_code
 
-            switch (this.mode) {
-                case 'receipt':
+            switch (seqCode) {
+                case 'IN':
                     if (isProductBarcode && await this._onBarcodeScannedReceipt(barcode)) return Promise.resolve();
                     break;
-                case 'internal':
+                case 'PICK':
                     if (isProductBarcode && await this._onBarcodeScannedInternal(barcode)) return Promise.resolve();
                     break;
-                case 'delivery':
+                case 'OUT':
                     if (!isProductBarcode && await this._onBarcodeScannedDelivery(barcode)) return Promise.resolve();
                     break;
             }

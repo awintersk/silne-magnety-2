@@ -30,6 +30,8 @@ _logger = getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    picking_sequence_code = fields.Char(related='picking_type_id.sequence_code')
+
     def get_barcode_view_state(self):
         product_env = self.env['product.product']
         response_list = super().get_barcode_view_state()
@@ -85,3 +87,9 @@ class StockPicking(models.Model):
     def _get_move_line_ids_fields_to_read(self):
         response = super(StockPicking, self)._get_move_line_ids_fields_to_read()
         return [*response, 'product_weight']
+
+    def _get_picking_fields_to_read(self):
+        response = super(StockPicking, self)._get_picking_fields_to_read()
+        if 'picking_sequence_code' not in response:
+            response.append('picking_sequence_code')
+        return response
