@@ -72,7 +72,7 @@ class ResPartner(models.Model):
         if parent_id:
             partner_vals.update({'parent_id': parent_id.id})
         partner_vals.update({'type': partner_type})
-        address_partner = self.create(partner_vals)
+        address_partner = self.with_context(no_vat_validation=True).create(partner_vals)
         if not parent_id and customer_id:
             address_partner.create_woo_res_partner_ept(woo_partner_values)
             address_partner.write({'is_woo_customer': True})
