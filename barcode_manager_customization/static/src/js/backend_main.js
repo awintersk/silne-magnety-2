@@ -61,6 +61,18 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
         },
 
         /**
+         * @param {String} name
+         * @returns {Promise<*>}
+         */
+        getParam(name) {
+            return this._rpc({
+                model: 'ir.config_parameter',
+                method: 'get_param',
+                args: [name],
+            })
+        },
+
+        /**
          * @param {String} barcode
          * @returns {Promise<{id: Number, quant_ids: Array[]}>}
          * @private
@@ -172,6 +184,10 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         async _onBarcodeScannedInternal(barcode) {
+            if (!await this.getParam('barcode_manager_customization.use_barcode_picking_dialog')) {
+                return false
+            }
+
             const moveLineIds = this.currentState.move_line_ids
 
             /**@type{Object<*>|undefined}*/

@@ -277,4 +277,24 @@
         </Dialog>
     </t>
 
+    <t t-name="barcode_manager_customization.BarcodePreferencesDialog" owl="1">
+        <Dialog title="'Barcode Preferences'" fullscreen="true" size="'medium'" t-on-dialog-closed="onClose">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <button t-attf-class="{{buttonClass('usePickingDialog')}} w-100"
+                            t-on-click="toggleValue('usePickingDialog')">
+                        <span>Use Picking Dialog</span>
+                        <input class="ml-3"
+                               t-model="state.usePickingDialog.value"
+                               type="checkbox"/>
+                    </button>
+                </div>
+            </div>
+            <t t-set-slot="buttons">
+                <button class="btn btn-primary" t-on-click="onClose">Cancel</button>
+                <button class="btn btn-secondary" t-on-click="onSave">Save</button>
+            </t>
+        </Dialog>
+    </t>
+
 </templates>

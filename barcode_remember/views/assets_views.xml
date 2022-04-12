@@ -11,6 +11,7 @@
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_header.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_gift_dialog.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_lang_warning_dialog.js"/>
+            <script type="text/javascript" src="/barcode_remember/static/src/js/remember_package_weight.js"/>
         </xpath>
     </template>
 
