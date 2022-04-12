@@ -36,4 +36,12 @@
         </t>
     </t>
 
+    <t t-extend="stock_barcode_settings_widget">
+        <t t-jquery=".o_barcode_settings > button:first" t-operation="replace">
+            <button class="btn-lg btn btn-dark text-uppercase o_barcode_preferences">
+                Barcode Preferences
+            </button>
+        </t>
+    </t>
+
 </templates>
