@@ -38,7 +38,7 @@ class ResPartner(models.Model):
                     return line.get('value')
             return False
 
-        address_key_list = ['name', 'street', 'street2', 'city', 'zip', 'phone', 'state_id', 'country_id']
+        address_key_list = ['name', 'street', 'street2', 'city', 'zip', 'phone', 'state_id', 'country_id', 'vat']
 
         first_name = customer_val.get("first_name")
         last_name = customer_val.get("last_name")
@@ -62,6 +62,7 @@ class ResPartner(models.Model):
 
         address_partner = self.woo_search_address_partner(partner_vals, address_key_list, parent_id, partner_type)
         if address_partner:
+
             if not parent_id and customer_id and not address_partner.is_woo_customer:
                 address_partner.create_woo_res_partner_ept(woo_partner_values)
                 address_partner.write({'is_woo_customer': True})
