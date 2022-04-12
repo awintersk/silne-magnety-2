@@ -5,6 +5,7 @@ odoo.define('barcode_remember.remember_lines', function (require) {
     const GiftDialog = require('barcode_remember.remember_gift_dialog')
     const {LanguageWarningDialog} = require('barcode_remember.remember_lang_warning_dialog')
     const {ComponentWrapper} = require('web.OwlCompatibility')
+    const {PackageWeightDialog} = require('barcode_remember.remember_package_weight')
 
     /**
      * @name LinesWidget
@@ -65,8 +66,10 @@ odoo.define('barcode_remember.remember_lines', function (require) {
             } else if (!this.containLangWarningProduct) {
                 await dialog(LanguageWarningDialog, {pickingID: this.res_id})
                 return true
+            } else {
+                await dialog(PackageWeightDialog, {pickingID: this.res_id})
+                return true
             }
-            return false
         },
     })
 
