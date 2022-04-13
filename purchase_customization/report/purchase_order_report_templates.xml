@@ -73,7 +73,7 @@
                 <h2 t-if="o.state in ['purchase', 'done']">Purchase Order #<span t-field="o.name"/></h2>
                 <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
 
-                <table class="table table-sm o_main_table">
+                <table class="table table-sm o_main_table o_hs_report_table">
                     <thead>
                         <tr>
                             <th name="th_product_image"/>
