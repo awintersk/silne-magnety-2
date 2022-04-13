@@ -34,9 +34,7 @@
                            widget="open_many2many_tags"
                            string="Sale Orders"
                            attrs="{'invisible': [('sale_ids', '=', [])]}"/>
-                    <field name="carrier_id"
-                           widget="many2many_tags"
-                           attrs="{'invisible': [('carrier_id', '=', False)]}"/>
+                    <field name="carrier_id" attrs="{'invisible': [('carrier_id', '=', False)]}"/>
                 </group>
             </xpath>
         </field>
