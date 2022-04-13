@@ -61,6 +61,18 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
         },
 
         /**
+         * @param {String} name
+         * @returns {Promise<*>}
+         */
+        getParam(name) {
+            return this._rpc({
+                model: 'ir.config_parameter',
+                method: 'get_param',
+                args: [name],
+            })
+        },
+
+        /**
          * @param {String} barcode
          * @returns {Promise<{id: Number, quant_ids: Array[]}>}
          * @private
@@ -101,15 +113,17 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
 
             const _super = this._super
             const isProductBarcode = Boolean(this.productsByBarcode[barcode])
+            /**@type{String}*/
+            const seqCode = this.initialState.picking_sequence_code
 
-            switch (this.mode) {
-                case 'receipt':
+            switch (seqCode) {
+                case 'IN':
                     if (isProductBarcode && await this._onBarcodeScannedReceipt(barcode)) return Promise.resolve();
                     break;
-                case 'internal':
+                case 'PICK':
                     if (isProductBarcode && await this._onBarcodeScannedInternal(barcode)) return Promise.resolve();
                     break;
-                case 'delivery':
+                case 'OUT':
                     if (!isProductBarcode && await this._onBarcodeScannedDelivery(barcode)) return Promise.resolve();
                     break;
             }
@@ -170,6 +184,10 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         async _onBarcodeScannedInternal(barcode) {
+            if (!await this.getParam('barcode_manager_customization.use_barcode_picking_dialog')) {
+                return false
+            }
+
             const moveLineIds = this.currentState.move_line_ids
 
             /**@type{Object<*>|undefined}*/

@@ -32,13 +32,15 @@
     'website': "https://smartteksas.com",
 
     'category': 'Purchases',
-    'version': '14.0.0.4',
+    'version': '14.0.0.6',
 
     'depends': [
         'base',
         'product',
         'sale',
+        'stock',
         'stock_barcode',
+        'barcode_manager_customization',
     ],
 
     'demo': [

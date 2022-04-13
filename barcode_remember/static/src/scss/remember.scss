@@ -18,3 +18,13 @@
     margin-left: 4px;
   }
 }
+
+.barcode-remember-dialog-content {
+  .modal-body {
+    padding: 8px 8px 16px 8px;
+  }
+
+  td, th {
+    vertical-align: middle;
+  }
+}

@@ -38,8 +38,6 @@ class StockMoveLine(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    picking_sequence_code = fields.Char(related='picking_type_id.sequence_code')
-
     @api.model
     def _get_move_line_ids_fields_to_read(self):
         response = super(StockPicking, self)._get_move_line_ids_fields_to_read()
@@ -88,8 +86,3 @@ class StockPicking(models.Model):
 
     def add_product_warning_line(self, product: int) -> int:
         return self._add_special_product(product, 'is_lang_warning')
-
-    def _get_picking_fields_to_read(self):
-        response = super(StockPicking, self)._get_picking_fields_to_read()
-        response.extend(['picking_sequence_code'])
-        return response
