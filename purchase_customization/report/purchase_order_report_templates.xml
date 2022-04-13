@@ -1,122 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_purchase_order_hs_document" inherit_id="purchase.report_purchaseorder_document" primary="True">
-        <xpath expr="//table" position="replace">
-            <table class="table table-sm o_main_table">
-                <thead>
-                    <tr>
-                        <th name="th_product_image"/>
-                        <th name="th_product_name">
-                            <strong>Product Name</strong>
-                        </th>
-                        <th name="th_product_code">
-                            <strong>Product Code</strong>
-                        </th>
-                        <th name="th_vendor_product_name">
-                            <strong>Vendor Product Name</strong>
-                        </th>
-                        <th name="th_vendor_product_code">
-                            <strong>Vendor Product Code</strong>
-                        </th>
-                        <th name="th_vendor_product_note">
-                            <strong>Vendor Product Note</strong>
-                        </th>
-                        <th name="th_hs_code">
-                            <strong>HS Code</strong>
-                        </th>
-                        <th name="th_hs_desc">
-                            <strong>HS Description</strong>
-                        </th>
-                        <th name="th_qty">
-                            <strong>Qty</strong>
-                        </th>
-                        <th name="th_net_weight">
-                            <strong>Net Weight</strong>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t t-set="current_weight" t-value="0"/>
-                    <t t-set="total_weight" t-value="0"/>
-                    <t t-foreach="o.order_line" t-as="line">
-                        <t t-set="current_weight" t-value="current_weight + line.net_weight"/>
-                        <t t-set="total_weight" t-value="total_weight + line.net_weight"/>
 
-                        <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
-                            <t t-if="not line.display_type">
-                                <td id="product_image">
-                                    <img t-if="line.product_id.image_1024"
-                                         class="rounded-circle o_report_product_img"
-                                         t-attf-src="data:image/png;base64,#{line.product_id.image_1024}"
-                                         alt="Product"/>
-                                </td>
-                                <td id="product_name">
-                                    <span t-field="line.product_id.name"/>
-                                </td>
-                                <td name="product_code">
-                                    <span t-field="line.product_id.default_code"/>
-                                </td>
-                                <td name="vendor_product_name">
-                                    <span t-field="line.vendor_product_name"/>
-                                </td>
-                                <td name="vendor_product_code">
-                                    <span t-field="line.vendor_product_code"/>
-                                </td>
-                                <td name="vendor_product_note">
-                                    <span t-field="line.vendor_product_note"/>
-                                </td>
-                                <td name="hs_code">
-                                    <span t-field="line.hs_code"/>
-                                </td>
-                                <td name="hs_description">
-                                    <span t-field="line.hs_description"/>
-                                </td>
-                                <td name="qty">
-                                    <span t-field="line.product_qty"/>
-                                </td>
-                                <td name="net_weight">
-                                    <span t-field="line.net_weight"/>
-                                </td>
-                            </t>
-                            <t t-if="line.display_type == 'line_section'">
-                                <td colspan="99" id="section">
-                                    <span t-field="line.name"/>
-                                </td>
-                                <t t-set="current_section" t-value="line"/>
-                                <t t-set="current_weight" t-value="0"/>
-                            </t>
-                            <t t-if="line.display_type == 'line_note'">
-                                <td colspan="99" id="note">
-                                    <span t-field="line.name"/>
-                                </td>
-                            </t>
-                        </tr>
-                        <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
-                            <tr class="is-subtotal text-right">
-                                <td colspan="99" id="subtotal">
-                                    <strong class="mr16">Weight</strong>
-                                    <span t-esc="current_weight"/>
-                                </td>
-                            </tr>
-                        </t>
-                    </t>
-                </tbody>
-            </table>
-        </xpath>
-        <xpath expr="//div[@id='total']" position="replace">
-            <div id="total" class="row justify-content-end">
-                <div class="col-4">
-                    <table class="table table-sm">
-                        <tr class="border-black o_total">
-                            <td name="td_amount_total_label"><strong>Total Weight</strong></td>
-                            <td class="text-right">
-                                <span t-esc="total_weight"/>
-                            </td>
-                        </tr>
-                    </table>
+    <template id="external_layout_clean">
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <t t-set="company" t-value="company.with_context(lang='en_US')"/>
+
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="o_clean_header">
+            <div class="row">
+                <div class="col-3">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                </div>
+                <div class="col-4 offset-1" name="company_address">
+                    <ul class="list-unstyled">
+                        <strong><li t-if="company.name"><span t-field="company.name"/></li></strong>
+                        <li t-if="company.vat"><t t-esc="company.country_id.vat_label or 'Tax ID'"/>: <span t-field="company.vat"/></li>
+                        <li t-if="company.phone">Tel: <span class="o_force_ltr" t-field="company.phone"/></li>
+                        <li t-if="company.email"><span t-field="company.email"/></li>
+                        <li t-if="company.website"><span t-field="company.website"/></li>
+                    </ul>
+                </div>
+                <div class="col-4 text-right">
+                    <span class="company_address" t-field="company.partner_id"
+                        t-options='{"widget": "contact", "fields": ["address"], "no_marker": true}'/>
                 </div>
             </div>
-        </xpath>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_clean o_company_#{company.id}_layout"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <t t-raw="0"/>
+        </div>
+
+        <div t-attf-class="footer o_clean_footer o_company_#{company.id}_layout">
+            <div class="row mt8">
+                <div class="col-3">
+                    <span t-field="company.report_footer"/>
+                </div>
+                <div class="col-4 offset-4">
+                    <h4 class="mt0 mb0 text-uppercase" t-field="company.report_header"/>
+                </div>
+                <div class="col-1">
+                    <ul t-if="report_type == 'pdf'" class="list-inline pagenumber float-right text-center">
+                        <li class="list-inline-item"><strong><span class="page"/></strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_purchase_order_hs_document">
+        <t t-call="purchase_customization.external_layout_clean">
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+
+                <h2 t-if="o.state == 'draft'">Request for Quotation #<span t-field="o.name"/></h2>
+                <h2 t-if="o.state in ['sent', 'to approve']">Purchase Order #<span t-field="o.name"/></h2>
+                <h2 t-if="o.state in ['purchase', 'done']">Purchase Order #<span t-field="o.name"/></h2>
+                <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
+
+                <table class="table table-sm o_main_table o_hs_report_table">
+                    <thead>
+                        <tr>
+                            <th name="th_product_image"/>
+                            <th name="th_product_name">
+                                <strong>Product Name</strong>
+                            </th>
+                            <th name="th_product_code">
+                                <strong>Product Code</strong>
+                            </th>
+                            <th name="th_vendor_product_name">
+                                <strong>Vendor Product Name</strong>
+                            </th>
+                            <th name="th_vendor_product_code">
+                                <strong>Vendor Product Code</strong>
+                            </th>
+                            <th name="th_vendor_product_note">
+                                <strong>Vendor Product Note</strong>
+                            </th>
+                            <th name="th_hs_code">
+                                <strong>HS Code</strong>
+                            </th>
+                            <th name="th_hs_desc">
+                                <strong>HS Description</strong>
+                            </th>
+                            <th name="th_qty">
+                                <strong>Qty</strong>
+                            </th>
+                            <th name="th_net_weight">
+                                <strong>Net Weight</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="current_weight" t-value="0"/>
+                        <t t-set="total_weight" t-value="0"/>
+                        <t t-foreach="o.order_line" t-as="line">
+                            <t t-set="current_weight" t-value="current_weight + line.net_weight"/>
+                            <t t-set="total_weight" t-value="total_weight + line.net_weight"/>
+
+                            <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="not line.display_type">
+                                    <td id="product_image">
+                                        <img t-if="line.product_id.image_1024"
+                                                class="rounded-circle o_report_product_img"
+                                                t-attf-src="data:image/png;base64,#{line.product_id.image_1024}"
+                                                alt="Product"/>
+                                    </td>
+                                    <td id="product_name">
+                                        <span t-field="line.product_id.name"/>
+                                    </td>
+                                    <td name="product_code">
+                                        <span t-field="line.product_id.default_code"/>
+                                    </td>
+                                    <td name="vendor_product_name">
+                                        <span t-field="line.vendor_product_name"/>
+                                    </td>
+                                    <td name="vendor_product_code">
+                                        <span t-field="line.vendor_product_code"/>
+                                    </td>
+                                    <td name="vendor_product_note">
+                                        <span t-field="line.vendor_product_note"/>
+                                    </td>
+                                    <td name="hs_code">
+                                        <span t-field="line.hs_code"/>
+                                    </td>
+                                    <td name="hs_description">
+                                        <span t-field="line.hs_description"/>
+                                    </td>
+                                    <td name="qty">
+                                        <span t-field="line.product_qty"/>
+                                    </td>
+                                    <td name="net_weight">
+                                        <span t-field="line.net_weight"/>
+                                    </td>
+                                </t>
+                                <t t-if="line.display_type == 'line_section'">
+                                    <td colspan="99" id="section">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <t t-set="current_section" t-value="line"/>
+                                    <t t-set="current_weight" t-value="0"/>
+                                </t>
+                                <t t-if="line.display_type == 'line_note'">
+                                    <td colspan="99" id="note">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                            </tr>
+                            <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
+                                <tr class="is-subtotal text-right">
+                                    <td colspan="99" id="subtotal">
+                                        <strong class="mr16">Weight</strong>
+                                        <span t-esc="round(current_weight, 2)"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div id="total" class="row justify-content-end">
+                    <div class="col-4">
+                        <table class="table table-sm">
+                            <tr class="border-black o_total">
+                                <td name="td_amount_total_label"><strong>Total Weight</strong></td>
+                                <td class="text-right">
+                                    <span t-esc="round(total_weight, 2)"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <p t-field="o.notes"/>
+                <div class="oe_structure"/>
+            </div>
+        </t>
     </template>
 
     <template id="report_purchase_order_hs">
