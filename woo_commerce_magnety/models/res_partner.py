@@ -22,14 +22,11 @@ from odoo import _, api, fields, models
 
 METADATA_FIELDS = {
     'billing_company_wi_tax': 'vat',
-    '_billing_company_wi_vat_enabled': 'is_vat_payer',
 }
 
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-
-    is_vat_payer = fields.Boolean(string='Is VAT Payer')
 
     def woo_create_or_update_customer(self, customer_val, instance, parent_id, partner_type, customer_id=False, meta_data={}):
         def get_meta_line(meta, key):

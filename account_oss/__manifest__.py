@@ -20,7 +20,7 @@
 
 {
     'name': "Account OSS",
-    'version': '14.0.1.0.2',
+    'version': '14.0.1.0.4',
     'category': 'Accounting/Accounting',
     'author': 'Smart Tek Solutions and Services',
     'website': "https://smartteksas.com/",
@@ -30,6 +30,7 @@
     ],
     'data': [
         'views/account_move_views.xml',
+        'views/sale_order_views.xml',
         'views/woo_payment_gateway_views.xml',
     ],
     'license': "AGPL-3",
