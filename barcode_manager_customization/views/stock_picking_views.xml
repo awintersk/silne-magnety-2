@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="extended_stock_picking_kanban" model="ir.ui.view">
+        <field name="name">extended.stock.picking.kanban</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.stock_picking_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//progressbar" position="before">
+                <field name="purchase_id" invisible="1"/>
+                <field name="sale_id" invisible="1"/>
+                <field name="picking_type_code" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[hasclass('o_kanban_record_bottom')]" position="after">
+                <div t-if="record.purchase_id || record.sale_id" class="picking-kanban-purchase-container">
+                    <t t-set="picking_type_code" t-value="record.picking_type_code.raw_value"/>
+                    <span t-if="['outgoing', 'internal'].includes(picking_type_code)" t-esc="record.sale_id.value"/>
+                    <span t-else="" t-esc="record.purchase_id.value"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="extended_stock_picking_barcode" model="ir.ui.view">
+        <field name="name">extended.stock.picking.barcode</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock_barcode.stock_picking_barcode"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_lines']" position="after">
+                <field name="barcode_sale_order_ids"
+                       readonly="1"
+                       attrs="{'invisible': [('barcode_sale_order_ids', '=', False)]}"
+                       string="Sale Orders"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

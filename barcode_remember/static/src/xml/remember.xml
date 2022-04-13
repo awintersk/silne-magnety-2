@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+
+    <t t-inherit="stock_barcode.stock_barcode_header_widget" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_show_information')]" position="attributes">
+            <attribute name="class" remove="mr-4" add="mr-2" separator=" "></attribute>
+        </xpath>
+        <xpath expr="//nav[last()]" position="before">
+            <div class="d-flex mx-1" t-if="widget.mode.includes('internal')">
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeGift ? 'Included' : ''}} Gift">
+                    <i t-attf-class="fa fa-heart{{!widget.includeGift ? '-o' : ''}}"/>
+                </span>
+                <span class="barcode-remember-info" t-attf-title="{{widget.includeLangWarning ? 'Included' : ''}} Warning">
+                    <i t-attf-class="fa fa-file{{!widget.includeWarning ? '-o' : ''}}"/>
+                </span>
+            </div>
+        </xpath>
+    </t>
+
+    <t t-inherit="stock_barcode.stock_barcode_lines_template" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_barcode_line_details')]" position="inside">
+            <div class="barcode-remember-options">
+                <div t-if="line.is_gift_product" title="Gift">
+                    <i class="fa fa-fw fa-gift"/>
+                </div>
+                <div t-if="line.is_lang_warning_product" title="Language Warning">
+                    <i class="fa fa-fw fa-file"/>
+                </div>
+            </div>
+        </xpath>
+    </t>
+
+</templates>
