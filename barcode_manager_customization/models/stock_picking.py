@@ -50,8 +50,19 @@ class StockPicking(models.Model):
     )
 
     def _compute_barcode_sale_order_ids(self):
-        for rec in self:
-            rec.barcode_sale_order_ids = rec.purchase_id._get_sale_orders()
+        for picking_id in self:
+            product_ids = picking_id.move_line_ids.product_id
+            move_ids = self.env['stock.move'].search([
+                ('product_id', 'in', product_ids.ids),
+                ('picking_type_id.sequence_code', '=', 'PICK'),
+                ('state', 'in', ('waiting', 'confirmed', 'partially_available'))
+            ]).filtered(
+                lambda move_id: move_id.reserved_availability < move_id.product_uom_qty
+            )
+            picking_id.barcode_sale_order_ids = self.env['sale.order'].search([
+                ('order_line.product_id', 'in', product_ids.ids),
+                ('picking_ids.move_lines', 'in', move_ids.ids)
+            ])
 
     def _put_in_pack(self, move_line_ids, create_package_level=True):
         self.env.context = dict(self._context, picking_id=self.id)
