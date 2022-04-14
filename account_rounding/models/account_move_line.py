@@ -18,8 +18,13 @@
 #
 ################################################################################
 
-from . import account_move
-from . import account_move_line
-from . import account_cash_rounding
-from . import sale_order
-from . import woo_payment_gateway
+from odoo import _, api, fields, models
+
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    is_tax_rounding_line = fields.Boolean(
+        string='Tax Rounding Line',
+        help="Technical field used to determine if the line is added automatically for cash rounding.",
+    )

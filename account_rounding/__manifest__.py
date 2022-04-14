@@ -29,6 +29,7 @@
         'woo_commerce_ept',
     ],
     'data': [
+        'views/account_cash_rounding_views.xml',
         'views/account_move_templates.xml',
         'views/account_move_views.xml',
         'views/woo_payment_gateway_views.xml',
