@@ -163,7 +163,6 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             let items = await this._rpc({
                 route: '/product_order_dialog_data',
                 params: {
-                    product_int_id: product.id,
                     line_id: lineId.id,
                 }
             })
@@ -296,7 +295,6 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                 let items = await this._rpc({
                     route: '/product_order_dialog_data',
                     params: {
-                        product_int_id: product.id,
                         line_id: lineId.id
                     }
                 })
