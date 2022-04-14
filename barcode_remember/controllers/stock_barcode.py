@@ -40,11 +40,20 @@ class RememberStockBarcodeController(Controller):
     @route('/barcode_remember/package/weight_data', type='json', methods=['POST'], auth='user')
     def barcode_remember_package_weight_data(self, picking: int) -> List[Optional[Dict]]:
         picking_id = request.env['stock.picking'].browse(picking)
-        if not picking_id.move_line_ids:
+        line_ids = picking_id.move_line_ids
+
+        if not line_ids:
             return []
-        return picking_id.move_line_ids.result_package_id.read([
-            'shipping_weight', 'name', 'weight_uom_name', 'weight',
-        ])
+
+        field2read = ['shipping_weight', 'name', 'weight_uom_name', 'weight']
+        package_ids = line_ids.package_id | line_ids.result_package_id
+        package_list = package_ids.read(field2read)
+
+        for package in package_list:
+            move_ids = line_ids.filtered(lambda move_id: package['id'] in package_ids.ids)
+            package['weight'] += sum(move_ids.product_id.mapped('weight'))
+
+        return package_list
 
     @route('/barcode_remember/package/weight_set', type='json', methods=['POST'], auth='user')
     def barcode_remember_package_weight_set(self, package_list: List[Tuple[int, float]]) -> bool:

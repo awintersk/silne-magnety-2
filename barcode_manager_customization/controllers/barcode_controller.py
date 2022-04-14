@@ -19,14 +19,21 @@
 #
 ################################################################################
 
+from typing import List, Dict, Any
 from odoo.http import route, Controller, request
 
 
 class BarcodeController(Controller):
 
     @route('/product_order_dialog_data', type='json', method='POST', auth='user')
-    def product_order_dialog_data(self, product_int_id: int, line_id: int):
+    def product_order_dialog_data(self, line_id: int) -> List[Dict[str, Any]]:
         move_line = request.env['stock.move.line'].browse(line_id)
+        order_ids = move_line.picking_id.barcode_sale_order_ids
+        move_ids = request.env['stock.move'].search([
+            ('picking_id.sale_id', 'in', order_ids.ids),
+            ('picking_type_id.sequence_code', '=', 'PICK'),
+            ('state', 'in', ('waiting', 'confirmed', 'partially_available')),
+        ])
 
         def get_qty2deliver(move) -> float:
             return move.product_uom_qty - move.reserved_availability
@@ -39,6 +46,6 @@ class BarcodeController(Controller):
                 'qtyToDeliver': get_qty2deliver(move_id),
                 'qty': 0,
             }
-            for move_id in move_line.move_id.move_dest_ids
-            if get_qty2deliver(move_id) > 0
+            for move_id in move_ids
+            if get_qty2deliver(move_id)
         ]

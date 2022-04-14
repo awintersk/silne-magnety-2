@@ -40,7 +40,9 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
          * @returns {Boolean}
          */
         activeValidateButton(item) {
-            return item.qty <= item.qtyToDeliver && !item.confirmed && item.qty > 0
+            const {totalQty} = this.props.product
+            const isCorrectRange = item.qty > 0 && item.qty <= item.qtyToDeliver
+            return isCorrectRange && item.qty <= totalQty && !item.confirmed
         }
 
         /**
