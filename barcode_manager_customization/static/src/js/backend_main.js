@@ -94,7 +94,7 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         _isAbleToCreateNewLine() {
-            return false;
+            return true;
         },
 
         _onDefaultBarcodeScanner({active}) {

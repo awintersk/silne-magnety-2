@@ -22,6 +22,7 @@
 
 from typing import Dict, List, Optional, Tuple
 from odoo.http import request, route, Controller
+from odoo.tools.float_utils import float_round
 
 
 class RememberStockBarcodeController(Controller):
@@ -48,10 +49,12 @@ class RememberStockBarcodeController(Controller):
         field2read = ['shipping_weight', 'name', 'weight_uom_name', 'weight']
         package_ids = line_ids.package_id | line_ids.result_package_id
         package_list = package_ids.read(field2read)
+        rounding = max(line_ids.product_uom_id.mapped('rounding'))
 
         for package in package_list:
             move_ids = line_ids.filtered(lambda move_id: package['id'] in package_ids.ids)
             package['weight'] += sum(move_ids.product_id.mapped('weight'))
+            package['weight'] = float_round(package['weight'], precision_rounding=rounding)
 
         return package_list
 
