@@ -6,9 +6,24 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
 
     const {Component, useState} = owl
 
+    /**
+     * @typedef {{
+     *     shipping_weight: Number,
+     *     name: String,
+     *     weight_uom_name: String,
+     *     weight: Number,
+     * }} PackageWeightDialogPackageItem
+     */
+
+    /**
+     * @typedef {{
+     *     packageList: PackageWeightDialogPackageItem[]
+     * }} PackageWeightDialogState
+     */
 
     /**
      * @extends Component
+     * @property {PackageWeightDialogState} state
      */
     class PackageWeightDialog extends Component {
         setup() {
