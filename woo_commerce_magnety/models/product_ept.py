@@ -56,7 +56,7 @@ class WooProductTemplateEpt(models.Model):
                             attribute_list.append((0, 0, data))
                         else:
                             attribute_for_update = product.attribute_line_ids.filtered(
-                                lambda x: x.attribute_id == attribute.id
+                                lambda x: x.attribute_id.id == attribute.id
                                           and x.value_ids[0].name not in value.mapped('name'))
                             if attribute_for_update:
                                 data = {
