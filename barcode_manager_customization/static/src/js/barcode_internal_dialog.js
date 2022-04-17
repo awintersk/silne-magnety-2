@@ -228,26 +228,6 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             this.state.isMoved = true
         }
 
-        async savePackageWeight() {
-            const boxID = Number(this.state.boxIntId)
-            if (boxID <= 0) return Promise.reject()
-            if (typeof this.state.shipping_weight !== 'number') return Promise.reject()
-
-            await this.rpc({
-                model: 'stock.quant.package',
-                method: 'write',
-                args: [[boxID], {
-                    'shipping_weight': this.state.shipping_weight
-                }]
-            })
-
-            this.notification.notify({
-                type: 'info',
-                title: 'Package',
-                message: `<b>Weight</b>: ${this.state.shipping_weight}kg`
-            })
-        }
-
         async _onPrint() {
             this.parentWidget.do_action('zpl_label_template.action_box_report', {
                     additional_context: {
