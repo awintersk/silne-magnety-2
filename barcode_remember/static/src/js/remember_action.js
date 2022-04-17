@@ -90,13 +90,18 @@ odoo.define('barcode_remember.remember_action', function (require) {
          */
         async _onValidate(event) {
             event.stopPropagation()
-            const _super = this._super
-            if (this.useWarningFunc) {
+            /**@type{Boolean}*/
+            const preventDialog = event.data.preventDialog
+            /**@type{Function}*/
+            const superOnValidate = this._super.bind(this)
+
+            if (this.useWarningFunc && !preventDialog) {
                 if (await this._openWarningDialog()) {
                     return undefined
                 }
             }
-            _super.apply(this, arguments)
+
+            superOnValidate(...arguments)
         },
 
         /**
