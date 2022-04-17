@@ -43,7 +43,7 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
 
         mounted() {
             if (!this.state.packageList.length) {
-                this.trigger('validate')
+                this.__validate()
                 this.destroy()
             }
         }
@@ -62,8 +62,12 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
                     }
                 })
             }
-            this.trigger('validate')
+            this.__validate()
             this.destroy()
+        }
+
+        __validate() {
+            this.trigger('validate', {preventDialog: true})
         }
     }
 

@@ -265,11 +265,6 @@
                         t-if="!state.isMoved">
                     Move
                 </button>
-                <button class="btn btn-secondary"
-                        t-on-click.prevent="savePackageWeight"
-                        t-if="state.boxIntId &gt; 0 &amp;&amp; !state.isMoved">
-                    Save Package Weight
-                </button>
                 <button class="btn btn-secondary" t-on-click="_onPrint" t-if="state.isMoved">
                     Print box label
                 </button>
