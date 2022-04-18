@@ -2,6 +2,10 @@ odoo.define('barcode_remember.remember_action', function (require) {
     'use strict'
 
     const ClientAction = require('stock_barcode.picking_client_action')
+    const GiftDialog = require('barcode_remember.remember_gift_dialog')
+    const {LanguageWarningDialog} = require('barcode_remember.remember_lang_warning_dialog')
+    const {ComponentWrapper} = require('web.OwlCompatibility')
+    const {PackageWeightDialog} = require('barcode_remember.remember_package_weight')
 
     ClientAction.include({
         custom_events: Object.assign({}, ClientAction.prototype.custom_events, {
@@ -13,6 +17,17 @@ odoo.define('barcode_remember.remember_action', function (require) {
             this._super.apply(this, arguments)
             this.containGiftProduct = false
             this.containLangWarningProduct = false
+            this.sequenceCode = ''
+            this.useWarningFunc = false
+        },
+
+        async willStart() {
+            const response = await this._super.apply(this, arguments)
+            const {mode} = this
+            const {model} = this.actionParams
+            this.sequenceCode = this.initialState.picking_sequence_code
+            this.useWarningFunc = this.sequenceCode === 'PICK' && model === 'stock.picking' && mode === 'internal'
+            return response
         },
 
         /**
@@ -67,6 +82,44 @@ odoo.define('barcode_remember.remember_action', function (require) {
                 }
             })
             this.trigger_up('reload')
+        },
+
+        /**
+         * @param {MouseEvent} event
+         * @private
+         */
+        async _onValidate(event) {
+            event.stopPropagation()
+            /**@type{Boolean}*/
+            const preventDialog = event.data.preventDialog
+            /**@type{Function}*/
+            const superOnValidate = this._super.bind(this)
+
+            if (this.useWarningFunc && !preventDialog) {
+                if (await this._openWarningDialog()) {
+                    return undefined
+                }
+            }
+
+            superOnValidate(...arguments)
+        },
+
+        /**
+         * @returns {Promise<Boolean>}
+         * @private
+         */
+        async _openWarningDialog() {
+            const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
+            if (!this.containGiftProduct) {
+                await dialog(GiftDialog, {})
+                return true
+            } else if (!this.containLangWarningProduct) {
+                await dialog(LanguageWarningDialog, {pickingID: this.initialState.id})
+                return true
+            } else {
+                await dialog(PackageWeightDialog, {pickingID: this.initialState.id})
+                return true
+            }
         },
     })
 
