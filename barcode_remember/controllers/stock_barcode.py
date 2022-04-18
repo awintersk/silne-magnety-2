@@ -52,8 +52,11 @@ class RememberStockBarcodeController(Controller):
         rounding = max(line_ids.product_uom_id.mapped('rounding'))
 
         for package in package_list:
-            move_ids = line_ids.filtered(lambda move_id: package['id'] in package_ids.ids)
-            package['weight'] += sum(move_ids.product_id.mapped('weight'))
+            for move_id in line_ids:
+                package_id = move_id.result_package_id or move_id.package_id
+                if package['id'] != package_id.id:
+                    continue
+                package['weight'] += move_id.product_id.weight * move_id.qty_done
             package['weight'] = float_round(package['weight'], precision_rounding=rounding)
 
         return package_list

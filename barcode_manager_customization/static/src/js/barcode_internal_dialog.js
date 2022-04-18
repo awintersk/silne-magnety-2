@@ -279,10 +279,12 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
 
             for (let lineId of this.props.moveLineIds) {
                 const {product_weight} = lineId
+                if (lineId.id === this.props.linesId.id) continue;
                 if (lineId.result_package_id[0] === Number(boxIntId) && product_weight) {
-                    weight += product_weight
+                    weight += product_weight * lineId.qty_done
                 }
             }
+
             return round(weight + this.productWeight * qty, 4)
         }
 
