@@ -3,7 +3,7 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
 
     const OwlDialog = require('web.OwlDialog')
     const patchMixin = require('web.patchMixin')
-
+    const {round} = require('barcode_manager_customization.BarcodeInternalDialog')
     const {Component, useState} = owl
 
     /**
@@ -33,12 +33,16 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
         }
 
         async willStart() {
-            this.state.packageList = await this.rpc({
+            const packageList = await this.rpc({
                 route: '/barcode_remember/package/weight_data',
                 params: {
                     picking: this.props.pickingID,
                 }
             })
+            for (let packageItem of packageList) {
+                packageItem['weight'] = round(packageItem['weight'], 4)
+            }
+            this.state.packageList = packageList
         }
 
         mounted() {

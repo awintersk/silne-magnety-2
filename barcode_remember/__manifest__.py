@@ -32,7 +32,7 @@
     'website': "https://smartteksas.com",
 
     'category': 'Purchases',
-    'version': '14.0.0.10',
+    'version': '14.0.0.11',
 
     'depends': [
         'base',

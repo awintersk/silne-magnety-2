@@ -49,7 +49,6 @@ class RememberStockBarcodeController(Controller):
         field2read = ['shipping_weight', 'name', 'weight_uom_name', 'weight']
         package_ids = line_ids.package_id | line_ids.result_package_id
         package_list = package_ids.read(field2read)
-        rounding = max(line_ids.product_uom_id.mapped('rounding'))
 
         for package in package_list:
             for move_id in line_ids:
@@ -57,7 +56,6 @@ class RememberStockBarcodeController(Controller):
                 if package['id'] != package_id.id:
                     continue
                 package['weight'] += move_id.product_id.weight * move_id.qty_done
-            package['weight'] = float_round(package['weight'], precision_rounding=rounding)
 
         return package_list
 

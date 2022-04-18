@@ -199,6 +199,7 @@ class StockMoveLine(models.Model):
 
         if is_new_package:
             new_package = self._new_package(package_type_int_id, weight)
+            new_package._compute_weight()
             package_int_id = new_package.id
         elif package_int_id > 0 and type(weight) in (float, int):
             package_env.browse(package_int_id).write({'shipping_weight': weight})
