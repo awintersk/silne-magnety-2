@@ -312,5 +312,5 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
         },
     })
 
-    return {BarcodeInternalDialog}
+    return {BarcodeInternalDialog, round}
 });
