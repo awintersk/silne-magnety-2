@@ -92,7 +92,7 @@ class XLSXContentManager:
             if key not in self.headers:
                 raise KeyError(key)
             col = self.headers.index(key)
-            if item is None:
+            if not item and type(item) not in (float, int):
                 item = ''
             self.worksheet.write(self.body_row, col, item, self.body_format)
         self.body_row += 1
