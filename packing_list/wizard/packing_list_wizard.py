@@ -148,7 +148,6 @@ class PackingListWizard(models.TransientModel):
             for sale_id in self.package_ids.sale_ids:
                 partner_id = sale_id.partner_shipping_id or sale_id.partner_id
                 sale_partner_id = sale_id.user_id.partner_id
-                package_weight = sum(sale_id.package_ids.mapped('shipping_weight'))
                 xlsx_data.write_dict({
                     'dobierka': sale_id.amount_total,
                     'meno_prijemcu': partner_id.name,
@@ -168,6 +167,6 @@ class PackingListWizard(models.TransientModel):
                     'pocet_balikov': len(sale_id.package_ids),
                     'sms_cislo': sale_partner_id.phone or sale_partner_id.mobile,
                     'email_prijemcu': partner_id.email_normalized,
-                    'vaha': package_weight,
+                    'vaha': '',
                 })
         return xlsx_data.content
