@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sequences for stock.quant.package -->
+    <record id="seq_quant_package_pallet" model="ir.sequence">
+        <field name="name">Packages Pallet</field>
+        <field name="code">stock.quant.package.pallet</field>
+        <field name="prefix">PALLET-</field>
+        <field name="padding">7</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

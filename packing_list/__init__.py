@@ -1,7 +1,8 @@
+# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,30 +19,26 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Customization",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from . import models
+from . import excel_tools
+from . import wizard
+
+from odoo import SUPERUSER_ID
+from odoo.api import Environment
+
+
+def _post_init(cr, registry):
+    env = Environment(cr, SUPERUSER_ID, {})
+
+    package_ids = env['stock.quant.package'].search([
+        ('quant_ids', '!=', False),
+    ], order='create_date desc', limit=1000)
+
+    package_ids.update_order_data()
+
+    for package_id in package_ids:
+        package_id.document_ids = env['documents.document'].search([
+            ('name', '=like', f'%%{package_id.name}%%'),
+            ('name', '=like', 'Package Currier%%'),
+            ('res_model', '=', 'stock.quant.package')
+        ])

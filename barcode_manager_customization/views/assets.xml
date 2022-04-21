@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="nt_backend_assets" name="NT Backend Assets" inherit_id="web.assets_backend">
+        <xpath expr="link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/barcode_manager_customization/static/src/scss/barcode_dialog_content.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/barcode_manager_customization/static/src/scss/main.scss"/>
+        </xpath>
+        <xpath expr="script[last()]" position="after">
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/backend_main.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/stock_barcode_header_widget.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/barcode_receipt_dialog.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/barcode_internal_dialog.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/barcode_package_dialog.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/lines_widget.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/secondary_body.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/barcode_preferences.js"/>
+            <script type="text/javascript" src="/barcode_manager_customization/static/src/js/barcode_actions.js"/>
+        </xpath>
+    </template>
+
+</odoo>

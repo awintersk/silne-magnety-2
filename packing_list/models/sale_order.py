@@ -1,7 +1,9 @@
+# -*- coding: UTF-8 -*-
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,30 +20,20 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Customization",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import models, fields
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    package_ids = fields.Many2many('stock.quant.package')
+
+    # --------- #
+    #  Actions  #
+    # --------- #
+
+    def action_generate_packing_document(self) -> dict:
+        action = self.env['ir.actions.act_window']._for_xml_id('packing_list.packing_list_action')
+        return dict(action, context={
+            'sale_ids': self.ids,
+        })

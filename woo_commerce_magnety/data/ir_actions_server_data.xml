@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="pull_product_weight_from_attribute" model="ir.actions.server">
+        <field name="name">Fetch weight from attribute</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_product_template"/>
+        <field name="binding_model_id" ref="model_product_template"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+            for product_tmpl_id in records:
+                product_tmpl_id._pull_product_weight_from_attribute()
+        </field>
+    </record>
+
+</odoo>

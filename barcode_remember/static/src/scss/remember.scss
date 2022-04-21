@@ -1,0 +1,30 @@
+.barcode-remember-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  font-size: 16px;
+
+  & + & {
+    margin-left: 5px;
+  }
+}
+
+.barcode-remember-options {
+  display: flex;
+  flex-direction: row;
+
+  & > * + * {
+    margin-left: 4px;
+  }
+}
+
+.barcode-remember-dialog-content {
+  .modal-body {
+    padding: 8px 8px 16px 8px;
+  }
+
+  td, th {
+    vertical-align: middle;
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="package_folder" model="documents.folder">
+        <field name="name">Packaging</field>
+    </record>
+
+</odoo>

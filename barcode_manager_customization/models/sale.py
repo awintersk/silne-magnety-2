@@ -1,7 +1,9 @@
+# -*- coding: UTF-8 -*-
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,30 +20,14 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Customization",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import api, fields, models
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    package_count = fields.Integer(default=0, copy=False)
+
+    def next_package_name(self):
+        self.package_count += 1
+        return f'{self.name}-{self.package_count:02}'

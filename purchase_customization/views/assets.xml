@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_backend" inherit_id="web.report_assets_common">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/purchase_customization/static/src/scss/purchase_order_report.scss"/>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="use_barcode_keypress_event" model="ir.config_parameter">
+        <field name="key">barcode_manager_customization.use_barcode_keypress_event</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="max_time_between_keys_in_ms" model="ir.config_parameter">
+        <field name="key">barcode.max_time_between_keys_in_ms</field>
+        <field name="value">60</field>
+    </record>
+
+    <record id="use_barcode_picking_dialog" model="ir.config_parameter">
+        <field name="key">barcode_manager_customization.use_barcode_picking_dialog</field>
+        <field name="value">True</field>
+    </record>
+
+</odoo>
