@@ -18,11 +18,11 @@
 #
 ################################################################################
 
+from odoo import models, fields, api, _
 
-from . import account_move
-from . import sale_order
-from . import product_supplierinfo
-from . import product_template
-from . import purchase_order
-from . import purchase_order_line
-from . import woo_payment_gateway
+
+class AccountCashRounding(models.Model):
+    _inherit = 'account.cash.rounding'
+
+    separate_taxes = fields.Boolean(string='Separate Taxes', default=False)
+    separate_taxes_ratio_from_first = fields.Boolean(string='Take taxes ratio from first line')

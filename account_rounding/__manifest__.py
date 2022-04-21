@@ -18,11 +18,24 @@
 #
 ################################################################################
 
-
-from . import account_move
-from . import sale_order
-from . import product_supplierinfo
-from . import product_template
-from . import purchase_order
-from . import purchase_order_line
-from . import woo_payment_gateway
+{
+    'name': 'Account Rounding',
+    'version': '14.0.1.0.0',
+    'category': 'Accounting/Accounting',
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
+    'depends': [
+        'account',
+        'woo_commerce_ept',
+    ],
+    'data': [
+        'views/account_cash_rounding_views.xml',
+        'views/account_move_templates.xml',
+        'views/account_move_views.xml',
+        'views/woo_payment_gateway_views.xml',
+    ],
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
+}

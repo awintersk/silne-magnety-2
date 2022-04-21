@@ -9,6 +9,9 @@
             <field name="amount_by_group" position="after">
                 <field name="amount_tax" string="Tax Amount" attrs="{'invisible': [('amount_tax', '=', 0)]}"/>
             </field>
+            <xpath expr="//field[@name='line_ids']//field[@name='is_rounding_line']" position="after">
+                <field name="is_tax_rounding_line" invisible="1"/>
+            </xpath>
         </field>
     </record>
 

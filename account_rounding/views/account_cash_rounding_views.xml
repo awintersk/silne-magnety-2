@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="account_cash_rounding_view_form_inherit" model="ir.ui.view">
+        <field name="name">account.cash.rounding.view.form.inherit</field>
+        <field name="model">account.cash.rounding</field>
+        <field name="inherit_id" ref="account.rounding_form_view"/>
+        <field name="arch" type="xml">
+            <field name="strategy" position="after">
+                <field name="separate_taxes"
+                       attrs="{'invisible': [('strategy', '!=', 'add_invoice_line')]}"/>
+                <field name="separate_taxes_ratio_from_first"
+                       attrs="{'invisible': [
+                       '|', ('strategy', '!=', 'add_invoice_line'),
+                               ('separate_taxes', '=', False)]}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
