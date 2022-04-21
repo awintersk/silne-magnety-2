@@ -76,32 +76,29 @@
                 <table class="table table-sm o_main_table o_hs_report_table">
                     <thead>
                         <tr>
-                            <th name="th_product_image"/>
-                            <th name="th_product_name">
+                            <th name="th_product_image" style="width: 8%"/>
+                            <th name="th_product_name" class="o_hs_report_col_lg">
                                 <strong>Product Name</strong>
                             </th>
-                            <th name="th_product_code">
+                            <th name="th_product_code" class="o_hs_report_col_lg">
                                 <strong>Product Code</strong>
                             </th>
-                            <th name="th_vendor_product_name">
+                            <th name="th_vendor_product_name" class="o_hs_report_col_lg">
                                 <strong>Vendor Product Name</strong>
                             </th>
-                            <th name="th_vendor_product_code">
+                            <th name="th_vendor_product_code" class="o_hs_report_col_lg">
                                 <strong>Vendor Product Code</strong>
                             </th>
-                            <th name="th_vendor_product_note">
-                                <strong>Vendor Product Note</strong>
-                            </th>
-                            <th name="th_hs_code">
+                            <th name="th_hs_code" class="o_hs_report_col_lg">
                                 <strong>HS Code</strong>
                             </th>
-                            <th name="th_hs_desc">
+                            <th name="th_hs_desc" class="o_hs_report_col_lg">
                                 <strong>HS Description</strong>
                             </th>
-                            <th name="th_qty">
+                            <th name="th_qty" class="o_hs_report_col_sm">
                                 <strong>Qty</strong>
                             </th>
-                            <th name="th_net_weight">
+                            <th name="th_net_weight" class="o_hs_report_col_sm">
                                 <strong>Net Weight</strong>
                             </th>
                         </tr>
@@ -115,37 +112,34 @@
 
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
-                                    <td id="product_image">
+                                    <td id="product_image" style="width: 8%">
                                         <img t-if="line.product_id.image_1024"
-                                                class="rounded-circle o_report_product_img"
+                                                class="o_report_product_img"
                                                 t-attf-src="data:image/png;base64,#{line.product_id.image_1024}"
                                                 alt="Product"/>
                                     </td>
-                                    <td id="product_name">
+                                    <td id="product_name" class="o_hs_report_col_lg">
                                         <span t-field="line.product_id.name"/>
                                     </td>
-                                    <td name="product_code">
+                                    <td name="product_code" class="o_hs_report_col_lg">
                                         <span t-field="line.product_id.default_code"/>
                                     </td>
-                                    <td name="vendor_product_name">
+                                    <td name="vendor_product_name" class="o_hs_report_col_lg">
                                         <span t-field="line.vendor_product_name"/>
                                     </td>
-                                    <td name="vendor_product_code">
+                                    <td name="vendor_product_code" class="o_hs_report_col_lg">
                                         <span t-field="line.vendor_product_code"/>
                                     </td>
-                                    <td name="vendor_product_note">
-                                        <span t-field="line.vendor_product_note"/>
-                                    </td>
-                                    <td name="hs_code">
+                                    <td name="hs_code" class="o_hs_report_col_lg">
                                         <span t-field="line.hs_code"/>
                                     </td>
-                                    <td name="hs_description">
+                                    <td name="hs_description" class="o_hs_report_col_lg">
                                         <span t-field="line.hs_description"/>
                                     </td>
-                                    <td name="qty">
+                                    <td name="qty" class="o_hs_report_col_sm">
                                         <span t-field="line.product_qty"/>
                                     </td>
-                                    <td name="net_weight">
+                                    <td name="net_weight" class="o_hs_report_col_sm">
                                         <span t-field="line.net_weight"/>
                                     </td>
                                 </t>

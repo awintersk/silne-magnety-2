@@ -7,7 +7,11 @@
 .o_hs_report_table {
     table-layout: fixed;
 
-    td, th {
-        width: 50%;
+    .o_hs_report_col_sm {
+        width: 6%;
+    }
+
+    .o_hs_report_col_lg {
+        width: 13.3%;
     }
 }
