@@ -32,12 +32,9 @@
     'data': [
         'data/ir_exports.xml',
         'views/assets.xml',
-        'views/account_move_templates.xml',
-        'views/account_move_views.xml',
         'views/product_supplierinfo_views.xml',
         'views/product_template_views.xml',
         'views/purchase_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
         'report/purchase_order_report_templates.xml',
         'report/purchase_order_report.xml',
     ],
