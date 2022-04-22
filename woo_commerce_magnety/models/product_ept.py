@@ -23,8 +23,11 @@ class WooProductTemplateEpt(models.Model):
                 [("woo_tmpl_id", "=", woo_product_template_id), ("woo_instance_id", "=", woo_instance.id)], limit=1)
             categ = data['categories'][0]
             woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', categ['id'])], limit=1)
-            if woo_category.category_id:
-                woo_template.product_tmpl_id.categ_id = woo_category.category_id
+            if not woo_category.category_id:
+                odoo_category = woo_category.create_odoo_category()
+            else:
+                odoo_category = woo_category.category_id
+            woo_template.product_tmpl_id.categ_id = odoo_category.id
             if data["attributes"]:
                 woo_template.sync_attributes(data["attributes"])
         return res
