@@ -27,7 +27,45 @@ class WooProductTemplateEpt(models.Model):
                 woo_template.product_tmpl_id.categ_id = woo_category.category_id
             if data["attributes"]:
                 woo_template.sync_attributes(data["attributes"])
+            meta_data = data["meta_data"]
+            if meta_data:
+                def get_value(data_list, key):
+                    for data in data_list:
+                        if data.get('key') == key:
+                            return data['value']
+                    return False
+                if get_value(meta_data, '_bulkdiscount_enabled') == 'yes':
+                    Price = self.env['product.pricelist.item']
+                    product = woo_template.product_tmpl_id
+                    price_data = []
+                    for i in range(1, 6):
+                        min_quantity = get_value(meta_data, f'_bulkdiscount_quantity_{i}')
+                        price = get_value(meta_data, f'_bulkdiscount_discount_fixed_{i}')
+                        if min_quantity and price:
+                            exist_price = Price.search([
+                                ('pricelist_id', '=', woo_instance.woo_pricelist_id.id),
+                                ('applied_on', '=', '1_product'),
+                                ('compute_price', '=', 'fixed'),
+                                ('product_tmpl_id', '=', product.id),
+                                ('min_quantity', '=', min_quantity),
+                            ])
+                            if exist_price:
+                                exist_price.fixed_price = price
+                            else:
+                                # TODO треба доробити розрахунок price
+                                price_data.append({
+                                    'product_tmpl_id': product.id,
+                                    'applied_on': '1_product',
+                                    'compute_price': 'fixed',
+                                    'min_quantity': min_quantity,
+                                    'fixed_price': product.with_context(pricelist=woo_instance.woo_pricelist_id.id).price - price,
+                                    'pricelist_id': woo_instance.woo_pricelist_id.id,
+                                })
+                    if price_data:
+                        Price.create(price_data)
         return res
+
+
 
     @api.model
     def sync_attributes(self, attributes):
