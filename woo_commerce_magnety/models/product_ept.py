@@ -21,13 +21,17 @@ class WooProductTemplateEpt(models.Model):
             woo_product_template_id, template_title = data.get("id"), data.get("name")
             woo_template = self.with_context(active_test=False).search(
                 [("woo_tmpl_id", "=", woo_product_template_id), ("woo_instance_id", "=", woo_instance.id)], limit=1)
-            categ = data['categories'][0]
-            woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', categ['id'])], limit=1)
-            if not woo_category.category_id:
-                odoo_category = woo_category.create_odoo_category()
-            else:
-                odoo_category = woo_category.category_id
-            woo_template.product_tmpl_id.categ_id = odoo_category.id
+            categories = []
+            for category_data in data['categories']:
+                woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', category_data['id'])], limit=1)
+                if not woo_category.category_id:
+                    odoo_category = woo_category.create_odoo_category()
+                else:
+                    odoo_category = woo_category.category_id
+                categories.append(odoo_category.id)
+            if categories:
+                woo_template.product_tmpl_id.categ_ids = [(6, 0, categories)]
+                woo_template.product_tmpl_id.categ_id = categories[0]
             if data["attributes"]:
                 woo_template.sync_attributes(data["attributes"])
         return res
@@ -61,7 +65,7 @@ class WooProductTemplateEpt(models.Model):
                             attribute_for_update = product.attribute_line_ids.filtered(
                                 lambda x: x.attribute_id.id == attribute.id
                                           and x.value_ids[0].name not in value.mapped('name'))
-                            if attribute_for_update:
+                            if attribute_for_update and value:
                                 data = {
                                     'value_ids': [(6, 0, value.ids)]
                                 }

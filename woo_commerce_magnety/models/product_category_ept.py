@@ -26,6 +26,8 @@ class WooProductCategoryEpt(models.Model):
             self.category_id.write(data)
         elif not Category.search([('name', '=', data['name'])]):
             self.category_id = Category.create([data])
+        else:
+            self.category_id = Category.search([('name', '=', data['name'])], limit=1)
         return self.category_id
 
     def prepare_odoo_category(self, parent_id):
