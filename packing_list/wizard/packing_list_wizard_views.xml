@@ -31,8 +31,22 @@
                     <button name="action_generate"
                             type="object"
                             class="btn btn-primary"
+                            attrs="{'invisible': [('name', '=', False)]}">
+                        <i class="fa fa-file mr-2"/>
+                        <span>
+                            Generate
+                        </span>
+                    </button>
+                    <button name="action_generate_download"
+                            type="object"
+                            class="btn btn-primary"
                             attrs="{'invisible': [('name', '=', False)]}"
-                            string="Generate"/>
+                            confirm="After download, please manually close the list wizard. I agree!">
+                        <i class="fa fa-download mr-2"/>
+                        <span>
+                            Generate &amp; Download
+                        </span>
+                    </button>
                     <button special="cancel" class="btn btn-secondary" string="Cancel"/>
                 </footer>
             </form>

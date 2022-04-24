@@ -109,6 +109,15 @@ class PackingListWizard(models.TransientModel):
         )
         return self.action_documents()
 
+    def action_generate_download(self):
+        document_action = self.action_generate()
+        return {
+            'name': document_action['name'],
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': f'/web/content/documents.document/{self.document_ids.id}/datas?download=true',
+        }
+
     # --------- #
     #  Private  #
     # --------- #
