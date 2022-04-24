@@ -8,6 +8,7 @@
             <xpath expr="//tree" position="inside">
                 <field name="sale_ids" string="Sales" widget="open_many2many_tags"/>
                 <field name="sales_customer" optional="show"/>
+                <field name="carrier_id" optional="show"/>
                 <field name="document_ids" widget="open_many2many_tags" optional="show"/>
             </xpath>
         </field>

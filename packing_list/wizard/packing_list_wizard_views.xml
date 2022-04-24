@@ -12,6 +12,12 @@
                 <group>
                     <h2><field name="name"/></h2>
                 </group>
+                <group>
+                    <group>
+                        <field name="folder_id"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                    </group>
+                </group>
                 <field name="package_ids" attrs="{'invisible': [('package_ids', '=', [])]}">
                     <tree>
                         <field name="name"/>
