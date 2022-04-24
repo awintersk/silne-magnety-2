@@ -7,7 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
                 <field name="sale_ids" string="Sales" widget="open_many2many_tags"/>
-                <field name="document_ids" widget="open_many2many_tags"/>
+                <field name="sales_customer" optional="show"/>
+                <field name="document_ids" widget="open_many2many_tags" optional="show"/>
             </xpath>
         </field>
     </record>
@@ -29,11 +30,11 @@
                 </button>
             </xpath>
             <xpath expr="//group[last()]" position="inside">
-                <group>
+                <group attrs="{'invisible': [('sale_ids', '=', [])]}">
                     <field name="sale_ids"
                            widget="open_many2many_tags"
-                           string="Sale Orders"
-                           attrs="{'invisible': [('sale_ids', '=', [])]}"/>
+                           string="Sale Orders"/>
+                    <field name="sales_customer"/>
                     <field name="carrier_id" attrs="{'invisible': [('carrier_id', '=', False)]}"/>
                 </group>
             </xpath>
@@ -52,6 +53,7 @@
             <xpath expr="//t[@t-name='kanban-box']" position="before">
                 <field name="document_ids"/>
                 <field name="sale_ids"/>
+                <field name="sales_customer"/>
                 <field name="packaging_type"/>
             </xpath>
             <xpath expr="//div[hasclass('o_kanban_record_top')]" position="attributes">
@@ -78,6 +80,11 @@
                     </div>
                 </div>
                 <div class="row mt-2">
+                    <div class="col-12" attrs="{'invisible': [('sales_customer', '=', False)]}" title="Customer">
+                        <i class="fa fa-user px-1"/>
+                        <b>Customer:</b>
+                        <field name="sales_customer"/>
+                    </div>
                     <div class="col-12" attrs="{'invisible': [('carrier_id', '=', False)]}" title="Carrier">
                         <i class="fa fa-truck fa-flip-horizontal px-1"/>
                         <b>Carrier:</b>
