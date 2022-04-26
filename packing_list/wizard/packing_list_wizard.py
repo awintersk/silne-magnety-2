@@ -45,6 +45,7 @@ class PackingListWizard(models.TransientModel):
         comodel_name='documents.document',
         store=False,
     )
+    folder_id = fields.Many2one('documents.folder')
 
     # ---------- #
     #  Defaults  #
@@ -73,11 +74,16 @@ class PackingListWizard(models.TransientModel):
             return {}
 
         if package_ids:
+            carrier_name = ', '.join(package_ids.sale_ids.carrier_id.mapped('name'))
+            if not carrier_name:
+                carrier_name = '<Without carrier>'
+            action_date = fields.Date.context_today(self)
             return dict(
                 response,
-                name=f"Package Currier ({','.join(package_ids.mapped('name'))})",
+                name=f"{carrier_name} {action_date}",
                 package_ids=[(6, 0, package_ids.ids)],
                 sale_ids=[(6, 0, self.package_ids.sale_ids.ids)],
+                folder_id=self.env.ref('packing_list.package_folder').id,
             )
 
         return {}
@@ -88,9 +94,8 @@ class PackingListWizard(models.TransientModel):
 
     def action_documents(self) -> dict:
         action_name = _('Documents')
-        self_name = ','.join(self.package_ids.mapped('name'))
         return {
-            'name': f"{action_name} ({self_name})",
+            'name': f"{action_name} ({self.name})",
             'domain': [('id', 'in', self.document_ids.ids)],
             'res_model': 'documents.document',
             'type': 'ir.actions.act_window',
@@ -104,26 +109,34 @@ class PackingListWizard(models.TransientModel):
         )
         return self.action_documents()
 
+    def action_generate_download(self):
+        document_action = self.action_generate()
+        return {
+            'name': document_action['name'],
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': f'/web/content/documents.document/{self.document_ids.id}/datas?download=true',
+        }
+
     # --------- #
     #  Private  #
     # --------- #
 
     def _generate_packing_documents(self, datas: bytes):
-        folder_id = self.env.ref('packing_list.package_folder')
         document_env = self.env['documents.document']
 
         self.document_ids = self.package_ids.document_ids.filtered(lambda doc_id: doc_id.name == self.name)
 
         if self.document_ids:
             self.document_ids.write({
-                'folder_id': folder_id.id,
+                'folder_id': self.folder_id.id,
                 'datas': datas,
                 'mimetype': XLSX_MIMETYPE,
             })
         else:
             self.document_ids = document_env.create({
                 'name': self.name,
-                'folder_id': folder_id.id,
+                'folder_id': self.folder_id.id,
                 'datas': datas,
                 'mimetype': XLSX_MIMETYPE,
                 'package_ids': self.package_ids.ids,
