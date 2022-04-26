@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,21 +19,23 @@
 ################################################################################
 
 {
-    'name': "Account OSS",
-    'version': '14.0.1.0.4',
+    'name': 'Account Rounding',
+    'version': '14.0.1.0.0',
     'category': 'Accounting/Accounting',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
     'depends': [
         'account',
-        'woo_commerce_magnety',
+        'woo_commerce_ept',
     ],
     'data': [
+        'views/account_cash_rounding_views.xml',
+        'views/account_move_templates.xml',
         'views/account_move_views.xml',
-        'views/sale_order_views.xml',
         'views/woo_payment_gateway_views.xml',
     ],
-    'license': "AGPL-3",
+    'license': 'AGPL-3',
     'installable': True,
+    'auto_install': False,
     'application': False,
 }

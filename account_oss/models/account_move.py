@@ -26,20 +26,4 @@ class AccountMove(models.Model):
 
     oss = fields.Boolean(
         string='OSS',
-        compute='_compute_oss',
-        store=True,
-        readonly=False,
     )
-
-    @api.depends(
-        'partner_id.is_vat_payer',
-        'invoice_line_ids.sale_line_ids.order_id.payment_gateway_id.with_oss',
-    )
-    def _compute_oss(self):
-        self.oss = False
-        for r in self.filtered(
-            lambda r: r.invoice_line_ids.sale_line_ids.order_id.mapped('payment_gateway_id')
-        ):
-            payment_gateways = r.invoice_line_ids.sale_line_ids.order_id.payment_gateway_id
-            r.oss = all(payment_gateways.mapped('with_oss')) \
-                and not r.partner_id.is_vat_payer

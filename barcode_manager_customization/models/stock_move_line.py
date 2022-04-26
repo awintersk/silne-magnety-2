@@ -249,19 +249,12 @@ class StockMoveLine(models.Model):
         :rtype: dict
         """
         new_move_ids = None
-        location_env = self.env['stock.location']
         picking_env = self.env['stock.picking']
         package_env = self.env['stock.quant.package']
 
-        location_id = location_env.search([('barcode', '=', 'WH-OUTPUT')])
-
-        if not location_id:
-            _logger.warning(location_id)
-            return {}
-
         order_picking_id = picking_env.search([
             ('sale_id', '=', order_int_id),
-            ('location_dest_id', '=', location_id.id),
+            ('picking_type_id.sequence_code', '=', 'PICK'),
             ('state', 'in', ('waiting', 'confirmed', 'assigned'))
         ], limit=1)
 
@@ -270,12 +263,14 @@ class StockMoveLine(models.Model):
             return {}
 
         normalized_qty = self.product_uom_id._compute_quantity(qty, self.product_uom_id, rounding_method='HALF_UP')
+        location_dest_id = self.location_dest_id
 
         new_picking_id = self.picking_id.copy({
             'name': '/',
             'move_lines': [],
             'move_line_ids': [],
-            'purchase_id': self.picking_id.purchase_id.id
+            'purchase_id': self.picking_id.purchase_id.id,
+            'location_dest_id': location_dest_id.id,
         })
 
         if package_int_id is None:
@@ -295,6 +290,7 @@ class StockMoveLine(models.Model):
             self.write(dict(
                 picking_id=new_picking_id.id,
                 qty_done=normalized_qty,
+                location_dest_id=location_dest_id.id,
             ))
             if package_id:
                 self.write({'result_package_id': package_id.id})
@@ -306,6 +302,7 @@ class StockMoveLine(models.Model):
                 **move_data,
                 'picking_id': new_picking_id.id,
                 'quantity_done': normalized_qty,
+                'location_dest_id': location_dest_id.id,
             } for move_data in split_move])
 
             if package_id:
@@ -316,11 +313,15 @@ class StockMoveLine(models.Model):
 
         ctx.update({
             'dest_ids': new_move_ids.move_dest_ids if new_move_ids else self.move_id.move_dest_ids,
-            'dest_id': order_picking_id.move_ids_without_package.
-                filtered(lambda move: move.product_id.id == self.product_id.id)
+            'dest_id': order_picking_id.move_ids_without_package.filtered(
+                lambda move: move.product_id.id == self.product_id.id
+            )
         })
+
         new_picking_id.action_confirm()
         new_picking_id.with_context(ctx).button_validate()
+
+        order_picking_id.action_assign()
 
         if package_id:
             response_package = {'id': package_id.id, 'name': package_id.name}

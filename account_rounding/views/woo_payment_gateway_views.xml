@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <group name="sales_config">
-                    <field name="rounding"/>
+                    <field name="rounding_id"/>
                 </group>
             </xpath>
         </field>

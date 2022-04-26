@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,22 +18,11 @@
 #
 ################################################################################
 
-{
-    'name': "Account OSS",
-    'version': '14.0.1.0.4',
-    'category': 'Accounting/Accounting',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'account',
-        'woo_commerce_magnety',
-    ],
-    'data': [
-        'views/account_move_views.xml',
-        'views/sale_order_views.xml',
-        'views/woo_payment_gateway_views.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import models, fields, api, _
+
+
+class AccountCashRounding(models.Model):
+    _inherit = 'account.cash.rounding'
+
+    separate_taxes = fields.Boolean(string='Separate Taxes', default=False)
+    separate_taxes_ratio_from_first = fields.Boolean(string='Take taxes ratio from first line')

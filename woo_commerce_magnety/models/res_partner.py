@@ -22,14 +22,11 @@ from odoo import _, api, fields, models
 
 METADATA_FIELDS = {
     'billing_company_wi_tax': 'vat',
-    '_billing_company_wi_vat_enabled': 'is_vat_payer',
 }
 
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-
-    is_vat_payer = fields.Boolean(string='Is VAT Payer')
 
     def woo_create_or_update_customer(self, customer_val, instance, parent_id, partner_type, customer_id=False, meta_data={}):
         def get_meta_line(meta, key):
@@ -38,7 +35,7 @@ class ResPartner(models.Model):
                     return line.get('value')
             return False
 
-        address_key_list = ['name', 'street', 'street2', 'city', 'zip', 'phone', 'state_id', 'country_id']
+        address_key_list = ['name', 'street', 'street2', 'city', 'zip', 'phone', 'state_id', 'country_id', 'vat']
 
         first_name = customer_val.get("first_name")
         last_name = customer_val.get("last_name")
@@ -62,6 +59,7 @@ class ResPartner(models.Model):
 
         address_partner = self.woo_search_address_partner(partner_vals, address_key_list, parent_id, partner_type)
         if address_partner:
+
             if not parent_id and customer_id and not address_partner.is_woo_customer:
                 address_partner.create_woo_res_partner_ept(woo_partner_values)
                 address_partner.write({'is_woo_customer': True})
@@ -72,7 +70,7 @@ class ResPartner(models.Model):
         if parent_id:
             partner_vals.update({'parent_id': parent_id.id})
         partner_vals.update({'type': partner_type})
-        address_partner = self.create(partner_vals)
+        address_partner = self.with_context(no_vat_validation=True).create(partner_vals)
         if not parent_id and customer_id:
             address_partner.create_woo_res_partner_ept(woo_partner_values)
             address_partner.write({'is_woo_customer': True})

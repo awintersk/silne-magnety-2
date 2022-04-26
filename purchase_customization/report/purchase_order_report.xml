@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="purchase_report_order_hs" model="report.paperformat">
-        <field name="name">Custom Paperformat for the Student report</field>
+        <field name="name">Custom Paperformat for the HS report</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
         <field name="orientation">Landscape</field>
