@@ -1,6 +1,7 @@
 odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) {
     'use strict'
 
+    const {catchCommandBarcode} = require('barcode_remember.remember_tools')
     const patchMixin = require('web.patchMixin')
     const Dialog = require('web.OwlDialog')
     const {bus} = require('web.core')
@@ -68,7 +69,17 @@ odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) 
          * @private
          */
         _onBarcodeScannedHandler(barcode) {
+            const useExit = catchCommandBarcode(barcode, {
+                validate: () => this._onValidate(),
+                discard: () => this.destroy(),
+            })
+
+            if (useExit) {
+                return
+            }
+
             const productId = this.state.productList.find(item => item.barcode === barcode)
+
             if (productId) {
                 this.state.productId = productId
                 this.notification.notify({

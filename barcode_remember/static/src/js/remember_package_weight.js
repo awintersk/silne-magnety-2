@@ -4,6 +4,7 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
     const OwlDialog = require('web.OwlDialog')
     const patchMixin = require('web.patchMixin')
     const {round} = require('barcode_manager_customization.BarcodeInternalDialog')
+    const {catchCommandBarcode, useBarcodeScanner} = require('barcode_remember.remember_tools')
     const {Component, useState} = owl
 
     /**
@@ -30,6 +31,7 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
             this.state = useState({
                 packageList: []
             })
+            useBarcodeScanner(this._onBarcodeScannedHandler)
         }
 
         async willStart() {
@@ -47,7 +49,7 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
 
         mounted() {
             if (!this.state.packageList.length) {
-                this.__validate()
+                this._validate()
                 this.destroy()
             }
         }
@@ -66,12 +68,24 @@ odoo.define('barcode_remember.remember_package_weight', function (require) {
                     }
                 })
             }
-            this.__validate()
+            this._validate()
             this.destroy()
         }
 
-        __validate() {
+        _validate() {
             this.trigger('validate', {preventDialog: true})
+        }
+
+        /**
+         * @param {String} barcode
+         * @private
+         */
+        _onBarcodeScannedHandler(barcode) {
+            catchCommandBarcode(barcode, {
+                validate: () => this.onSave(),
+                discard: () => this.onClose(),
+                cancel: () => this.onClose(),
+            })
         }
     }
 
