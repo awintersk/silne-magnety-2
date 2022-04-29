@@ -19,6 +19,7 @@ odoo.define('barcode_remember.remember_action', function (require) {
             this.containLangWarningProduct = false
             this.sequenceCode = ''
             this.useWarningFunc = false
+            this.preventPickingValidationDialog = false
         },
 
         async willStart() {
@@ -90,18 +91,8 @@ odoo.define('barcode_remember.remember_action', function (require) {
          */
         async _onValidate(event) {
             event.stopPropagation()
-            /**@type{Boolean}*/
-            const preventDialog = event.data.preventDialog
-            /**@type{Function}*/
-            const superOnValidate = this._super.bind(this)
-
-            if (this.useWarningFunc && !preventDialog) {
-                if (await this._openWarningDialog()) {
-                    return undefined
-                }
-            }
-
-            superOnValidate(...arguments)
+            this.preventPickingValidationDialog = event.data.preventDialog
+            await this._super.apply(this, arguments)
         },
 
         /**
@@ -121,6 +112,22 @@ odoo.define('barcode_remember.remember_action', function (require) {
                 return true
             }
         },
+
+        async _validate() {
+            /**@type{Function}*/
+            const superValidate = this._super.bind(this)
+
+            if (this.useWarningFunc && !this.preventPickingValidationDialog) {
+                if (await this._openWarningDialog()) {
+                    return undefined
+                }
+            }
+
+            await superValidate(...arguments)
+
+            this.preventPickingValidationDialog = false
+        },
+
     })
 
 });
