@@ -166,6 +166,16 @@
                     <th>Qty</th>
                     <td><t t-esc="props.item.qty"/> units</td>
                 </tr>
+                <tr class="thead-light">
+                    <th>Destination Location</th>
+                    <td class="vertical-align-middle">
+                        <select class="o_input" t-model.number="state.locationDestID">
+                            <t t-foreach="props.destinationLocationList" t-as="location" t-key="'location_' + location.id">
+                                <option t-att-value="location.id" t-esc="location.display_name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
                 <tr class="thead-light h-100">
                     <th>Package №</th>
                     <td class="pr-3 vertical-align-middle">
