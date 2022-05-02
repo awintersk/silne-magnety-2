@@ -67,3 +67,13 @@ class RememberStockBarcodeController(Controller):
             if package_id.exists():
                 package_id.write({'shipping_weight': weight})
         return True
+
+    @route('/barcode_remember/package', type='json', methods=['POST'], auth='user')
+    def barcode_remember_package_data(self, picking: int) -> List[Optional[Dict]]:
+        picking_id = request.env['stock.picking'].browse(picking)
+        line_ids = picking_id.move_line_ids
+
+        if not line_ids:
+            return []
+
+        return line_ids.result_package_id.read(['name', 'packaging_id'])
