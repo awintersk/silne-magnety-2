@@ -47,6 +47,7 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
                 packageTypeItems: [],
                 boxIntId: 0,
                 packageTypeIntId: 0,
+                locationDestID: this.props.locationDestID,
             })
             this.eventSetup()
             useWatchDog({
@@ -101,31 +102,44 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
             return this.props.product && this.props.product.display_name.length >= 60 ? 'large' : 'medium'
         }
 
+        get notification() {
+            return this.env.services.notification
+        }
+
         /**
          * @param {String} barcode
          * @returns {Promise<void>}
          * @private
          */
         async _onBarcodeScanned(barcode) {
-            const [packageId] = await this.rpc({
-                model: 'stock.quant.package',
-                method: 'search_read',
-                domain: [['name', '=', barcode]],
-                fields: ['id', 'packaging_id']
-            })
+            const location = this.props.locationsByBarcode[barcode]
+
+            if (location) {
+                this.state.locationDestID = location.id
+                this.notification.notify({
+                    message: `Selected location: ${location.display_name}`,
+                    type: 'success',
+                })
+                return;
+            }
+
+            const packageId = this.state.packageItems.find(item => item.name === barcode)
+
             if (packageId) {
                 this.state.packageTypeIntId = packageId.packaging_id ? packageId.packaging_id[0] : 0
                 this.state.boxIntId = packageId.id
-            } else {
-                this.state.boxIntId = 0
-                this.state.packageTypeIntId = 0
-
-                this.env.services.notification.notify({
-                    type: 'danger',
-                    title: 'Barcode',
-                    message: `Package with barcode: <strong>${barcode}</strong> is not found!`
+                this.notification.notify({
+                    message: `Package: ${packageId.name}`,
+                    type: 'success',
                 })
+                return;
             }
+
+            this.notification.notify({
+                type: 'danger',
+                title: 'Barcode',
+                message: `Package with barcode: <strong>${barcode}</strong> is not found!`
+            })
         }
 
         _onChangePackage() {
@@ -150,7 +164,8 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
                 item: Object.assign({}, this.props.item, {
                     boxIntId: Number(this.state.boxIntId),
                     packageTypeIntId: Number(this.state.packageTypeIntId)
-                })
+                }),
+                locationDestID: Number(this.state.locationDestID),
             })
             this.destroy()
         }
