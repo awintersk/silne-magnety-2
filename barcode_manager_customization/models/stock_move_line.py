@@ -239,18 +239,29 @@ class StockMoveLine(models.Model):
             rec.split_and_put_in_pack(rec.qty_done if use_qty_done else rec.product_uom_qty, package_int_id)
         return True
 
-    def split_move_line_for_order(self, qty, order_int_id, package_int_id=None, package_type_int_id=None):
+    def split_move_line_for_order(
+            self,
+            qty,
+            order_int_id,
+            package_int_id=None,
+            package_type_int_id=None,
+            location_dest_int_id=None
+    ):
         """
         Used for barcode customization
         :type qty float
         :type order_int_id int
-        :type package_int_id int
-        :type package_type_int_id int
+        :type package_int_id int | None
+        :type package_type_int_id int | None
+        :type location_dest_int_id int | None
         :rtype: dict
         """
         new_move_ids = None
         picking_env = self.env['stock.picking']
         package_env = self.env['stock.quant.package']
+
+        if not location_dest_int_id:
+            location_dest_int_id = self.location_dest_id.id
 
         order_picking_id = picking_env.search([
             ('sale_id', '=', order_int_id),
@@ -263,14 +274,13 @@ class StockMoveLine(models.Model):
             return {}
 
         normalized_qty = self.product_uom_id._compute_quantity(qty, self.product_uom_id, rounding_method='HALF_UP')
-        location_dest_id = self.location_dest_id
 
         new_picking_id = self.picking_id.copy({
             'name': '/',
             'move_lines': [],
             'move_line_ids': [],
             'purchase_id': self.picking_id.purchase_id.id,
-            'location_dest_id': location_dest_id.id,
+            'location_dest_id': location_dest_int_id,
         })
 
         if package_int_id is None:
@@ -290,7 +300,7 @@ class StockMoveLine(models.Model):
             self.write(dict(
                 picking_id=new_picking_id.id,
                 qty_done=normalized_qty,
-                location_dest_id=location_dest_id.id,
+                location_dest_id=location_dest_int_id,
             ))
             if package_id:
                 self.write({'result_package_id': package_id.id})
@@ -302,7 +312,7 @@ class StockMoveLine(models.Model):
                 **move_data,
                 'picking_id': new_picking_id.id,
                 'quantity_done': normalized_qty,
-                'location_dest_id': location_dest_id.id,
+                'location_dest_id': location_dest_int_id,
             } for move_data in split_move])
 
             if package_id:

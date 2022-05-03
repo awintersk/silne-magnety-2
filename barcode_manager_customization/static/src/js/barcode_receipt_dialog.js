@@ -61,12 +61,18 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         async _onValidate(item) {
             await mount(SecondaryBody, {
                 target: this.el,
-                props: {item, product: this.props.product}
+                props: {
+                    item,
+                    product: this.props.product,
+                    destinationLocationList: this.props.destinationLocationList,
+                    locationDestID: this.props.locationDestID,
+                    locationsByBarcode: this.props.locationsByBarcode,
+                }
             })
         }
 
         /**
-         * @param detail.item
+         * @param {{item:Object, locationDestID:Number}} detail
          * @private
          * @returns Promise<void>
          */
@@ -84,7 +90,8 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
                         qty: detail.item.qty,
                         order_int_id: detail.item.id,
                         package_int_id: detail.item.boxIntId,
-                        package_type_int_id: detail.item.packageTypeIntId
+                        package_type_int_id: detail.item.packageTypeIntId,
+                        location_dest_int_id: detail.locationDestID,
                     }
                 })
 
@@ -157,11 +164,17 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         product: {},
         items: [],
         lineId: 0,
+        destinationLocationList: [],
+        locationDestID: 0,
+        locationsByBarcode: [],
     }
     BarcodeReceiptDialog.props = {
         product: Object,
         items: Array,
         lineId: Number,
+        destinationLocationList: Object,
+        locationDestID: Number,
+        locationsByBarcode: Object,
     }
 
     return {BarcodeReceiptDialog}
