@@ -48,6 +48,7 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
                 boxIntId: 0,
                 packageTypeIntId: 0,
                 locationDestID: this.props.locationDestID,
+                destinationLocationList: [],
             })
             this.eventSetup()
             useWatchDog({
@@ -74,8 +75,13 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
                     ['name', 'ilike', `${this.props.item.name}-%%`],
                     ['packaging_id', 'in', this.state.packageTypeItems.map(el => el.id)]
                 ],
-                fields: ['name', 'packaging_id'],
+                fields: ['name', 'packaging_id', 'location_id'],
                 orderBy: [{name: 'id', asc: false}]
+            })
+            this.state.destinationLocationList = await this.rpc({
+                model: 'stock.picking',
+                method: 'stock_location_for_order_receipt',
+                args: [[this.props.pickingID], this.props.item.id],
             })
         }
 
@@ -107,14 +113,51 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
         }
 
         /**
+         * @returns {Boolean}
+         */
+        get disabledLocation() {
+            const box = this.state.packageItems.find(item => item.id === Number(this.state.boxIntId))
+            if (box) {
+                return Boolean(box.location_id)
+            }
+            return false
+        }
+
+        /**
+         * @param {Number} boxID
+         * @returns {Number}
+         */
+        locationIdByBox(boxID) {
+            const box = this.state.packageItems.find(item => item.id === boxID)
+
+            if (!box) {
+                return 0
+            }
+
+            const location = this.state.destinationLocationList.find(item => item.id === box.location_id[0])
+            if (location) {
+                return location.id
+            }
+            return 0
+        }
+
+        /**
+         * @param {String} barcode
+         * @returns {*|undefined}
+         */
+        locationByBarcode(barcode) {
+            return this.state.destinationLocationList.find(item => item.barcode === barcode)
+        }
+
+        /**
          * @param {String} barcode
          * @returns {Promise<void>}
          * @private
          */
         async _onBarcodeScanned(barcode) {
-            const location = this.props.locationsByBarcode[barcode]
+            const location = this.locationByBarcode(barcode)
 
-            if (location) {
+            if (location && !this.disabledLocation) {
                 this.state.locationDestID = location.id
                 this.notification.notify({
                     message: `Selected location: ${location.display_name}`,
@@ -138,7 +181,7 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
             this.notification.notify({
                 type: 'danger',
                 title: 'Barcode',
-                message: `Package with barcode: <strong>${barcode}</strong> is not found!`
+                message: `Item with barcode: <strong>${barcode}</strong> is not found!`
             })
         }
 
@@ -153,6 +196,12 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
             } else {
                 this.state.packageTypeIntId = 0
             }
+
+            const locationID = this.locationIdByBox(boxId)
+            if (locationID) {
+                this.state.locationDestID = locationID
+            }
+
         }
 
         onClose() {

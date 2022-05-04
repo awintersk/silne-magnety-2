@@ -64,9 +64,8 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
                 props: {
                     item,
                     product: this.props.product,
-                    destinationLocationList: this.props.destinationLocationList,
                     locationDestID: this.props.locationDestID,
-                    locationsByBarcode: this.props.locationsByBarcode,
+                    pickingID: this.props.pickingID,
                 }
             })
         }
@@ -107,14 +106,7 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
                     message: `${_t('Box')}: ${packageId.name}`,
                     sticky: false,
                 });
-            } catch (error) {
-                console.error(error)
-                services.notification.notify({
-                    type: "danger",
-                    title: this.env._t('Error'),
-                    message: this.env._t(error),
-                    sticky: false,
-                });
+            } catch {
             } finally {
                 services.unblockUI()
             }
@@ -164,17 +156,15 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         product: {},
         items: [],
         lineId: 0,
-        destinationLocationList: [],
         locationDestID: 0,
-        locationsByBarcode: [],
+        pickingID: 0
     }
     BarcodeReceiptDialog.props = {
         product: Object,
         items: Array,
         lineId: Number,
-        destinationLocationList: Object,
         locationDestID: Number,
-        locationsByBarcode: Object,
+        pickingID: Number,
     }
 
     return {BarcodeReceiptDialog}
