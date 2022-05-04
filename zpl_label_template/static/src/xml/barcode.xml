@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <t t-extend="stock_barcode_settings_widget">
+        <t t-jquery=".o_print_barcodes_zpl" t-operation="replace">
+            <button t-if="widget.isStockPicking()" class="btn-lg btn btn-dark text-uppercase o_print_product_labels_zpl">
+                Print Product Label ZPL
+            </button>
+            <button t-if="widget.isStockPicking() &amp;&amp; ['internal', 'delivery'].includes(widget.mode)"
+                    class="btn-lg btn btn-dark text-uppercase o_print_box_labels_zpl">
+                Print Box Label ZPL
+            </button>
+            <button t-if="widget.isStockPicking() &amp;&amp; widget.mode == 'delivery'"
+                    class="btn-lg btn btn-dark text-uppercase o_print_pallet_labels_zpl">
+                Print Pallet Label ZPL
+            </button>
+        </t>
+    </t>
+
+    <t t-name="zpl_label_template.ProductPrintLabelZPL" owl="1">
+        <Dialog t-ref="dialog"
+                size="'medium'"
+                title="'Print (Product Label ZPL)'"
+                fullscreen="true"
+                stopClicks="false"
+                t-on-dialog-closed="_onDialogClosed">
+            <div class="d-flex justify-content-center align-items-center" t-if="!state.lines.length">
+                <strong>This stage does not contain product lines</strong>
+            </div>
+            <table class="table table-bordered" t-else="">
+                <tr>
+                    <th class="text-uppercase">Product</th>
+                    <th class="text-uppercase text-center">QTY</th>
+                    <th/>
+                </tr>
+                <tr t-foreach="state.lines" t-as="line" t-key="line_index">
+                    <td>
+                        <span t-att-class="line.qty&lt;=0 ? 'text-muted' : ''" t-esc="line.name"/>
+                    </td>
+                    <td width="80" class="align-middle">
+                        <input class="o_input text-center" type="number" min="0" t-model.number="line.qty"/>
+                    </td>
+                    <td class="p-1 align-middle text-center">
+                        <button t-attf-class="btn {{line.printed ? 'btn-primary' : 'btn-outline-primary'}}"
+                                t-on-click="_onPrintLine(line)"
+                                t-att-disabled="line.qty &lt;= 0">
+                            <i class="fa fa-print"/>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-secondary w-100" t-on-click.prevent="_onClose">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="zpl_label_template.BoxPrintLabelZPL" owl="1">
+        <Dialog t-ref="dialog"
+                size="'small'"
+                title="'Print (Box Label ZPL)'"
+                fullscreen="true"
+                stopClicks="false"
+                t-on-dialog-closed="_onDialogClosed">
+            <div class="d-flex justify-content-center align-items-center" t-if="!state.lines.length">
+                <strong>This stage does not contain box lines</strong>
+            </div>
+            <table class="table table-bordered" t-else="">
+                <tr>
+                    <th class="text-uppercase">Box</th>
+                    <th/>
+                </tr>
+                <tr t-foreach="state.lines" t-as="line" t-key="line.id">
+                    <td>
+                        <span t-esc="line.name"/>
+                    </td>
+                    <td class="p-1 align-middle text-center" width="45">
+                        <button t-attf-class="btn {{line.printed ? 'btn-primary' : 'btn-outline-primary'}}" t-on-click="_onPrintLine(line)">
+                            <i class="fa fa-print"/>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-secondary w-100" t-on-click.prevent="_onClose">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="zpl_label_template.PalletPrintLabelZPL" owl="1">
+        <Dialog t-ref="dialog"
+                size="'small'"
+                title="'Print (Pallet Label ZPL)'"
+                fullscreen="true"
+                stopClicks="false"
+                t-on-dialog-closed="_onDialogClosed">
+            <div class="d-flex justify-content-center align-items-center" t-if="!state.lines.length">
+                <strong>This stage does not contain pallet lines</strong>
+            </div>
+            <table class="table table-bordered" t-else="">
+                <tr>
+                    <th class="text-uppercase">Pallet</th>
+                    <th/>
+                </tr>
+                <tr t-foreach="state.lines" t-as="line" t-key="line.id">
+                    <td>
+                        <span t-esc="line.name"/>
+                    </td>
+                    <td class="p-1 align-middle text-center" width="45">
+                        <button t-attf-class="btn {{line.printed ? 'btn-primary' : 'btn-outline-primary'}}" t-on-click="_onPrintLine(line)">
+                            <i class="fa fa-print"/>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-secondary w-100" t-on-click.prevent="_onClose">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>
