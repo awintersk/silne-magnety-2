@@ -1,8 +1,7 @@
-# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,47 +19,20 @@
 ################################################################################
 
 {
-    'name': "Packing List",
-
-    'summary': """
-    """,
-
-    'description': """
-    """,
-
-    'author': "SmartTek",
-    'website': "https://smartteksas.com",
-
-    'category': 'Inventory/Delivery',
-    'version': '14.0.0.8',
-
+    'name': 'Sale Customization',
+    'version': '14.0.1.0.0',
+    'category': 'Sales/Sales',
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
     'depends': [
-        'base',
-        'stock',
-        'delivery',
-        'documents',
-        'report_xlsx',
-        'sale_customization',
-        'w_open_many2many_tags',
-        'barcode_manager_customization',
+        'sale',
     ],
-
-    'demo': [
-    ],
-
     'data': [
-        'security/ir.model.access.csv',
-
-        'data/documents_folder_data.xml',
-        'data/ir_actions_server_data.xml',
-
-        'views/stock_quant_package_views.xml',
-
-        'wizard/packing_list_wizard_views.xml',
+        'report/sale_delivery_list_report.xml',
+        'report/sale_delivery_list_report_templates.xml',
     ],
-
-    'qweb': [
-    ],
-
-    'post_init_hook': '_post_init'
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
 }
