@@ -248,9 +248,9 @@
                     <th>Package №</th>
                     <td class="pr-3">
                         <select class="o_input" t-model.number="state.boxIntId" t-att-disabled="state.isMoved">
-                            <option t-att-selected="state.boxIntId === 0" value="0">New package</option>
-                            <t t-foreach="state.packageItems" t-as="item" t-key="item.id">
-                                <option t-att-selected="state.boxIntId === item.id" t-att-value="item.id" t-esc="item.name"/>
+                            <option value="0">New package</option>
+                            <t t-foreach="state.packageItems" t-as="item" t-key="'pacakage_' + item.id">
+                                <option t-att-value="item.id" t-esc="item.name"/>
                             </t>
                         </select>
                     </td>

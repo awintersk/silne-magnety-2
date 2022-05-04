@@ -187,23 +187,28 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                 return false
             }
 
-            const moveLineIds = this.currentState.move_line_ids
+            /**@type{Object<*>[]}*/
+            const moveLineIds = this.linesWidget.page.lines
+            /**@type{Object<*>[]}*/
+            const linesWithBarcode = moveLineIds.filter(item => item.product_barcode === barcode)
 
-            /**@type{Object<*>|undefined}*/
-            const linesId = moveLineIds.find(rec => {
-                const getID = rec => rec ? rec[0] : null
-                if (rec.product_barcode !== barcode) return false;
-                if (rec.qty_done >= rec.product_uom_qty) return false
-                return !rec.result_package_id || getID(rec.package_id) === getID(rec.result_package_id)
-            })
-
-            if (!linesId) {
+            if (!linesWithBarcode.length) {
                 this.displayNotification({
                     type: 'danger',
                     title: 'Barcode',
                     message: `Product Barcode: <strong>${barcode}</strong> is not found.`
                 })
-                return true
+            }
+
+            /**@type{Object<*>|undefined}*/
+            const linesId = linesWithBarcode.find(rec => {
+                const getID = rec => _.isEmpty(rec) ? rec[0] : null
+                if (rec.qty_done >= rec.product_uom_qty) return false
+                return !_.isEmpty(rec.result_package_id) || getID(rec.package_id) === getID(rec.result_package_id)
+            })
+
+            if (!linesId) {
+                return false
             }
 
             await this._save()
