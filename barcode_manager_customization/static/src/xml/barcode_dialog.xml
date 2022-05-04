@@ -169,8 +169,8 @@
                 <tr class="thead-light">
                     <th>Destination Location</th>
                     <td class="vertical-align-middle">
-                        <select class="o_input" t-model.number="state.locationDestID">
-                            <t t-foreach="props.destinationLocationList" t-as="location" t-key="'location_' + location.id">
+                        <select class="o_input" t-model.number="state.locationDestID" t-att-disabled="disabledLocation">
+                            <t t-foreach="state.destinationLocationList" t-as="location" t-key="'location_' + location.id">
                                 <option t-att-value="location.id" t-esc="location.display_name"/>
                             </t>
                         </select>
