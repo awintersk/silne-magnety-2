@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="zpl_label_template_pandora_product" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="width" eval="32"/>
+        <field name="height" eval="24"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_pandora_product_view"/>
+        <field name="report_id" ref="zpl_label_template.action_pandora_product_report"/>
+    </record>
+
+    <record id="zpl_label_template_pandora_product_template" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="width" eval="32"/>
+        <field name="height" eval="24"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_pandora_product_template_view"/>
+        <field name="report_id" ref="zpl_label_template.action_pandora_product_template_report"/>
+    </record>
+
+    <record id="zpl_label_template_monti_product_template" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_monti_product_template_view"/>
+        <field name="report_id" ref="zpl_label_template.action_monti_product_template_report"/>
+    </record>
+
+    <record id="zpl_label_template_monti_product" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_monti_product_view"/>
+        <field name="report_id" ref="zpl_label_template.action_monti_product_report"/>
+    </record>
+
+    <record id="zpl_label_template_ysl_product" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_ysl_product_view"/>
+        <field name="report_id" ref="action_ysl_product_report"/>
+    </record>
+
+    <record id="zpl_label_template_ysl_product_template" model="zpl.label.template">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_ysl_product_template_view"/>
+        <field name="report_id" ref="action_ysl_product_template_report"/>
+    </record>
+
+    <record id="zpl_label_template_location" model="zpl.label.template">
+        <field name="model_id" ref="stock.model_stock_location"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_location_view"/>
+        <field name="report_id" ref="action_location_report"/>
+    </record>
+
+    <record id="zpl_label_template_pallet" model="zpl.label.template">
+        <field name="model_id" ref="stock.model_stock_quant_package"/>
+        <field name="width" eval="98"/>
+        <field name="height" eval="150"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_pallet_view"/>
+        <field name="report_id" ref="action_pallet_report"/>
+    </record>
+
+    <record id="zpl_label_template_box" model="zpl.label.template">
+        <field name="model_id" ref="stock.model_stock_quant_package"/>
+        <field name="width" eval="60"/>
+        <field name="height" eval="40"/>
+        <field name="measurement">mm</field>
+        <field name="dpmm">8dpmm</field>
+        <field name="report_view_id" ref="zpl_label_template.zpl_label_box_view"/>
+        <field name="report_id" ref="zpl_label_template.action_box_report"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_users_form_preferences_inherited" model="ir.ui.view">
+        <field name="name">view.users.form.preferences.inherited</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="printnode_base.view_users_form_preferences"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='printing']" position="inside">
+                <field name="printnode_pallet_printer_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
