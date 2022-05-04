@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="zpl_template_view_form" model="ir.ui.view">
+        <field name="name">zpl_template_view_form</field>
+        <field name="model">zpl.label.template</field>
+        <field name="arch" type="xml">
+            <form string="zpl_template_form">
+                <field name="active" invisible="1"/>
+                <field name="published" invisible="1"/>
+                <field name="report_id" invisible="1"/>
+
+                <sheet>
+                    <div class="oe_button_box" name="expense_button_box">
+                        <button name="toggle_publish"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-globe">
+                            <span attrs="{'invisible': [('published', '=', True)]}">Publish</span>
+                            <span attrs="{'invisible': [('published', '=', False)]}">Unpublish</span>
+                        </button>
+                        <button name="open_related_report"
+                                attrs="{'invisible': [('report_id', '=', False)]}"
+                                type="object"
+                                class="oe_stat_button"
+                                groups="base.group_no_one"
+                                string="Report"
+                                icon="fa-barcode">
+                        </button>
+                        <button name="toggle_active"
+                                type="object"
+                                confirm="(Un)archiving a project automatically (un)archives its tasks and issues. Do you want to proceed?"
+                                class="oe_stat_button"
+                                icon="fa-archive">
+                            <span attrs="{'invisible': [('active', '=', False)]}">Archive</span>
+                            <span attrs="{'invisible': [('active', '=', True)]}">Unarchive</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                    </div>
+                    <group name="model">
+                        <group>
+                            <field name="model_id"
+                                   options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                        </group>
+                        <group>
+                            <field name="record_int_id"
+                                   string="Record"
+                                   widget="model_record_list"
+                                   options="{'record_limit': 60}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="product_category_ids"
+                               widget="many2many_tags"
+                               options="{'color_field': 'color', 'no_create': True}"/>
+                    </group>
+                    <notebook>
+                        <page string="ZPL">
+                            <field name="zpl_code" widget="ace" options="{'mode': 'xml'}" nolabel="1"/>
+                        </page>
+                        <page string="Preview">
+                            <button name="generate_zpl_image" type="object" string="Redraw" class="btn btn-outline-primary"/>
+                            <group>
+                                <group>
+                                    <label for="width" string="Label size"/>
+                                    <div class="o_row">
+                                        <field name="width" nolabel="1" class="oe_inline" options="{'type': 'number', 'step': 1}"/>
+                                        <span class="px-1">x</span>
+                                        <field name="height" nolabel="1" class="oe_inline" options="{'type': 'number', 'step': 1}"/>
+                                        <field name="measurement" nolabel="1" class="oe_inline"/>
+                                    </div>
+                                    <field name="dpmm"/>
+                                </group>
+                                <group attrs="{'invisible': [('zpl_image', '=', False)]}">
+                                    <field name="zpl_image" widget="image" nolabel="1" readonly="1" class="zpl-template-image"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Documentations">
+                            <div id="accordion">
+                                <div class="card"
+                                >
+                                    <div class="card-header py-0" id="headingOne">
+                                        <h5 class="mb-0">
+                                            <a class="btn btn-link collapsed w-100 text-left py-3"
+                                               data-toggle="collapse"
+                                               data-target="#collapseOne"
+                                               role="button"
+                                               aria-expanded="false"
+                                               aria-controls="collapseOne">
+                                                Odoo
+                                            </a>
+                                        </h5>
+                                    </div>
+
+                                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-end">
+                                                <a class="btn btn-outline-primary" role="button"
+                                                   href="https://www.odoo.com/documentation/14.0/developer/reference/javascript/qweb.html"
+                                                   target="new">
+                                                    QWeb documentation
+                                                </a>
+                                            </div>
+                                            <h3 class="mt-5">Condition</h3>
+                                            <hr class="w-100 bg-light"/>
+                                            <div class="row">
+                                                <span class="col-6">
+                                                    QWeb has a conditional directive <code>if</code>, which evaluates an expression given as
+                                                    attribute
+                                                    value:
+                                                </span>
+                                                <div class="col-6">
+                                                    <code>
+                                                        &amp;lt;t t-if="condition"&amp;gt;Test&amp;lt;/t&amp;gt;
+                                                    </code>
+                                                </div>
+                                            </div>
+                                            <hr class="w-100 bg-light"/>
+                                            <div class="row">
+                                                <span class="col-6">
+                                                    Extra conditional branching directives <code>t-elif</code> and <code>t-else</code> are
+                                                    also available:
+                                                </span>
+                                                <div class="col-6">
+                                                    <code>
+                                                        &amp;lt;t t-if="user.birthday"&amp;gt;Happy birthday!&amp;lt;/t&amp;gt;
+                                                        <br/>
+                                                        &amp;lt;t t-elif="user.login"&amp;gt;Welcome master!&amp;lt;/t&amp;gt;
+                                                        <br/>
+                                                        &amp;lt;t t-else=""&amp;gt;Welcome!&amp;lt;/t&amp;gt;
+                                                    </code>
+                                                </div>
+                                            </div>
+                                            <hr class="w-100 bg-light"/>
+                                            <h3 class="mt-5">Output</h3>
+                                            <hr class="w-100 bg-light"/>
+                                            <div class="row">
+                                                <span class="col-6">
+                                                    <code>t-esc</code> takes an expression, evaluates it and prints the content:
+                                                </span>
+                                                <div class="col-6">
+                                                    <code>
+                                                        &amp;lt;t t-esc="value"/t&amp;gt;
+                                                    </code>
+                                                </div>
+                                            </div>
+                                            <hr class="w-100 bg-light"/>
+                                            <h3 class="mt-5">Loops</h3>
+                                            <hr class="w-100 bg-light"/>
+                                            <div class="row">
+                                                <span class="col-6">
+                                                    QWeb has an iteration directive <code>foreach</code> which take an expression returning
+                                                    the collection to iterate on, and a second parameter <code>t-as</code> providing
+                                                    the name to use for the "current item" of the iteration:
+                                                </span>
+                                                <div class="col-6">
+                                                    <code>
+                                                        &amp;lt;t t-foreach="[1, 2, 3]" t-as="i"&amp;gt;
+                                                        <br/>
+                                                        &amp;lt;t t-esc="i"/&amp;gt;
+                                                        <br/>
+                                                        &amp;lt;/t&amp;gt;
+                                                    </code>
+                                                    <br/>
+                                                    <br/>
+                                                    <b>Output:</b>
+                                                    <br/>
+                                                    <code>
+                                                        1
+                                                        <br/>
+                                                        2
+                                                        <br/>
+                                                        3
+                                                    </code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header py-0" id="headingTwo">
+                                        <h5 class="mb-0">
+                                            <a class="btn btn-link collapsed w-100 text-left py-3"
+                                               data-toggle="collapse"
+                                               data-target="#collapseTwo"
+                                               role="button"
+                                               aria-expanded="false" aria-controls="collapseTwo">
+                                                ZPL
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-end">
+                                                <a class="btn btn-outline-primary mx-2" role="button"
+                                                   href="http://labelary.com/docs.html"
+                                                   target="new">
+                                                    ZPL documentation
+                                                </a>
+                                                <a class="btn btn-outline-primary mx-2" role="button"
+                                                   href="http://labelary.com/zpl.html"
+                                                   target="new">
+                                                    ZPL Intro
+                                                </a>
+                                            </div>
+
+                                            <hr class="w-100 bg-light"/>
+                                            <h3>Text</h3>
+                                            <br/>
+                                            <div class="row">
+                                                <code class="col-4">
+                                                    ^CF0,10,12
+                                                    <br/>
+                                                    ^FO110,20,0^FDPANDORA^FS
+                                                </code>
+                                                <span class="col-8">
+                                                    <code>^CF fontName, height, width</code> &amp;nbsp;(Change default font)
+                                                    <br/>
+                                                    <code>^FO x, y</code> &amp;nbsp;(alignment Field origin)
+                                                    <br/>
+                                                    <code>^FD data</code> &amp;nbsp;(Field data)
+                                                    <br/>
+                                                    <code>^FS</code> &amp;nbsp;(Field separator)
+                                                </span>
+                                            </div>
+                                            <hr class="w-100 bg-light"/>
+                                            <h3>Barcode</h3>
+                                            <br/>
+                                            <div class="row">
+                                                <code class="col-4">
+                                                    ^FO40,70^BY1 <br/>
+                                                    ^BCN,70,Y,N,N <br/>
+                                                    ^FD&amp;lt;t t-esc="product.barcode"/>^FS &amp;lt;br/&amp;gt;
+                                                </code>
+                                                <span class="col-8">
+                                                    <code>^BC orientation, height, line, lineAbove, checkDigit, mode</code>
+                                                    &amp;nbsp; (Code 128 bar code)
+                                                </span>
+                                            </div>
+                                            <hr class="w-100 bg-light"/>
+                                            <h3>How to Draw Barcodes</h3>
+                                            <br/>
+                                            <span>
+                                                Note that there are many types of barcodes, and in general there is one command for each
+                                                type of barcode: <code>^BC</code> for Code 128 barcodes, <code>^BO</code> for Aztec
+                                                barcodes, <code>^BQ</code> for QR codes, <code>^BX</code>
+                                                for Data Matrix codes, <code>^B3</code> for Code 39 barcodes, etc. Each barcode command has
+                                                different parameters available to control the barcode's appearance and behavior.
+                                                <br/>
+                                                <br/>
+                                                <code>
+                                                    ^BC orientation, height, showHumanReadableText, showTextAbove, addUccCheckDigit, mode
+                                                </code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20BC%20command%20parameters%3A%0A%5EFX%20-%20orientation%20(N%2FR%2FI%2FB)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20showHumanReadableText%20(Y%2FN)%0A%5EFX%20-%20showTextAbove%20(Y%2FN)%0A%5EFX%20-%20addUccCheckDigit%20(Y%2FN)%0A%5EFX%20-%20mode%20(A%2FU%2FD%2FN)%0A%5EFO50%2C50%5EBCN%2C100%2CY%2CN%2CN%2CA%5EFD12345678%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>
+                                                    ^BO orientation, magnification, eci, size, readerInit, structuredAppendCount,
+                                                    structuredAppendMessageId
+                                                </code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20BO%20command%20parameters%3A%0A%5EFX%20-%20orientation%20(N%2FR%2FI%2FB)%0A%5EFX%20-%20magnification%20(number)%0A%5EFX%20-%20eci%20(Y%2FN)%0A%5EFX%20-%20size%20(number)%0A%5EFX%20-%20readerInit%20(Y%2FN)%0A%5EFX%20-%20structuredAppendCount%20(number)%0A%5EFX%20-%20structuredAppendMessageId%20(string)%0A%5EFO50%2C50%5EBON%2C3%2CN%2C205%2CN%5EFD12345678%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>
+                                                    ^BQ orientation, model, magnification, errorCorrection, mask
+                                                </code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20BQ%20command%20parameters%3A%0A%5EFX%20-%20orientation%20(N%2FR%2FI%2FB)%0A%5EFX%20-%20model%20(number%2C%20always%202)%0A%5EFX%20-%20magnification%20(number)%0A%5EFX%20-%20error%20correction%20(character)%0A%5EFX%20-%20mask%20(number)%0A%5EFO50%2C50%5EBQN%2C2%2C4%5EFDQA,12345678%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>
+                                                    ^BX orientation, height, qualityLevel, columns, rows, format, escape, aspectRatio
+                                                </code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20BX%20command%20parameters%3A%0A%5EFX%20-%20orientation%20(N%2FR%2FI%2FB)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20qualityLevel%20(number%2C%20always%20200)%0A%5EFX%20-%20columns%20(number)%0A%5EFX%20-%20rows%20(number)%0A%5EFX%20-%20format%20(number%2C%20ignored%20when%20qualityLevel%20%3D%20200)%0A%5EFX%20-%20escape%20(character)%0A%5EFX%20-%20aspectRatio%20(number)%0A%5EFO50%2C50%5EBXN%2C9%2C200%5EFD12345678%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>
+                                                    ^B3 orientation, addCheckDigit, height, showHumanReadableText, showTextAbove
+                                                </code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20B3%20command%20parameters%3A%0A%5EFX%20-%20orientation%20(N%2FR%2FI%2FB)%0A%5EFX%20-%20addCheckDigit%20(Y%2FN)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20showHumanReadableText%20(Y%2FN)%0A%5EFX%20-%20showTextAbove%20(Y%2FN)%0A%5EFO50%2C50%5EB3N%2CN%2C60%2CY%2CN%5EFD1234567%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                            </span>
+                                            <hr class="w-100 bg-light"/>
+                                            <span>
+                                                <h3>How to Draw Shapes</h3>
+                                                <br/>
+                                                The third and final field draws a box around the label using 3 commands:
+                                                <br/>
+                                                <code>^FO, ^GB</code> and <code>^FS</code>.
+                                                <br/>
+                                                <code> ^FO 25, 25 ^GB 380, 200, 2 ^FS</code>
+                                                <br/>
+                                                The <code>^FO</code> command places the top left of the field at position (25, 25).
+                                                The <code>^GB</code> command
+                                                indicates that the current field should draw a rectangle (a Graphical Box).
+                                                The <code>^GB</code> command
+                                                takes 5 parameters, but we are only using the first three: we want our rectangle to be 380
+                                                dots wide, 200 dots high, and 2 dots thick. Finally, the
+                                                <code>^FS</code> command finishes the field.
+                                                <br/>
+                                                ZPL supports a number of basic shapes, including circles (<code>^GC</code>),
+                                                ellipses (<code>^GE</code>), diagonal
+                                                lines (<code>^GD</code>), and rectangles/boxes (<code>^GB</code>).
+                                                Each of these commands have different parameters
+                                                which allow you to control the shapes' appearance. There is not a separate command to draw a
+                                                simple horizontal or vertical line, but the
+                                                <code>^GB</code> command can be used for this purpose by
+                                                drawing a rectangle with height = 1 (horizontal line) or width = 1 (vertical line).
+                                                <br/>
+                                                <br/>
+                                                <code>^GC diameter, thickness, color</code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20GC%20command%20parameters%3A%0A%5EFX%20-%20diameter%20(number)%0A%5EFX%20-%20thickness%20(number)%0A%5EFX%20-%20color%20(B%2FW)%0A%5EFO50%2C50%5EGC100%2C3%2CB%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>^GE width, height, thickness, color</code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20GE%20command%20parameters%3A%0A%5EFX%20-%20width%20(number)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20thickness%20(number)%0A%5EFX%20-%20color%20(B%2FW)%0A%5EFO50%2C50%5EGE250%2C100%2C3%2CB%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>^GD width, height, thickness, color, orientation</code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20GD%20command%20parameters%3A%0A%5EFX%20-%20width%20(number)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20thickness%20(number)%0A%5EFX%20-%20color%20(B%2FW)%0A%5EFX%20-%20orientation%20(R%2FL)%0A%5EFO50%2C50%5EGD250%2C100%2C3%2CB%2CR%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                                <br/>
+                                                <code>^GB width, height, thickness, color, rounding</code>
+                                                <a href="http://labelary.com/viewer.html?density=8&amp;quality=grayscale&amp;width=2&amp;height=1&amp;units=inches&amp;index=0&amp;zpl=%5EXA%0A%5EFX%20GB%20command%20parameters%3A%0A%5EFX%20-%20width%20(number)%0A%5EFX%20-%20height%20(number)%0A%5EFX%20-%20thickness%20(number)%0A%5EFX%20-%20color%20(B%2FW)%0A%5EFX%20-%20rounding%20(number%2C%200-8)%0A%5EFO50%2C50%5EGB250%2C100%2C3%2CB%2C3%5EFS%0A%5EXZ"
+                                                   target="new">
+                                                    [example]
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="zpl_label_template_view_tree" model="ir.ui.view">
+        <field name="name">zpl_label_template_view_tree</field>
+        <field name="model">zpl.label.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="product_category_ids"
+                       widget="many2many_tags"
+                       options="{'color_field': 'color'}"/>
+                <field name="model_id"/>
+                <field name="display_size" string="Size"/>
+                <field name="published"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="zpl_label_template_kanban" model="ir.ui.view">
+        <field name="name">zpl_label_template_kanban</field>
+        <field name="model">zpl.label.template</field>
+        <field name="arch" type="xml">
+            <kanban records_draggable="false" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="published"/>
+                <field name="active"/>
+                <field name="display_size"/>
+                <field name="product_category_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_content" style="border-radius: 4px;">
+                            <div class="d-flex flex-column p-3">
+                                <div class="row">
+                                    <div class="col-12 mb-2">
+                                        <strong t-esc="record.name.raw_value"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <strong>Model:</strong>
+                                        <span t-esc="record.model_id.value"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <strong>Size:</strong>
+                                        <span t-esc="record.display_size.value"/>
+                                    </div>
+                                    <div class="col-12 py-2">
+                                        <field name="product_category_ids"
+                                               widget="many2many_tags"
+                                               options="{'color_field': 'color'}"
+                                               t-if="record.product_category_ids.raw_value.length"/>
+                                        <span t-else="">&amp;nbsp;</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <i t-if="record.published.raw_value" class="fa fa-globe mr-2" title="Publish"/>
+                                        <i t-if="!record.active.raw_value" class="fa fa-archive mr-2" title="Archive"/>
+                                        <i class="fa"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <hr class="w-100 bg-light"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="o_kanban_image zpl-template-image w-100" style="height: 128px">
+                                            <img t-att-src="kanban_image('zpl.label.template', 'zpl_image', record.id.raw_value)"
+                                                 alt="ZPL Image"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="zpl_label_template_search" model="ir.ui.view">
+        <field name="name">zpl_label_template_search</field>
+        <field name="model">zpl.label.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="active"/>
+                <field name="published"/>
+                <field name="product_category_ids"/>
+                <field name="display_size" string="Size"/>
+                <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="filter_archive" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="filter_published" string="Published" domain="[('published','=',True)]"/>
+                <filter name="filter_hide_product" string="Hide Product Template" domain="[('model_id.model','!=','product.template')]"/>
+                <filter name="filter_product" string="Products" domain="[('model_id.model','=like','product.%')]"/>
+                <group>
+                    <filter name="group_by_model" string="Model" context="{'group_by': 'model_id'}"/>
+                    <filter name="group_by_display_size" string="Size" context="{'group_by': 'display_size'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="zpl_template_action" model="ir.actions.act_window">
+        <field name="name">ZPL Templates</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">zpl.label.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_filter_hide_product': 1}</field>
+    </record>
+
+    <menuitem id="zpl_template_menu"
+              name="ZPL Templates"
+              action="zpl_template_action"
+              parent="stock.menu_warehouse_report"
+              sequence="100"/>
+
+</odoo>
