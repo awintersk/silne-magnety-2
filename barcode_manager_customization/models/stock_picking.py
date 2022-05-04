@@ -23,6 +23,7 @@ from typing import List, Union
 from logging import getLogger
 
 from odoo import models, fields, _, api
+from odoo.osv import expression
 
 _logger = getLogger(__name__)
 
@@ -104,3 +105,31 @@ class StockPicking(models.Model):
         if 'picking_sequence_code' not in response:
             response.append('picking_sequence_code')
         return response
+
+    def stock_location_for_order_receipt(self, order_int_id):
+        """
+        :param int order_int_id: Sale Order int id
+        :rtype: list[dict[str, Any]]
+        :return: Location list
+        """
+        self.ensure_one()
+
+        sale_picking_ids = self.env['stock.picking'].search([
+            ('sale_id', '=', order_int_id),
+            ('picking_type_id.sequence_code', '=', 'PICK'),
+            ('state', 'not in', ('draft', 'cancel')),
+        ])
+
+        domain = [('id', 'child_of', self.location_dest_id.ids)]
+
+        if sale_picking_ids:
+            domain = expression.OR([
+                domain,
+                [('id', 'child_of', sale_picking_ids.location_id.ids), ('usage', '!=', 'view')]
+            ])
+
+        location_ids = self.env['stock.location'].search_read(
+            domain=domain,
+            fields=['id', 'display_name', 'barcode'],
+        )
+        return location_ids

@@ -357,9 +357,8 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                     confirmed: false,
                 })),
                 lineId,
-                destinationLocationList: this.currentState.destination_location_list,
                 locationDestID: this.linesWidget.page.location_dest_id,
-                locationsByBarcode: this.locationsByBarcode,
+                pickingID: this.currentState.id,
             })
 
             await ntOrderDialogComponent.mount(content)
