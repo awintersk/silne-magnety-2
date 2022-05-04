@@ -63,7 +63,7 @@ class StockPicking(models.Model):
 
         quant_ids = self.env['stock.quant'].search([
             ('product_id', '=', product),
-            ('location_id', '=', (self.location_id.child_ids | self.location_id).ids),
+            ('location_id', 'child_of', self.move_lines.location_id.ids),
         ])
         free_product_qty = sum(quant_ids.mapped('available_quantity'))
 

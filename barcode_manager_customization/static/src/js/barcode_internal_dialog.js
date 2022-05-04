@@ -55,14 +55,16 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             this.state = useState({
                 packageItems: [],
                 packageTypeItems: [],
-                boxIntId: 0,
+                boxIntId: this.initialResultPackageID,
                 packageTypeIntId: 0,
                 qty: this.props.linesId.product_uom_qty || 0,
                 shipping_weight: 0,
                 weight: 0,
                 isMoved: false,
             })
+
             this.eventSetup()
+
             useWatchDog({
                 state: this.state,
                 field: 'boxIntId',
@@ -102,7 +104,9 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 orderBy: [{name: 'id', asc: false}]
             })
 
-            this.state.boxIntId = this.defaultResultPackageIntId
+            if (!this.state.boxIntId) {
+                this.state.boxIntId = this.defaultResultPackageIntId
+            }
 
             if (this.state.boxIntId > 0) {
                 const packageId = this.state.packageItems.find(el => el.id === this.state.boxIntId)
@@ -154,6 +158,17 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
          */
         get productWeight() {
             return this.props.linesId.product_weight
+        }
+
+        /**
+         * @returns {Number}
+         */
+        get initialResultPackageID() {
+            const resultPackage = this.props.linesId.result_package_id
+            if (_.isEmpty(resultPackage)) {
+                return 0
+            }
+            return resultPackage[0]
         }
 
         /**
