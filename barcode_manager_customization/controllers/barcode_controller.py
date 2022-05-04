@@ -35,17 +35,28 @@ class BarcodeController(Controller):
             ('state', 'in', ('waiting', 'confirmed', 'partially_available')),
         ])
 
-        def get_qty2deliver(move) -> float:
-            return move.product_uom_qty - move.reserved_availability
+        response = {}
 
-        return [
-            {
-                'id': move_id.picking_id.sale_id.id,
-                'name': move_id.picking_id.sale_id.name,
-                'partnerName': move_id.picking_id.sale_id.partner_id.name,
-                'qtyToDeliver': get_qty2deliver(move_id),
-                'qty': 0,
-            }
-            for move_id in move_ids
-            if get_qty2deliver(move_id)
-        ]
+        for move_id in move_ids:
+            qty2deliver = move_id.product_uom_qty - move_id.reserved_availability
+
+            if not qty2deliver:
+                continue
+
+            sale_id = move_id.picking_id.sale_id
+
+            if sale_id in response:
+                response[sale_id.id]['qtyToDeliver'] += qty2deliver
+                continue
+
+            response.update({
+                sale_id.id: {
+                    'id': sale_id.id,
+                    'name': sale_id.name,
+                    'partnerName': sale_id.partner_id.name,
+                    'qtyToDeliver': qty2deliver,
+                    'qty': 0,
+                }
+            })
+
+        return list(response.values())
