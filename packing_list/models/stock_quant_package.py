@@ -115,6 +115,10 @@ class StockQuantPackage(models.Model):
             'package_ids': self.ids,
         })
 
+    def action_delivery_list(self):
+        report = self.env.ref('sale_customization.action_sale_delivery_list_report')
+        return report.report_action(self.sale_ids)
+
     # -------- #
     #  Public  #
     # -------- #

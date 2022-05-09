@@ -97,7 +97,7 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 model: 'stock.quant.package',
                 method: 'search_read',
                 domain: [
-                    ['name', 'ilike', `${relatedSaleId.name}-%%`],
+                    ['sale_ids', 'in', [relatedSaleId.id]],
                     ['packaging_id', 'in', this.state.packageTypeItems.map(el => el.id)]
                 ],
                 fields: ['name', 'packaging_id', 'shipping_weight', 'weight'],
@@ -134,23 +134,15 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
          * @return {Number}
          */
         get defaultResultPackageIntId() {
-            const {result_package_id, package_id} = this.props.linesId
-            const itemsIntIds = this.state.packageItems.map(el => el.id)
+            const {linesId, packageList} = this.props
+            const [resultPackageID] = linesId.result_package_id || []
+            const [packageID] = linesId.package_id || []
 
-            if (!itemsIntIds.includes(package_id[0])) {
-                return RECORD_ID_CODE.NEW
+            if (!resultPackageID && !packageID) {
+                return packageList.length ? packageList[0] : RECORD_ID_CODE.NEW
             }
 
-            if (!itemsIntIds.includes(result_package_id[0])) {
-                return RECORD_ID_CODE.NEW
-            }
-
-            if (result_package_id) {
-                return result_package_id[0] || RECORD_ID_CODE.NEW
-            } else if (package_id) {
-                return package_id[0] || RECORD_ID_CODE.NEW
-            }
-            return RECORD_ID_CODE.NEW
+            return resultPackageID || packageID || RECORD_ID_CODE.NEW
         }
 
         /**
@@ -324,6 +316,10 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             },
             linesId: Object,
             pickingIntId: Number,
+            packageList: {
+                type: Array,
+                element: Number
+            }
         },
     })
 

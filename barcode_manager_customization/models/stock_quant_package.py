@@ -27,7 +27,8 @@ from odoo import fields, models, _, api
 class ProductPackaging(models.Model):
     _inherit = 'product.packaging'
 
-    weight = fields.Float(default=0, help='Package weight without products')
+    weight = fields.Float(default=0, help='Package weight without products', digits='Package Weight')
+    max_weight = fields.Float(digits='Package Weight')
 
 
 class StockQuantPackage(models.Model):
@@ -72,7 +73,8 @@ class StockQuantPackage(models.Model):
         return response
 
     name = fields.Char(default=lambda self: self._default_name())
-    weight = fields.Float(compute='_compute_weight')
+    weight = fields.Float(compute='_compute_weight', digits='Package Weight')
+    shipping_weight = fields.Float(digits='Package Weight')
     packaging_weight = fields.Float(
         related='packaging_id.weight',
         string='Packaging Weight',

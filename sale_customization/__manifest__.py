@@ -1,8 +1,7 @@
-# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,40 +19,20 @@
 ################################################################################
 
 {
-    'name': "Barcode Remember",
-
-    'summary': """
-    """,
-
-    'description': """
-    """,
-
-    'author': "SmartTek",
-    'website': "https://smartteksas.com",
-
-    'category': 'Purchases',
-    'version': '14.0.0.17',
-
+    'name': 'Sale Customization',
+    'version': '14.0.1.0.0',
+    'category': 'Sales/Sales',
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
     'depends': [
-        'base',
-        'product',
         'sale',
-        'stock',
-        'stock_barcode',
-        'barcode_manager_customization',
     ],
-
-    'demo': [
-        'data/product_template_demo.xml',
-    ],
-
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/assets_views.xml',
-        'views/product_template_views.xml',
+        'report/sale_delivery_list_report.xml',
+        'report/sale_delivery_list_report_templates.xml',
     ],
-
-    'qweb': [
-        'static/src/xml/remember.xml'
-    ]
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
 }
