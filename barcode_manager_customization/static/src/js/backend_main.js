@@ -213,9 +213,21 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
 
             await this._save()
 
+            const packageList = []
+
+            for (let line of this.currentState.move_line_ids) {
+                if (!(line.result_package_id || line.package_id)) {
+                    continue
+                }
+                const [resultPackageID] = line.result_package_id || []
+                const [packageID] = line.package_id || []
+                packageList.push(resultPackageID || packageID)
+            }
+
             const internalBody = new ComponentWrapper(this, BarcodeInternalDialog, {
                 linesId,
                 moveLineIds,
+                packageList,
                 pickingIntId: this.currentState.id,
             })
 
