@@ -32,7 +32,7 @@
     'website': "https://smartteksas.com",
 
     'category': 'Purchases',
-    'version': '14.0.0.16',
+    'version': '14.0.0.17',
 
     'depends': [
         'base',
@@ -51,6 +51,7 @@
 
         'data/sequence_data.xml',
         'data/config_parameter_data.xml',
+        'data/decimal_precision_data.xml',
 
         'views/assets.xml',
         'views/purchase_views.xml',
