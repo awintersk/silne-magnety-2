@@ -39,10 +39,6 @@ odoo.define('zpl_label_template.barcode_actions', function (require) {
             event.stopPropagation()
             this.trigger_up('print_pallet_zpl')
         },
-
-        isStockPicking() {
-            return this.model === 'stock.picking'
-        }
     })
 
     PickingClientAction.include({
