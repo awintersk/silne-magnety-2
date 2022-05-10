@@ -3,14 +3,14 @@
 
     <t t-extend="stock_barcode_settings_widget">
         <t t-jquery=".o_print_barcodes_zpl" t-operation="replace">
-            <button t-if="widget.isStockPicking()" class="btn-lg btn btn-dark text-uppercase o_print_product_labels_zpl">
+            <button t-if="widget.model === 'stock.picking'" class="btn-lg btn btn-dark text-uppercase o_print_product_labels_zpl">
                 Print Product Label ZPL
             </button>
-            <button t-if="widget.isStockPicking() &amp;&amp; ['internal', 'delivery'].includes(widget.mode)"
+            <button t-if="widget.model === 'stock.picking' &amp;&amp; ['internal', 'delivery'].includes(widget.mode)"
                     class="btn-lg btn btn-dark text-uppercase o_print_box_labels_zpl">
                 Print Box Label ZPL
             </button>
-            <button t-if="widget.isStockPicking() &amp;&amp; widget.mode == 'delivery'"
+            <button t-if="widget.model === 'stock.picking' &amp;&amp; widget.mode == 'delivery'"
                     class="btn-lg btn btn-dark text-uppercase o_print_pallet_labels_zpl">
                 Print Pallet Label ZPL
             </button>

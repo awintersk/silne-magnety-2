@@ -66,9 +66,9 @@ class StockPicking(models.Model):
             ('location_id', 'child_of', self.move_lines.location_id.ids),
         ])
         free_product_qty = sum(quant_ids.mapped('available_quantity'))
+        product_name = product_env.browse(product).name
 
         if not free_product_qty:
-            product_name = product_env.browse(product).name
             raise UserError(_('Product "%s" has zero available qty') % product_name)
 
         if field == 'is_gift':
@@ -91,7 +91,7 @@ class StockPicking(models.Model):
 
             return order_line_id.id
 
-        return 0
+        raise UserError(_('Product "%s" already exists in Sale Order "%s"') % (product_name, order_id.name))
 
     def _package_for_special_product(self):
         """
