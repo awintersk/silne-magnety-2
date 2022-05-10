@@ -16,6 +16,7 @@
     'data': [
         'data/ir_actions_server_data.xml',
         'data/ir_config_parameter_data.xml',
+        'data/mail_activity.xml',
         'data/product_data.xml',
         'views/product.xml',
         'views/sale_order_views.xml',
