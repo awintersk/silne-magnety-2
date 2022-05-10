@@ -29,7 +29,8 @@ class WooProductTemplateEpt(models.Model):
                     odoo_category = woo_category.create_odoo_category()
                 else:
                     odoo_category = woo_category.category_id
-                categories.append(odoo_category.id)
+                if odoo_category:
+                    categories.append(odoo_category.id)
             if categories:
                 woo_template.product_tmpl_id.categ_ids = [(6, 0, categories)]
                 woo_template.product_tmpl_id.categ_id = categories[0]
@@ -47,7 +48,8 @@ class WooProductTemplateEpt(models.Model):
             for attr in attributes:
                 if not attr['variation']:
                     attribute = WooAttribute.search([
-                        ('woo_attribute_id', '=', attr['id'])
+                        ('woo_attribute_id', '=', attr['id']),
+                        ('woo_instance_id', '=', self.woo_instance_id.id),
                     ], limit=1).attribute_id
                     exist_attribute = product.attribute_line_ids.mapped('attribute_id').ids
                     if attribute:
@@ -55,22 +57,23 @@ class WooProductTemplateEpt(models.Model):
                             ('attribute_id', '=', attribute.id),
                             ('name', 'in', attr['options']),
                         ], limit=1)
-                        if attribute.id not in exist_attribute:
-                            data = {
-                                'product_tmpl_id': product.id,
-                                'attribute_id': attribute.id,
-                                'value_ids': [(6, 0, value.ids)]
-                            }
-                            attribute_list.append((0, 0, data))
-                        else:
-                            attribute_for_update = product.attribute_line_ids.filtered(
-                                lambda x: x.attribute_id.id == attribute.id
-                                          and x.value_ids[0].name not in value.mapped('name'))
-                            if attribute_for_update and value:
+                        if value:  # TODO need checking language(can't find some values)
+                            if attribute.id not in exist_attribute:
                                 data = {
+                                    'product_tmpl_id': product.id,
+                                    'attribute_id': attribute.id,
                                     'value_ids': [(6, 0, value.ids)]
                                 }
-                                attribute_list.append((1, attribute_for_update[0].id, data))
+                                attribute_list.append((0, 0, data))
+                            else:
+                                attribute_for_update = product.attribute_line_ids.filtered(
+                                    lambda x: x.attribute_id.id == attribute.id
+                                              and x.value_ids[0].name not in value.mapped('name'))
+                                if attribute_for_update:
+                                    data = {
+                                        'value_ids': [(6, 0, value.ids)]
+                                    }
+                                    attribute_list.append((1, attribute_for_update[0].id, data))
 
             if attribute_list:
                 product.write({
