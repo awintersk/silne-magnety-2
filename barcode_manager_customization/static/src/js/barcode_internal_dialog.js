@@ -97,7 +97,9 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 model: 'stock.quant.package',
                 method: 'search_read',
                 domain: [
+                    '|',
                     ['sale_ids', 'in', [relatedSaleId.id]],
+                    ['name', 'ilike', `${relatedSaleId.name}-%%`],
                     ['packaging_id', 'in', this.state.packageTypeItems.map(el => el.id)]
                 ],
                 fields: ['name', 'packaging_id', 'shipping_weight', 'weight'],
@@ -279,15 +281,23 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 qty
             } = this.state
 
+            const {
+                moveLineIds,
+                linesId,
+            } = this.props
+
             if (weight === undefined) {
                 const packagingId = packageTypeItems.find(el => el.id === +packageTypeIntId)
                 weight = packagingId && packagingId.id ? packagingId.weight : 0
             }
 
-            for (let lineId of this.props.moveLineIds) {
+            for (let lineId of moveLineIds) {
                 const {product_weight} = lineId
-                if (lineId.id === this.props.linesId.id) continue;
-                if (lineId.result_package_id[0] === Number(boxIntId) && product_weight) {
+                if (lineId.id === linesId.id) continue;
+                if (!product_weight) continue
+                if (lineId.result_package_id[0] === Number(boxIntId)) {
+                    weight += product_weight * lineId.qty_done
+                } else if (lineId.package_id[0] === Number(boxIntId)) {
                     weight += product_weight * lineId.qty_done
                 }
             }
