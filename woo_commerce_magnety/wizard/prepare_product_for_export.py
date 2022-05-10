@@ -16,3 +16,16 @@ class PrepareProductForExport(models.TransientModel):
                 'woo_product_type': 'simple',
             })
         return data
+
+    def create_update_woo_template(self, variant, woo_instance, woo_template_id, woo_category_dict):
+        woo_template_id = super(PrepareProductForExport, self).create_update_woo_template(variant, woo_instance, woo_template_id, woo_category_dict)
+        product_template = variant.product_tmpl_id
+        if product_template.categ_ids:
+            categories = []
+            for categ in product_template.categ_ids:
+                self.create_categ_in_woo(categ, woo_instance.id, woo_category_dict)
+                woo_categ = self.update_category_info(categ, woo_instance.id)
+                categories.append(woo_categ.id)
+            self.env["woo.product.template.ept"].browse(woo_template_id).write(
+                {'woo_categ_ids': [(4, c) for c in categories]})
+        return woo_template_id
