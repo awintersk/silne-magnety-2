@@ -204,7 +204,8 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             const linesId = linesWithBarcode.find(rec => {
                 const getID = rec => _.isEmpty(rec) ? rec[0] : null
                 if (rec.qty_done >= rec.product_uom_qty) return false
-                return !_.isEmpty(rec.result_package_id) || getID(rec.package_id) === getID(rec.result_package_id)
+                if (_.isEmpty(rec.result_package_id)) return true
+                return getID(rec.package_id) !== getID(rec.result_package_id)
             })
 
             if (!linesId) {
