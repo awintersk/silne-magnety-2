@@ -117,6 +117,8 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                     weight: packageId ? this._computeExpectedWeight(packageId) : 0,
                     packageTypeIntId: packageId && packageId.packaging_id ? packageId.packaging_id[0] : 0,
                 })
+            } else {
+                this.state.weight = this._computeExpectedWeight({})
             }
         }
 
@@ -277,8 +279,8 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             const {
                 packageTypeItems,
                 packageTypeIntId,
-                boxIntId,
-                qty
+                boxIntId: boxID,
+                qty,
             } = this.state
 
             const {
@@ -286,23 +288,31 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 linesId,
             } = this.props
 
+            const boxIntId = Number(boxID)
+
             if (weight === undefined) {
                 const packagingId = packageTypeItems.find(el => el.id === +packageTypeIntId)
                 weight = packagingId && packagingId.id ? packagingId.weight : 0
+                weight += this.productWeight * qty
             }
 
             for (let lineId of moveLineIds) {
-                const {product_weight} = lineId
-                if (lineId.id === linesId.id) continue;
-                if (!product_weight) continue
-                if (lineId.result_package_id[0] === Number(boxIntId)) {
-                    weight += product_weight * lineId.qty_done
-                } else if (lineId.package_id[0] === Number(boxIntId)) {
-                    weight += product_weight * lineId.qty_done
+                const {
+                    product_weight,
+                    qty_done,
+                    product_uom_qty,
+                    package_id,
+                    result_package_id,
+                } = lineId
+
+                if (lineId.id === linesId.id && package_id[0] === boxIntId) {
+                    weight -= product_weight * (product_uom_qty - qty)
+                } else if (result_package_id[0] === boxIntId) {
+                    weight += product_weight * qty_done
                 }
             }
 
-            return round(weight + this.productWeight * qty, 4)
+            return round(weight, 4)
         }
 
         _onChangePackageTypeIntId() {
@@ -320,6 +330,10 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
         template: 'barcode_manager_customization.receipt_internal_body',
         components: {Dialog},
         props: {
+            pageMoveLineIds: {
+                type: Array,
+                element: Object,
+            },
             moveLineIds: {
                 type: Array,
                 element: Object,
