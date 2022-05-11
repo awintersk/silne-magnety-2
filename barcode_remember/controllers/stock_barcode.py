@@ -41,21 +41,27 @@ class RememberStockBarcodeController(Controller):
     @route('/barcode_remember/package/weight_data', type='json', methods=['POST'], auth='user')
     def barcode_remember_package_weight_data(self, picking: int) -> List[Optional[Dict]]:
         picking_id = request.env['stock.picking'].browse(picking)
-        line_ids = picking_id.move_line_ids
+        picking_line_ids = picking_id.move_line_ids
 
-        if not line_ids:
-            return []
+        package_int_ids = set(
+            line_id.result_package_id.id or line_id.package_id.id
+            for line_id in picking_line_ids if line_id.result_package_id.id or line_id.package_id.id
+        )
 
+        package_ids = request.env['stock.quant.package'].browse(package_int_ids)
         field2read = ['shipping_weight', 'name', 'weight_uom_name', 'weight']
-        package_ids = line_ids.package_id | line_ids.result_package_id
-        package_list = package_ids.read(field2read)
+        package_list = []
 
-        for package in package_list:
-            for move_id in line_ids:
-                package_id = move_id.result_package_id or move_id.package_id
-                if package['id'] != package_id.id:
-                    continue
-                package['weight'] += move_id.product_id.weight * move_id.qty_done
+        for package_id in package_ids:
+            move_line_ids = package_id.move_line_ids.filtered(lambda el: el.state != 'done')
+            move_line_ids |= picking_line_ids.filtered(lambda el: package_id.id in (el.result_package_id or el.package_id).ids)
+            item = package_id.read(field2read)[0]
+            item['weight'] = package_id.packaging_id.weight if package_id.packaging_id else 0
+
+            for line_id in move_line_ids:
+                item['weight'] += line_id.product_id.weight * line_id.qty_done
+
+            package_list.append(item)
 
         return package_list
 
