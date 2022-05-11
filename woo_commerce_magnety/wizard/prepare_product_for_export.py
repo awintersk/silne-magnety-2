@@ -36,5 +36,5 @@ class PrepareProductForExport(models.TransientModel):
         return woo_template_id
 
     def prepare_product_for_export(self):
-        instance_lang = self.woo_instance.woo_lang_id
+        instance_lang = self.woo_instance_id.woo_lang_id
         return super(PrepareProductForExport, self.with_context(lang=instance_lang.code)).prepare_product_for_export()
