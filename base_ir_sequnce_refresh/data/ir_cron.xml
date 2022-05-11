@@ -1,0 +1,13 @@
+<odoo>
+
+    <record id="ir_cron_sequence_refresh" model="ir.cron">
+        <field name="name">Base: Refresh sequences</field>
+        <field name="model_id" ref="model_ir_sequence"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_refresh_sequence()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+</odoo>
