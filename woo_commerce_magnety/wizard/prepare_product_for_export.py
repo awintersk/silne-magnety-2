@@ -15,6 +15,11 @@ class PrepareProductForExport(models.TransientModel):
             data.update({
                 'woo_product_type': 'simple',
             })
+        if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
+            data.update({
+                "woo_description": product_template.woo_description,
+                "woo_short_description": product_template.woo_short_description,
+            })
         return data
 
     def create_update_woo_template(self, variant, woo_instance, woo_template_id, woo_category_dict):
@@ -29,3 +34,7 @@ class PrepareProductForExport(models.TransientModel):
             self.env["woo.product.template.ept"].browse(woo_template_id).write(
                 {'woo_categ_ids': [(4, c) for c in categories]})
         return woo_template_id
+
+    def prepare_product_for_export(self):
+        instance_lang = self.woo_instance.woo_lang_id
+        return super(PrepareProductForExport, self.with_context(lang=instance_lang.code)).prepare_product_for_export()

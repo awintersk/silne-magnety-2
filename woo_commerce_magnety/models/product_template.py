@@ -35,6 +35,9 @@ class ProductTemplate(models.Model):
         'product.category', string='Product Categories',
         help="Select category for the current product")
 
+    woo_description = fields.Html("Description", translate=True)
+    woo_short_description = fields.Html("Short Description", translate=True)
+
     def _pull_product_weight_from_attribute(self):
         self.ensure_one()
 
