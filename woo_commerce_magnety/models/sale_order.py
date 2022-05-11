@@ -24,6 +24,13 @@ from odoo import _, api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def _prepare_invoice(self):
+        invoice_vals = super()._prepare_invoice()
+        invoice_vals.update({
+            'woo_instance_origin_id': self.woo_instance_id.id,
+        })
+        return invoice_vals
+
     def woo_order_billing_shipping_partner(self, order_data, woo_instance, queue_line, common_log_book_id):
         partner_obj = self.env['res.partner']
         woo_partner_obj = self.env['woo.res.partner.ept']
