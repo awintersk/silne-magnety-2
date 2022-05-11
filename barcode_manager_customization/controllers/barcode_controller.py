@@ -60,3 +60,25 @@ class BarcodeController(Controller):
             })
 
         return list(response.values())
+
+    @route('/barcode/expected/weight', type='json', auth='user')
+    def barcode_expected_weight(self, picking_int_id, package_int_id, target_line_int_id, qty):
+        """
+        :param int picking_int_id:
+        :param int package_int_id:
+        :param int target_line_int_id:
+        :param int qty:
+        :rtype: float
+        """
+        picking_id = request.env['stock.picking'].browse(picking_int_id)
+        package_id = request.env['stock.quant.package'].browse(package_int_id)
+
+        expected_weight = package_id.weight
+        is_boxed_target_line = target_line_int_id in package_id.move_line_ids.ids
+
+        for line_id in picking_id.move_line_ids:
+            if line_id.id == target_line_int_id and is_boxed_target_line:
+                expected_weight -= line_id.product_weight * (line_id.product_qty - qty)
+            else:
+                expected_weight += line_id.product_weight * line_id.qty_done
+        return expected_weight
