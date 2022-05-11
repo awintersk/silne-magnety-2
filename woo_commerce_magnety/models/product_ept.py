@@ -13,6 +13,7 @@ class WooProductTemplateEpt(models.Model):
 
     @api.model
     def sync_products(self, *args, **kwargs):
+        self = self.with_context(lang=self.woo_instance_id.woo_lang_id.code)
         product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products = args[:4]
         order_queue_line = kwargs.get('order_queue_line')
         res = super(WooProductTemplateEpt, self).sync_products(product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products, **kwargs)
