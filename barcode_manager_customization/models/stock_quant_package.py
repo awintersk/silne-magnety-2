@@ -22,6 +22,7 @@
 
 
 from odoo import fields, models, _, api
+from odoo.osv import expression
 
 
 class ProductPackaging(models.Model):
@@ -79,6 +80,10 @@ class StockQuantPackage(models.Model):
         related='packaging_id.weight',
         string='Packaging Weight',
     )
+    move_line_ids = fields.One2many(
+        comodel_name='stock.move.line',
+        compute='_compute_move_line_ids',
+    )
 
     @property
     def _picking_id_from_context(self):
@@ -90,3 +95,20 @@ class StockQuantPackage(models.Model):
         for rec_id in self:
             if rec_id.packaging_id:
                 rec_id.weight = rec_id.weight + rec_id.packaging_id.weight
+
+    @api.depends('quant_ids')
+    def _compute_move_line_ids(self):
+        for package_id in self:
+            move_line_domain = expression.OR([
+                [
+                    ('product_id', '=', quant_id.product_id.id),
+                    '|',
+                    ('location_id', '=', quant_id.location_id.id),
+                    ('location_dest_id', '=', quant_id.location_id.id),
+                    ('lot_id', '=', quant_id.lot_id.id),
+                    '|',
+                    ('package_id', '=', quant_id.package_id.id),
+                    ('result_package_id', '=', quant_id.package_id.id)
+                ] for quant_id in package_id.quant_ids
+            ])
+            package_id.move_line_ids = self.env['stock.move.line'].search(move_line_domain)
