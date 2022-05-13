@@ -19,3 +19,4 @@
 ################################################################################
 
 from . import account_move_reversal
+from . import sale_make_invoice_advance

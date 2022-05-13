@@ -27,7 +27,8 @@ class AccountMoveReversal(models.TransientModel):
     def _prepare_default_reversal(self, move):
         res = super()._prepare_default_reversal(move)
 
-        classifer_sequence_id = move.woo_instance_origin_id.reversal_classifer_sequence_id
+        classifer_sequence_id = move.woo_instance_origin_id.reversal_classifer_sequence_id \
+            or self.env.company.reversal_classifer_sequence_id
         if classifer_sequence_id:
             res['kros_classifier'] = classifer_sequence_id.next_by_id()
 

@@ -18,8 +18,18 @@
 #
 ################################################################################
 
-from . import account_move
-from . import res_company
-from . import res_config_settings
-from . import sale_order
-from . import woo_instance_ept
+from odoo import _, api, fields, models
+
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+
+    invoice_classifer_sequence_id = fields.Many2one(
+        'ir.sequence',
+        string='Invoice Classifier Sequence',
+    )
+    reversal_classifer_sequence_id = fields.Many2one(
+        'ir.sequence',
+        string='Credit Note Classifier Sequence',
+    )
+
