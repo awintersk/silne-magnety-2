@@ -2,7 +2,7 @@
 # See LICENSE file for full copyright and licensing details.
 {
     'name': 'Odoo WooCommerce Customization',
-    'version': '14.0.2.0.4',
+    'version': '14.0.2.0.5',
     'category': 'Sales',
     'summary': 'Odoo Woocommerce Connector helps you automate your vital business processes at Odoo by enabling '
                'bi-directional data exchange between WooCommerce & Odoo.',
