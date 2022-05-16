@@ -11,6 +11,8 @@ _logger = logging.getLogger("WooCommerce")
 class WooProductTemplateEpt(models.Model):
     _inherit = "woo.product.template.ept"
 
+    name = fields.Char(related='product_tmpl_id.name')
+
     @api.model
     def sync_products(self, *args, **kwargs):
         self = self.with_context(lang=self.woo_instance_id.woo_lang_id.code)
@@ -149,3 +151,15 @@ class WooProductTemplateEpt(models.Model):
             product_tmpl_id._pull_product_weight_from_attribute()
 
         return woo_template_id
+
+    @api.model
+    def update_products_in_woo(self, instance, templates, update_price, publish, update_image,
+                               update_basic_detail, common_log_id):
+        templates = templates.with_context(lang=instance.woo_lang_id.code)
+        return super(
+            WooProductTemplateEpt,
+            self.with_context(lang=instance.woo_lang_id.code)
+        ).update_products_in_woo(
+            instance, templates, update_price, publish, update_image,
+            update_basic_detail, common_log_id,
+        )
