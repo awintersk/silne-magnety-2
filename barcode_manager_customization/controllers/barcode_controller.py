@@ -74,11 +74,12 @@ class BarcodeController(Controller):
         package_id = request.env['stock.quant.package'].browse(package_int_id)
 
         expected_weight = package_id.weight
-        is_boxed_target_line = target_line_int_id in package_id.move_line_ids.ids
+        package_line_int_ids = package_id.move_line_ids.ids
 
         for line_id in picking_id.move_line_ids:
-            if line_id.id == target_line_int_id and is_boxed_target_line:
-                expected_weight -= line_id.product_weight * (line_id.product_qty - qty)
+            line_qty = qty if line_id.id == target_line_int_id else line_id.qty_done
+            if line_id.id in package_line_int_ids:
+                expected_weight -= line_id.product_weight * (line_id.product_qty - line_qty)
             else:
-                expected_weight += line_id.product_weight * line_id.qty_done
+                expected_weight += line_id.product_weight * line_qty
         return expected_weight
