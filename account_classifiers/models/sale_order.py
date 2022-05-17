@@ -27,7 +27,8 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         invoice_vals = super()._prepare_invoice()
 
-        classifier_sequence_id = self.woo_instance_id.invoice_classifer_sequence_id
+        classifier_sequence_id = self.woo_instance_id.invoice_classifer_sequence_id \
+            or self.env.company.invoice_classifer_sequence_id
         if classifier_sequence_id:
             invoice_vals['kros_classifier'] = classifier_sequence_id.next_by_id()
 

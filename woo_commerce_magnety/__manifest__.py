@@ -18,6 +18,7 @@
         'data/ir_config_parameter_data.xml',
         'data/product_data.xml',
         'views/product.xml',
+        'views/sale_order_views.xml',
     ],
     'installable': True,
     'auto_install': False,

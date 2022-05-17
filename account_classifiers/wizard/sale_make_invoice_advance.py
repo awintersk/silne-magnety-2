@@ -18,8 +18,19 @@
 #
 ################################################################################
 
-from . import account_move
-from . import res_company
-from . import res_config_settings
-from . import sale_order
-from . import woo_instance_ept
+from odoo import api, fields, models, _
+
+
+class SaleAdvancePaymentInv(models.TransientModel):
+    _inherit = "sale.advance.payment.inv"
+
+    def _prepare_invoice_values(self, order, name, amount, so_line):
+        invoice_vals = super()._prepare_invoice_values(order, name, amount, so_line)
+
+        classifier_sequence_id = order.woo_instance_id.invoice_classifer_sequence_id \
+            or self.env.company.invoice_classifer_sequence_id
+
+        if classifier_sequence_id:
+            invoice_vals['kros_classifier'] = classifier_sequence_id.next_by_id()
+
+        return invoice_vals

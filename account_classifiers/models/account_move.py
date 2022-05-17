@@ -28,3 +28,12 @@ class AccountMove(models.Model):
         string='Classifier',
         copy=False,
     )
+
+    @api.depends('posted_before', 'state', 'journal_id', 'date')
+    def _compute_name(self):
+        res = super()._compute_name()
+
+        for move in self.filtered(lambda m: m.name != '/' and m.kros_classifier):
+            move.name = move.kros_classifier
+
+        return res
