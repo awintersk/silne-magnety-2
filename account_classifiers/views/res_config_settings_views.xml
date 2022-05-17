@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="res_config_settings_classifiers_view_form_inherit" model="ir.ui.view">
+        <field name="name">WooCommerce Classifiers Settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="woo_commerce_ept.view_woo_config_settings"/>
+        <field name="groups_id" eval="[(4, ref('woo_commerce_ept.group_woo_ept'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//separator[@id='misc']" position="before">
+                <div name="woo_classifiers_settings" attrs="{'invisible': [('woo_instance_id', '=', False)]}">
+                    <h2 style="font-size:25px;background-color:#e9ecef;">Classifiers Settings</h2>
+                </div>
+
+                <div name="last_date_information" attrs="{'invisible': [('woo_instance_id', '=', False)]}"
+                     class="row mt16 o_settings_container o_settings_container_woo_config">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="woo_invoice_classifer_sequence_id"/>
+                            <div class="text-muted">
+                                Set the sequence object for invoice classifiers.
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="woo_invoice_classifer_sequence_id" class="oe_inline"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="woo_reversal_classifer_sequence_id"/>
+                            <div class="text-muted">
+                                Set the sequence object for credit notes classifiers.
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="woo_reversal_classifer_sequence_id" class="oe_inline"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
