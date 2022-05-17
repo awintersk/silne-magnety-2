@@ -40,8 +40,9 @@ class WooProductTemplateEpt(models.Model):
                     price_data = []
                     for i in range(1, 6):
                         min_quantity = get_value(meta_data, f'_bulkdiscount_quantity_{i}')
-                        price = get_value(meta_data, f'_bulkdiscount_discount_fixed_{i}')
-                        if min_quantity and price:
+                        discount = get_value(meta_data, f'_bulkdiscount_discount_fixed_{i}')
+                        if min_quantity and discount:
+                            fixed_price = product.with_context(pricelist=woo_instance.woo_pricelist_id.id).price - discount
                             exist_price = Price.search([
                                 ('pricelist_id', '=', woo_instance.woo_pricelist_id.id),
                                 ('applied_on', '=', '1_product'),
@@ -50,22 +51,19 @@ class WooProductTemplateEpt(models.Model):
                                 ('min_quantity', '=', min_quantity),
                             ])
                             if exist_price:
-                                exist_price.fixed_price = price
+                                exist_price.fixed_price = fixed_price
                             else:
-                                # TODO треба доробити розрахунок price
                                 price_data.append({
                                     'product_tmpl_id': product.id,
                                     'applied_on': '1_product',
                                     'compute_price': 'fixed',
                                     'min_quantity': min_quantity,
-                                    'fixed_price': product.with_context(pricelist=woo_instance.woo_pricelist_id.id).price - price,
+                                    'fixed_price': fixed_price,
                                     'pricelist_id': woo_instance.woo_pricelist_id.id,
                                 })
                     if price_data:
                         Price.create(price_data)
         return res
-
-
 
     @api.model
     def sync_attributes(self, attributes):
