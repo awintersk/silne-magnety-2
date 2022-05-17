@@ -22,10 +22,19 @@ class WooProductCategoryEpt(models.Model):
         if self.parent_id:
             parent_id = self.parent_id.create_odoo_category().id
         data = self.prepare_odoo_category(parent_id)
+
         if self.category_id:
             self.category_id.write(data)
-        elif not Category.search([('name', '=', data['name'])]):
-            self.category_id = Category.create([data])
+        else:
+            exist_category = self.search([
+                ('woo_categ_id', '=', self.woo_categ_id),
+                ('id', '!=', self.id),
+                ('category_id', '!=', False),
+            ], limit=1)
+            if exist_category:
+                self.category_id = exist_category.category_id
+            else:
+                self.category_id = Category.create([data])
         return self.category_id
 
     def prepare_odoo_category(self, parent_id):

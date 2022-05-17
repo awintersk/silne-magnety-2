@@ -13,21 +13,27 @@ class WooProductTemplateEpt(models.Model):
 
     @api.model
     def sync_products(self, *args, **kwargs):
-        product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products = args[:4]
+        product_data_queue_lines, woo_instance, common_log_book_id = args[:3]
         order_queue_line = kwargs.get('order_queue_line')
+        skip_existing_products = kwargs.get('skip_existing_products')
         res = super(WooProductTemplateEpt, self).sync_products(product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products, **kwargs)
         for product_data_queue_line in product_data_queue_lines:
             data, product_queue_id, product_data_queue_line, sync_category_and_tags = self.prepare_product_response(order_queue_line, product_data_queue_line)
             woo_product_template_id, template_title = data.get("id"), data.get("name")
             woo_template = self.with_context(active_test=False).search(
                 [("woo_tmpl_id", "=", woo_product_template_id), ("woo_instance_id", "=", woo_instance.id)], limit=1)
-            categ = data['categories'][0]
-            woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', categ['id'])], limit=1)
-            if not woo_category.category_id:
-                odoo_category = woo_category.create_odoo_category()
-            else:
-                odoo_category = woo_category.category_id
-            woo_template.product_tmpl_id.categ_id = odoo_category.id
+            categories = []
+            for category_data in data['categories']:
+                woo_category = self.env['woo.product.categ.ept'].search([('woo_categ_id', '=', category_data['id'])], limit=1)
+                if not woo_category.category_id:
+                    odoo_category = woo_category.create_odoo_category()
+                else:
+                    odoo_category = woo_category.category_id
+                if odoo_category:
+                    categories.append(odoo_category.id)
+            if categories:
+                woo_template.product_tmpl_id.categ_ids = [(6, 0, categories)]
+                woo_template.product_tmpl_id.categ_id = categories[0]
             if data["attributes"]:
                 woo_template.sync_attributes(data["attributes"])
         return res
@@ -42,7 +48,8 @@ class WooProductTemplateEpt(models.Model):
             for attr in attributes:
                 if not attr['variation']:
                     attribute = WooAttribute.search([
-                        ('woo_attribute_id', '=', attr['id'])
+                        ('woo_attribute_id', '=', attr['id']),
+                        ('woo_instance_id', '=', self.woo_instance_id.id),
                     ], limit=1).attribute_id
                     exist_attribute = product.attribute_line_ids.mapped('attribute_id').ids
                     if attribute:
@@ -50,22 +57,23 @@ class WooProductTemplateEpt(models.Model):
                             ('attribute_id', '=', attribute.id),
                             ('name', 'in', attr['options']),
                         ], limit=1)
-                        if attribute.id not in exist_attribute:
-                            data = {
-                                'product_tmpl_id': product.id,
-                                'attribute_id': attribute.id,
-                                'value_ids': [(6, 0, value.ids)]
-                            }
-                            attribute_list.append((0, 0, data))
-                        else:
-                            attribute_for_update = product.attribute_line_ids.filtered(
-                                lambda x: x.attribute_id.id == attribute.id
-                                          and x.value_ids[0].name not in value.mapped('name'))
-                            if attribute_for_update:
+                        if value:  # TODO need checking language(can't find some values)
+                            if attribute.id not in exist_attribute:
                                 data = {
+                                    'product_tmpl_id': product.id,
+                                    'attribute_id': attribute.id,
                                     'value_ids': [(6, 0, value.ids)]
                                 }
-                                attribute_list.append((1, attribute_for_update[0].id, data))
+                                attribute_list.append((0, 0, data))
+                            else:
+                                attribute_for_update = product.attribute_line_ids.filtered(
+                                    lambda x: x.attribute_id.id == attribute.id
+                                              and x.value_ids[0].name not in value.mapped('name'))
+                                if attribute_for_update:
+                                    data = {
+                                        'value_ids': [(6, 0, value.ids)]
+                                    }
+                                    attribute_list.append((1, attribute_for_update[0].id, data))
 
             if attribute_list:
                 product.write({

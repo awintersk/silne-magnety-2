@@ -1,8 +1,7 @@
-# -*- coding: UTF-8 -*-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,48 +19,20 @@
 ################################################################################
 
 {
-    'name': "Barcode Customization",
-
-    'summary': """
-    """,
-
-    'description': """
-    """,
-
-    'author': "SmartTek",
-    'website': "https://smartteksas.com",
-
-    'category': 'Purchases',
-    'version': '14.0.0.21',
-
+    'name': 'Refresh Sequence',
+    'version': '14.0.1.0.0',
+    'category': 'Hidden/Tools',
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
     'depends': [
         'base',
-        'purchase',
-        'stock',
-        'stock_barcode',
-        'product',
-        'sale',
-        'delivery',
-        'sale_purchase_stock',
     ],
-
     'data': [
-        'security/ir.model.access.csv',
-        'report/report_picking.xml',
-
-        'data/sequence_data.xml',
-        'data/config_parameter_data.xml',
-        'data/decimal_precision_data.xml',
-
-        'views/assets.xml',
-        'views/purchase_views.xml',
-        'views/stock_picking_views.xml',
-        'views/stock_move_line_views.xml',
-        'views/product_packaging_views.xml',
+        'data/ir_cron.xml',
+        'views/ir_sequence_views.xml'
     ],
-
-    'qweb': [
-        'static/src/xml/stock_barcode.xml',
-        'static/src/xml/barcode_dialog.xml',
-    ]
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
 }
