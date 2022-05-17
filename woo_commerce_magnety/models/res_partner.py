@@ -73,7 +73,7 @@ class ResPartner(models.Model):
         partner_vals.update({'type': partner_type})
         address_partner = self.with_context(no_vat_validation=True).create(partner_vals)
         try:
-            address_partner.check_vat()
+            address_partner.with_context(no_vat_validation=False).check_vat()
         except ValidationError:
             address_partner.activity_schedule('woo_commerce_magnety.mail_act_vat_check',
                                               user_id=self.env.uid,
