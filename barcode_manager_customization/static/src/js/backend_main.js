@@ -188,9 +188,9 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             }
 
             /**@type{Object<*>[]}*/
-            const moveLineIds = this.linesWidget.page.lines
+            const pageMoveLineIds = this.linesWidget.page.lines
             /**@type{Object<*>[]}*/
-            const linesWithBarcode = moveLineIds.filter(item => item.product_barcode === barcode)
+            const linesWithBarcode = pageMoveLineIds.filter(item => item.product_barcode === barcode)
 
             if (!linesWithBarcode.length) {
                 this.displayNotification({
@@ -201,11 +201,7 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             }
 
             /**@type{Object<*>|undefined}*/
-            const linesId = linesWithBarcode.find(rec => {
-                const getID = rec => _.isEmpty(rec) ? rec[0] : null
-                if (rec.qty_done >= rec.product_uom_qty) return false
-                return !_.isEmpty(rec.result_package_id) || getID(rec.package_id) === getID(rec.result_package_id)
-            })
+            const linesId = linesWithBarcode.find(rec => rec.qty_done < rec.product_uom_qty)
 
             if (!linesId) {
                 return false
@@ -226,8 +222,9 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
 
             const internalBody = new ComponentWrapper(this, BarcodeInternalDialog, {
                 linesId,
-                moveLineIds,
+                pageMoveLineIds,
                 packageList,
+                moveLineIds: this.currentState.move_line_ids,
                 pickingIntId: this.currentState.id,
             })
 

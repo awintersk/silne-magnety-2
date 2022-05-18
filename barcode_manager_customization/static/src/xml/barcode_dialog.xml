@@ -216,9 +216,9 @@
                     <td>
                         <input class="o_input d-inline-flex"
                                t-model.number="state.qty"
-                               min="0"
+                               min="1"
                                t-att-max="props.linesId.product_uom_qty"
-                               step="0.01"
+                               step="1"
                                type="number"
                                t-att-disabled="state.isMoved"
                                style="max-width: 70px"/>

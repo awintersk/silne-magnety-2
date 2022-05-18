@@ -50,6 +50,7 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
      * }} props
      */
     class BarcodeInternalDialog extends SecondaryBody {
+
         setup() {
             /**@type{BarcodeInternalDialogState}*/
             this.state = useState({
@@ -68,17 +69,17 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             useWatchDog({
                 state: this.state,
                 field: 'boxIntId',
-                callback: this._onChangePackage,
+                callback: _.debounce(this._onChangePackage, 200),
             })
             useWatchDog({
                 state: this.state,
                 field: 'qty',
-                callback: this._onChangeQty,
+                callback: _.debounce(this._onChangeQty, 500),
             })
             useWatchDog({
                 state: this.state,
                 field: 'packageTypeIntId',
-                callback: this._onChangePackageTypeIntId,
+                callback: _.debounce(this._onChangePackageTypeIntId, 200),
             })
         }
 
@@ -97,7 +98,9 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 model: 'stock.quant.package',
                 method: 'search_read',
                 domain: [
+                    '|',
                     ['sale_ids', 'in', [relatedSaleId.id]],
+                    ['name', 'ilike', `${relatedSaleId.name}-%%`],
                     ['packaging_id', 'in', this.state.packageTypeItems.map(el => el.id)]
                 ],
                 fields: ['name', 'packaging_id', 'shipping_weight', 'weight'],
@@ -112,9 +115,11 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 const packageId = this.state.packageItems.find(el => el.id === this.state.boxIntId)
                 Object.assign(this.state, {
                     shipping_weight: packageId ? packageId.shipping_weight : 0,
-                    weight: packageId ? this._computeExpectedWeight(packageId) : 0,
+                    weight: packageId ? await this._computeExpectedWeight() : 0,
                     packageTypeIntId: packageId && packageId.packaging_id ? packageId.packaging_id[0] : 0,
                 })
+            } else {
+                this.state.weight = await this._computeExpectedWeight()
             }
         }
 
@@ -244,7 +249,7 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
             )
         }
 
-        _onChangePackage() {
+        async _onChangePackage() {
             const boxId = Number(this.state.boxIntId)
             const {state} = this
 
@@ -257,48 +262,56 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
                 state.packageTypeIntId = 0
             }
 
-            state.weight = this._computeExpectedWeight(item && item.id ? item : {})
+            state.weight = await this._computeExpectedWeight()
         }
 
-        _onChangeQty() {
-            const {state} = this
-            const packageId = state.packageItems.find(el => el.id === +state.boxIntId)
-            state.weight = this._computeExpectedWeight(packageId ? packageId : {})
+        async _onChangeQty() {
+            this.state.weight = await this._computeExpectedWeight()
         }
 
         /**
-         * @param {Number} [weight]
-         * @returns {Number}
+         * @returns {Promise<Number>}
          * @private
          */
-        _computeExpectedWeight({weight}) {
+        async _computeExpectedWeight() {
             const {
                 packageTypeItems,
                 packageTypeIntId,
-                boxIntId,
-                qty
+                boxIntId: boxID,
+                qty,
             } = this.state
 
-            if (weight === undefined) {
+            const {
+                linesId,
+                pickingIntId,
+            } = this.props
+
+            let weight = 0
+            const boxIntId = Number(boxID)
+
+            if (!boxIntId) {
                 const packagingId = packageTypeItems.find(el => el.id === +packageTypeIntId)
                 weight = packagingId && packagingId.id ? packagingId.weight : 0
+                return round(weight + this.productWeight * qty, 4)
             }
 
-            for (let lineId of this.props.moveLineIds) {
-                const {product_weight} = lineId
-                if (lineId.id === this.props.linesId.id) continue;
-                if (lineId.result_package_id[0] === Number(boxIntId) && product_weight) {
-                    weight += product_weight * lineId.qty_done
-                }
+            if (boxIntId) {
+                weight += await this.rpc({
+                    route: `/barcode/expected/weight`,
+                    params: {
+                        picking_int_id: pickingIntId,
+                        package_int_id: boxIntId,
+                        target_line_int_id: linesId.id,
+                        qty: qty,
+                    }
+                })
             }
 
-            return round(weight + this.productWeight * qty, 4)
+            return round(weight, 4)
         }
 
-        _onChangePackageTypeIntId() {
-            const {state} = this
-            const packageId = state.packageItems.find(el => el.id === +state.boxIntId)
-            state.weight = this._computeExpectedWeight(packageId && packageId.id ? packageId : {})
+        async _onChangePackageTypeIntId() {
+            this.state.weight = await this._computeExpectedWeight()
         }
 
         willUnmount() {
@@ -310,6 +323,10 @@ odoo.define('barcode_manager_customization.BarcodeInternalDialog', function (req
         template: 'barcode_manager_customization.receipt_internal_body',
         components: {Dialog},
         props: {
+            pageMoveLineIds: {
+                type: Array,
+                element: Object,
+            },
             moveLineIds: {
                 type: Array,
                 element: Object,
