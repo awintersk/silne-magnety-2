@@ -10,7 +10,7 @@ class WooProductCategoryEpt(models.Model):
     _inherit = 'woo.product.categ.ept'
 
     name = fields.Char(compute='_compute_name', store=True, translate=False)
-    category_id = fields.Many2one('product.category')
+    category_id = fields.Many2one('product.category', string='Origin category')
 
     @api.depends('category_id.name', 'woo_instance_id.woo_lang_id')
     def _compute_name(self):
