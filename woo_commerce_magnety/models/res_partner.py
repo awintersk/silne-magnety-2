@@ -72,13 +72,6 @@ class ResPartner(models.Model):
             partner_vals.update({'parent_id': parent_id.id})
         partner_vals.update({'type': partner_type})
         address_partner = self.with_context(no_vat_validation=True).create(partner_vals)
-        try:
-            address_partner.with_context(no_vat_validation=False).check_vat()
-        except ValidationError:
-            address_partner.activity_schedule('woo_commerce_magnety.mail_act_vat_check',
-                                              user_id=self.env.uid,
-                                              note=_('Please check the VAT number of the customer.'))
-
         if not parent_id and customer_id:
             address_partner.create_woo_res_partner_ept(woo_partner_values)
             address_partner.write({'is_woo_customer': True})
