@@ -38,3 +38,9 @@ class PrepareProductForExport(models.TransientModel):
     def prepare_product_for_export(self):
         instance_lang = self.woo_instance_id.woo_lang_id
         return super(PrepareProductForExport, self.with_context(lang=instance_lang.code)).prepare_product_for_export()
+
+    def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=None):
+        if not ctg_list:
+            ctg_list = []
+        return super().create_categ_in_woo(category_id, instance, woo_category_dict, ctg_list)
+
