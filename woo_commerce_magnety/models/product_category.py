@@ -10,3 +10,8 @@ class ProductCategory(models.Model):
     name = fields.Char(
         translate=True,
     )
+
+    @api.depends('name', 'parent_id.complete_name')
+    def _compute_complete_name(self):
+        self = self.with_context(lang=self.env.user.lang)
+        return super(ProductCategory, self)._compute_complete_name()

@@ -31,7 +31,8 @@ class WooProductCategoryEpt(models.Model):
         data = self.prepare_odoo_category(parent_id)
 
         if self.category_id:
-            self.category_id.write(data)
+            instance_lang = self.woo_instance_id.woo_lang_id
+            self.category_id.with_context(lang=instance_lang.code).write(data)
         else:
             exist_category = self.search([
                 ('woo_categ_id', '=', self.woo_categ_id),
