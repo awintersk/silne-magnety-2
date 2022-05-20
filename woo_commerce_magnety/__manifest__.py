@@ -17,6 +17,7 @@
         'data/ir_actions_server_data.xml',
         'data/ir_config_parameter_data.xml',
         'data/product_data.xml',
+        'views/product.xml',
     ],
     'installable': True,
     'auto_install': False,

@@ -23,13 +23,17 @@
 import logging
 import re
 
-from odoo import models, _
+from odoo import models, _, fields
 
 _logger = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
+    categ_ids = fields.Many2many(
+        'product.category', string='Product Categories',
+        help="Select category for the current product")
 
     def _pull_product_weight_from_attribute(self):
         self.ensure_one()
