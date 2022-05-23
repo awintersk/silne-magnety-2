@@ -45,7 +45,7 @@ odoo.define('barcode_manager_customization.secondary_body', function (require) {
             this.state = useState({
                 packageItems: [],
                 packageTypeItems: [],
-                boxIntId: 0,
+                boxIntId: -1,
                 packageTypeIntId: 0,
                 locationDestID: this.props.locationDestID,
                 destinationLocationList: [],

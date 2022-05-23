@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page//field[@name='ref']" position="after">
-                <field name="kros_classifier"/>
+                <field name="kros_classifier" invisible="1"/>
             </xpath>
         </field>
     </record>

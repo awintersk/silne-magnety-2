@@ -24,6 +24,14 @@ from odoo import _, api, fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    invoice_classifer_sequence_id = fields.Many2one(
+        related='company_id.invoice_classifer_sequence_id',
+        readonly=False,
+    )
+    reversal_classifer_sequence_id = fields.Many2one(
+        related='company_id.reversal_classifer_sequence_id',
+        readonly=False
+    )
     woo_invoice_classifer_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Invoice Classifier Sequence',

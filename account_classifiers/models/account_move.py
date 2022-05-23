@@ -28,3 +28,25 @@ class AccountMove(models.Model):
         string='Classifier',
         copy=False,
     )
+
+    @api.depends('posted_before', 'state', 'journal_id', 'date')
+    def _compute_name(self):
+        res = super()._compute_name()
+
+        for move in self.filtered(lambda m: m.name != '/' and m.kros_classifier):
+            move.name = move.kros_classifier
+
+        return res
+
+    def _get_last_sequence_domain(self, relaxed=False):
+        """Get the sql domain to retreive the previous sequence number.
+        :param relaxed: see _get_last_sequence.
+
+        :returns: tuple(where_string, where_params): with
+            where_string: the entire SQL WHERE clause as a string.
+            where_params: a dictionary containing the parameters to substitute
+                at the execution of the query.
+        """
+        where_string, param = super()._get_last_sequence_domain(relaxed)
+        where_string += " AND kros_classifier IS NULL"
+        return where_string, param

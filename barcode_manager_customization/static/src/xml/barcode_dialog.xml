@@ -180,7 +180,7 @@
                     <th>Package №</th>
                     <td class="pr-3 vertical-align-middle">
                         <select class="o_input" t-model.number="state.boxIntId">
-                            <option value="-1" selected="1"/>
+                            <option value="-1"/>
                             <option value="0">New package</option>
                             <option t-foreach="state.packageItems" t-as="item" t-key="item.id" t-att-value="item.id" t-esc="item.name"/>
                         </select>
