@@ -46,9 +46,28 @@ class PrepareProductForExport(models.TransientModel):
         return super().create_categ_in_woo(category_id, instance, woo_category_dict, ctg_list)
 
     def create_woo_category(self, category_name, instance, parent_id=False, origin_id=False):
-        res = super().create_woo_category(category_name, instance, parent_id)
-        res.category_id = origin_id
+        res = self.env["woo.product.categ.ept"].search([
+            ('category_id', '=', origin_id.id),
+            ('woo_instance_id', '=', instance),
+        ], limit=1)
+        if not res:
+            res = super().create_woo_category(category_name, instance, parent_id)
+            res.category_id = origin_id
         return res
+
+    def update_category_info(self, categ_obj, instance_id):
+        woo_product_categ = self.env['woo.product.categ.ept']
+        woo_categ_id = woo_product_categ.search([('category_id', '=', categ_obj.id),
+                                                 ('woo_instance_id', '=', instance_id)], limit=1)
+        if not woo_categ_id:
+            woo_categ_id = woo_product_categ.create({
+                'name': categ_obj.name,
+                'woo_instance_id': instance_id,
+                'category_id': categ_obj.id,
+            })
+        else:
+            woo_categ_id._compute_name()
+        return woo_categ_id
 
     def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=[]):
         """

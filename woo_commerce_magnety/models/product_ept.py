@@ -156,10 +156,15 @@ class WooProductTemplateEpt(models.Model):
     def update_products_in_woo(self, instance, templates, update_price, publish, update_image,
                                update_basic_detail, common_log_id):
         templates = templates.with_context(lang=instance.woo_lang_id.code)
-        return super(
+        res = super(
             WooProductTemplateEpt,
             self.with_context(lang=instance.woo_lang_id.code)
         ).update_products_in_woo(
             instance, templates, update_price, publish, update_image,
             update_basic_detail, common_log_id,
         )
+
+        categories = templates.woo_categ_ids.filtered('exported_in_woo')
+        self.env['woo.product.categ.ept'].update_product_categs_in_woo( instance, categories)
+
+        return res
