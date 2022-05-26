@@ -18,6 +18,8 @@
         'data/ir_config_parameter_data.xml',
         'data/mail_activity.xml',
         'data/product_data.xml',
+        'views/product_category_view.xml',
+        'views/product_template_view.xml',
         'views/product.xml',
         'views/sale_order_views.xml',
     ],
