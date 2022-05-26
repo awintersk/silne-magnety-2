@@ -2,17 +2,38 @@ odoo.define('barcode_remember.remember_action', function (require) {
     'use strict'
 
     const ClientAction = require('stock_barcode.picking_client_action')
+    const GiftDialog = require('barcode_remember.remember_gift_dialog')
+    const {LanguageWarningDialog} = require('barcode_remember.remember_lang_warning_dialog')
+    const {ComponentWrapper} = require('web.OwlCompatibility')
+    const {PackageWeightDialog} = require('barcode_remember.remember_package_weight')
+    const {PackageTypeDialog} = require('barcode_remember.remember_package_type')
+    const {Component} = owl
 
     ClientAction.include({
         custom_events: Object.assign({}, ClientAction.prototype.custom_events, {
             add_gift_product: '_onAddGiftProduct',
             add_warning_product: '_onAddLangWarningProduct',
+            change_confirmed_package_type: '_onConfirmedPackageType',
+            change_confirmed_package_weight: '_onConfirmedPackageWeight'
         }),
 
         init() {
             this._super.apply(this, arguments)
             this.containGiftProduct = false
             this.containLangWarningProduct = false
+            this.sequenceCode = ''
+            this.useWarningFunc = false
+            this.isConfirmedPackageType = false
+            this.isConfirmedPackageWeight = false
+        },
+
+        async willStart() {
+            const response = await this._super.apply(this, arguments)
+            const {mode} = this
+            const {model} = this.actionParams
+            this.sequenceCode = this.initialState.picking_sequence_code
+            this.useWarningFunc = this.sequenceCode === 'PICK' && model === 'stock.picking' && mode === 'internal'
+            return response
         },
 
         /**
@@ -20,7 +41,7 @@ odoo.define('barcode_remember.remember_action', function (require) {
          * @returns {Boolean}
          * @private
          */
-        _getContainGiftProduct(pages) {
+        _containGiftProduct(pages) {
             return pages.flatMap(item => item.lines).some(item => item.is_gift_product)
         },
 
@@ -29,14 +50,14 @@ odoo.define('barcode_remember.remember_action', function (require) {
          * @returns {Boolean}
          * @private
          */
-        _fetContainLangWarningProduct(pages) {
+        _containLangWarningProduct(pages) {
             return pages.flatMap(item => item.lines).some(item => item.is_lang_warning_product)
         },
 
         _makePages() {
             const response = this._super.apply(this, arguments)
-            this.containGiftProduct = this._getContainGiftProduct(response)
-            this.containLangWarningProduct = this._fetContainLangWarningProduct(response)
+            this.containGiftProduct = this._containGiftProduct(response)
+            this.containLangWarningProduct = this._containLangWarningProduct(response)
             this.headerWidget.updateRememberState({
                 includeGift: this.containGiftProduct,
                 includeLangWarning: this.containLangWarningProduct,
@@ -68,6 +89,58 @@ odoo.define('barcode_remember.remember_action', function (require) {
             })
             this.trigger_up('reload')
         },
+
+        /**
+         * @returns {Promise<Boolean>}
+         * @private
+         */
+        async _openWarningDialog() {
+            /**
+             * @param {Component} comp
+             * @param {Object} props
+             * @returns {Promise<*>}
+             */
+            const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
+            /**@type{Number}*/
+            const pickingID = this.initialState.id
+
+            if (!this.containGiftProduct) {
+                await dialog(GiftDialog, {})
+                return true
+            } else if (!this.containLangWarningProduct) {
+                await dialog(LanguageWarningDialog, {pickingID})
+                return true
+            } else if (!this.isConfirmedPackageType) {
+                await dialog(PackageTypeDialog, {pickingID})
+                return true
+            } else if (!this.isConfirmedPackageWeight) {
+                await dialog(PackageWeightDialog, {pickingID})
+                return true
+            }
+            return false
+        },
+
+        async _validate() {
+            /**@type{Function}*/
+            const superValidate = this._super.bind(this)
+
+            if (this.useWarningFunc) {
+                if (await this._openWarningDialog()) {
+                    return undefined
+                }
+            }
+
+            await superValidate(...arguments)
+        },
+
+        _onConfirmedPackageType({data}) {
+            this.isConfirmedPackageType = data.confirmed
+        },
+
+        _onConfirmedPackageWeight({data}) {
+            this.isConfirmedPackageWeight = data.confirmed
+        },
+
     })
 
 });

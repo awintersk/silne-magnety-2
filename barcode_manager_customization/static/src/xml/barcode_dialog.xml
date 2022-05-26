@@ -166,11 +166,21 @@
                     <th>Qty</th>
                     <td><t t-esc="props.item.qty"/> units</td>
                 </tr>
+                <tr class="thead-light">
+                    <th>Destination Location</th>
+                    <td class="vertical-align-middle">
+                        <select class="o_input" t-model.number="state.locationDestID" t-att-disabled="disabledLocation">
+                            <t t-foreach="state.destinationLocationList" t-as="location" t-key="'location_' + location.id">
+                                <option t-att-value="location.id" t-esc="location.display_name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
                 <tr class="thead-light h-100">
                     <th>Package №</th>
                     <td class="pr-3 vertical-align-middle">
                         <select class="o_input" t-model.number="state.boxIntId">
-                            <option value="-1" selected="1"/>
+                            <option value="-1"/>
                             <option value="0">New package</option>
                             <option t-foreach="state.packageItems" t-as="item" t-key="item.id" t-att-value="item.id" t-esc="item.name"/>
                         </select>
@@ -206,9 +216,9 @@
                     <td>
                         <input class="o_input d-inline-flex"
                                t-model.number="state.qty"
-                               min="0"
+                               min="1"
                                t-att-max="props.linesId.product_uom_qty"
-                               step="0.01"
+                               step="1"
                                type="number"
                                t-att-disabled="state.isMoved"
                                style="max-width: 70px"/>
@@ -238,9 +248,9 @@
                     <th>Package №</th>
                     <td class="pr-3">
                         <select class="o_input" t-model.number="state.boxIntId" t-att-disabled="state.isMoved">
-                            <option t-att-selected="state.boxIntId === 0" value="0">New package</option>
-                            <t t-foreach="state.packageItems" t-as="item" t-key="item.id">
-                                <option t-att-selected="state.boxIntId === item.id" t-att-value="item.id" t-esc="item.name"/>
+                            <option value="0">New package</option>
+                            <t t-foreach="state.packageItems" t-as="item" t-key="'pacakage_' + item.id">
+                                <option t-att-value="item.id" t-esc="item.name"/>
                             </t>
                         </select>
                     </td>
@@ -265,14 +275,29 @@
                         t-if="!state.isMoved">
                     Move
                 </button>
-                <button class="btn btn-secondary"
-                        t-on-click.prevent="savePackageWeight"
-                        t-if="state.boxIntId &gt; 0 &amp;&amp; !state.isMoved">
-                    Save Package Weight
-                </button>
                 <button class="btn btn-secondary" t-on-click="_onPrint" t-if="state.isMoved">
                     Print box label
                 </button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="barcode_manager_customization.BarcodePreferencesDialog" owl="1">
+        <Dialog title="'Barcode Preferences'" fullscreen="true" size="'medium'" t-on-dialog-closed="onClose">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <button t-attf-class="{{buttonClass('usePickingDialog')}} w-100"
+                            t-on-click="toggleValue('usePickingDialog')">
+                        <span>Use Picking Dialog</span>
+                        <input class="ml-3"
+                               t-model="state.usePickingDialog.value"
+                               type="checkbox"/>
+                    </button>
+                </div>
+            </div>
+            <t t-set-slot="buttons">
+                <button class="btn btn-primary" t-on-click="onClose">Cancel</button>
+                <button class="btn btn-secondary" t-on-click="onSave">Save</button>
             </t>
         </Dialog>
     </t>

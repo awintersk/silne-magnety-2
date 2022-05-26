@@ -23,12 +23,15 @@ from typing import List, Union
 from logging import getLogger
 
 from odoo import models, fields, _, api
+from odoo.osv import expression
 
 _logger = getLogger(__name__)
 
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
+
+    picking_sequence_code = fields.Char(related='picking_type_id.sequence_code')
 
     def get_barcode_view_state(self):
         product_env = self.env['product.product']
@@ -48,8 +51,19 @@ class StockPicking(models.Model):
     )
 
     def _compute_barcode_sale_order_ids(self):
-        for rec in self:
-            rec.barcode_sale_order_ids = rec.purchase_id._get_sale_orders()
+        for picking_id in self:
+            product_ids = picking_id.move_line_ids.product_id
+            move_ids = self.env['stock.move'].search([
+                ('product_id', 'in', product_ids.ids),
+                ('picking_type_id.sequence_code', '=', 'PICK'),
+                ('state', 'in', ('waiting', 'confirmed', 'partially_available'))
+            ]).filtered(
+                lambda move_id: move_id.reserved_availability < move_id.product_uom_qty
+            )
+            picking_id.barcode_sale_order_ids = self.env['sale.order'].search([
+                ('order_line.product_id', 'in', product_ids.ids),
+                ('picking_ids.move_lines', 'in', move_ids.ids)
+            ])
 
     def _put_in_pack(self, move_line_ids, create_package_level=True):
         self.env.context = dict(self._context, picking_id=self.id)
@@ -85,3 +99,37 @@ class StockPicking(models.Model):
     def _get_move_line_ids_fields_to_read(self):
         response = super(StockPicking, self)._get_move_line_ids_fields_to_read()
         return [*response, 'product_weight']
+
+    def _get_picking_fields_to_read(self):
+        response = super(StockPicking, self)._get_picking_fields_to_read()
+        if 'picking_sequence_code' not in response:
+            response.append('picking_sequence_code')
+        return response
+
+    def stock_location_for_order_receipt(self, order_int_id):
+        """
+        :param int order_int_id: Sale Order int id
+        :rtype: list[dict[str, Any]]
+        :return: Location list
+        """
+        self.ensure_one()
+
+        sale_picking_ids = self.env['stock.picking'].search([
+            ('sale_id', '=', order_int_id),
+            ('picking_type_id.sequence_code', '=', 'PICK'),
+            ('state', 'not in', ('draft', 'cancel')),
+        ])
+
+        domain = [('id', 'child_of', self.location_dest_id.ids)]
+
+        if sale_picking_ids:
+            domain = expression.OR([
+                domain,
+                [('id', 'child_of', sale_picking_ids.location_id.ids), ('usage', '!=', 'view')]
+            ])
+
+        location_ids = self.env['stock.location'].search_read(
+            domain=domain,
+            fields=['id', 'display_name', 'barcode'],
+        )
+        return location_ids

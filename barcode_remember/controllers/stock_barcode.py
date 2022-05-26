@@ -20,11 +20,12 @@
 #
 ################################################################################
 
-from odoo.http import request, route
-from odoo.addons.stock_barcode.controllers.main import StockBarcodeController
+from typing import Dict, List, Optional, Tuple
+from odoo.http import request, route, Controller
+from odoo.tools.float_utils import float_round
 
 
-class RememberStockBarcodeController(StockBarcodeController):
+class RememberStockBarcodeController(Controller):
 
     @route('/barcode_remember/warning/country', type='json', methods=['POST'], auth='user')
     def barcode_warranty_language(self, picking: int):
@@ -36,3 +37,49 @@ class RememberStockBarcodeController(StockBarcodeController):
             }
         else:
             return {'country': {}}
+
+    @route('/barcode_remember/package/weight_data', type='json', methods=['POST'], auth='user')
+    def barcode_remember_package_weight_data(self, picking: int) -> List[Optional[Dict]]:
+        picking_id = request.env['stock.picking'].browse(picking)
+        picking_line_ids = picking_id.move_line_ids
+
+        package_int_ids = set(
+            line_id.result_package_id.id or line_id.package_id.id
+            for line_id in picking_line_ids if line_id.result_package_id.id or line_id.package_id.id
+        )
+
+        package_ids = request.env['stock.quant.package'].browse(package_int_ids)
+        field2read = ['shipping_weight', 'name', 'weight_uom_name', 'weight']
+        package_list = []
+
+        for package_id in package_ids:
+            move_line_ids = package_id.move_line_ids.filtered(lambda el: el.state != 'done')
+            move_line_ids |= picking_line_ids.filtered(lambda el: package_id.id in (el.result_package_id or el.package_id).ids)
+            item = package_id.read(field2read)[0]
+            item['weight'] = package_id.packaging_id.weight if package_id.packaging_id else 0
+
+            for line_id in move_line_ids:
+                item['weight'] += line_id.product_id.weight * line_id.qty_done
+
+            package_list.append(item)
+
+        return package_list
+
+    @route('/barcode_remember/package/weight_set', type='json', methods=['POST'], auth='user')
+    def barcode_remember_package_weight_set(self, package_list: List[Tuple[int, float]]) -> bool:
+        package_env = request.env['stock.quant.package']
+        for package_int_id, weight in package_list:
+            package_id = package_env.browse(package_int_id)
+            if package_id.exists():
+                package_id.write({'shipping_weight': weight})
+        return True
+
+    @route('/barcode_remember/package', type='json', methods=['POST'], auth='user')
+    def barcode_remember_package_data(self, picking: int) -> List[Optional[Dict]]:
+        picking_id = request.env['stock.picking'].browse(picking)
+        line_ids = picking_id.move_line_ids
+
+        if not line_ids:
+            return []
+
+        return line_ids.result_package_id.read(['name', 'packaging_id'])

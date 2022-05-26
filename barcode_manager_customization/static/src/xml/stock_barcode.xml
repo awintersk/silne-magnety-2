@@ -28,11 +28,21 @@
     </t>
 
     <t t-extend="stock_barcode_lines_widget">
-        <t t-jquery="button.o_add_line" t-operation="replace">
-            <button class="btn btn-secondary text-uppercase o_create_backorder"><i class="fa fa-plus mr-2"/>Create Backorder</button>
+        <t t-jquery="button.o_add_line" t-operation="after">
+            <button class="btn btn-secondary text-uppercase o_create_backorder">
+                <i class="fa fa-plus mr-2"/>Create Backorder
+            </button>
         </t>
         <t t-jquery="button.o_put_in_pack" t-operation="attributes">
             <attribute name="t-att-disabled">widget._isPutInPackDisabled() || undefined</attribute>
+        </t>
+    </t>
+
+    <t t-extend="stock_barcode_settings_widget">
+        <t t-jquery=".o_barcode_settings > button:first" t-operation="replace">
+            <button class="btn-lg btn btn-dark text-uppercase o_barcode_preferences">
+                Barcode Preferences
+            </button>
         </t>
     </t>
 

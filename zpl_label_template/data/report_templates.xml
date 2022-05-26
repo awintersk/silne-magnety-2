@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <template id="zpl_label_pandora_product_view">
+<t t-foreach="docs" t-as="product">
+^XA
+^LL200
+^ML400
+^PW255
+
+^A0,12^FO100,15,0^FD<t t-esc="product.categ_id.name or product.name or ''"/>^FS
+^FO0,35^GB255,1,1^FS
+<t t-if="product.default_code">
+^A0,14^FO70,45^FD<t t-esc="product.default_code"/>^FS
+</t>
+<t t-if="product.barcode">
+^FO35,65^BY1
+^BCN,65,Y,N,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+^XZ
+</t>
+    </template>
+
+    <template id="zpl_label_pandora_product_template_view">
+<t t-foreach="docs" t-as="product_tmpl">
+<t t-foreach="product_tmpl.product_variant_ids" t-as="product">
+^XA
+^LL200
+^ML400
+^PW255
+
+^A0,12^FO100,15,0^FD<t t-esc="product.categ_id.name or product.name or ''"/>^FS
+^FO0,35^GB255,1,1^FS
+<t t-if="product.default_code">
+^A0,14^FO70,45^FD<t t-esc="product.default_code"/>^FS
+</t>
+<t t-if="product.barcode">
+^FO35,65^BY1
+^BCN,65,Y,N,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+^XZ
+</t>
+</t>
+    </template>
+
+    <template id="zpl_label_monti_product_view">
+<t t-foreach="docs" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^Aa,14
+^FO15,30^FD<t t-esc="product.name"/>^FS
+<t t-if="product.barcode">
+^FO48,120^BY2
+^BCN,80,Y,Y,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+<t t-if="product.default_code">
+^Aa,14
+^FO135,240^FD<t t-esc="product.default_code"/>^FS
+</t>
+^XZ
+</t>
+    </template>
+
+    <template id="zpl_label_monti_product_template_view">
+<t t-foreach="docs" t-as="product_tmpl">
+<t t-foreach="product_tmpl.product_variant_ids" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^Aa,14
+^FO15,30^FD<t t-esc="product.name"/>^FS
+<t t-if="product.barcode">
+^FO48,120^BY2
+^BCN,80,Y,Y,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+<t t-if="product.default_code">
+^Aa,14
+^FO135,240^FD<t t-esc="product.default_code"/>^FS
+</t>
+^XZ
+</t>
+</t>
+    </template>
+
+    <template id="zpl_label_ysl_product_view">
+<t t-foreach="docs" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^AQ^FO10,30^FD<t t-esc="product.product_tmpl_id.default_code or ''"/>^FS
+^AD^FO10,80^FD<t t-esc="product.name.upper() or ''"/>^FS
+
+<t t-if="product.categ_id">
+^AD^FO10,120^FD<t t-esc="product.categ_id.name.upper()"/>^FS
+</t>
+
+<t t-if="product.barcode">
+^FO50,190^BY2
+^BCN,80,Y,N,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+^XZ
+</t>
+    </template>
+
+    <template id="zpl_label_ysl_product_template_view">
+<t t-foreach="docs" t-as="product_tmpl">
+<t t-foreach="product_tmpl.product_variant_ids" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^AQ^FO10,30^FD<t t-esc="product.default_code or ''"/>^FS
+^AD^FO10,80^FD<t t-esc="product.name.upper() or ''"/>^FS
+
+<t t-if="product.categ_id">
+^AD^FO10,120^FD<t t-esc="product.categ_id.name.upper()"/>^FS
+</t>
+
+<t t-if="product.barcode">
+^FO50,190^BY2
+^BCN,80,Y,N,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+^XZ
+</t>
+</t>
+    </template>
+
+    <template id="zpl_label_location_view">
+<t t-foreach="docs" t-as="location">
+^XA
+^LL320
+^ML640
+^PW458
+
+^AA,50
+^FO70,70^FD<t t-esc="location.name"/>^FS
+<t t-if="location.barcode">
+^FO35,150^BY<t t-esc="3 if location.barcode and len(location.barcode) > 6 else 4"/>
+^BCN,100,N,N,N
+^FD<t t-esc="location.barcode"/>^FS
+</t>
+^XZ
+</t>
+    </template>
+
+    <template id="zpl_label_pallet_view">
+<t t-foreach="docs.filtered(lambda el: el.packaging_id.packing_type == 'pallet')" t-as="pallet">
+<t t-set="company" t-value="env.company"/>
+<t t-set="row_position" t-value="270"/>
+^XA
+^LL1200
+^ML2400
+^PW768
+
+^A0,30,30^FO20,40^FD<t t-esc="company.name"/>^FS
+^A0,30,30^FO20,80^FD<t t-esc="company.street"/>^FS
+^A0,30,30^FO20,110^FD
+<t t-esc="company.zip"/>
+<t t-esc="company.city"/>^FS
+^A0,30,30^FO20,140^FD<t t-esc="company.country_id.name"/>^FS
+
+^FO360,40^BY2
+^BCN,80,Y,N,N
+^FD<t t-esc="pallet.name"/>^FS
+
+^FO0,190^GB784,3,3^FS
+
+^A0,30,30^FO20,220^FD#Pacs^FS
+^A0,30,30^FO240,220^FDPieces^FS
+^A0,30,30^FO400,220^FDGr. Weight^FS
+^A0,30,30^FO640,220^FDVolume^FS
+
+<t t-set="boxes_data" t-value="pallet.get_boxes()"/>
+<t t-set="boxes" t-value="boxes_data[0]"/>
+<t t-set="total_data" t-value="boxes_data[1]"/>
+
+<t t-foreach="boxes" t-as="box_key">
+^A0,30,30^FO20,<t t-esc="row_position"/>^FD<t t-esc="boxes[box_key]['name']"/>^FS
+^A0,30,30^FO240,<t t-esc="row_position"/>^FD<t t-esc="boxes[box_key]['qty']"/>^FS
+^A0,30,30^FO400,<t t-esc="row_position"/>^FD<t t-esc="boxes[box_key]['weight']"/>^FS
+^A0,30,30^FO640,<t t-esc="row_position"/>^FD<t t-esc="boxes[box_key]['volume']"/>^FS
+<t t-set="row_position" t-value="row_position+40"/>
+</t>
+
+^FO0,<t t-esc="row_position+10"/>^GB784,3,3^FS
+<t t-set="row_position" t-value="row_position+40"/>
+
+^A0,30,30^FO240,<t t-esc="row_position"/>^FD<t t-esc="total_data['qty']"/>^FS
+^A0,30,30^FO400,<t t-esc="row_position"/>^FD<t t-esc="total_data['weight']"/>^FS
+^A0,30,30^FO640,<t t-esc="row_position"/>^FD<t t-esc="total_data['volume']"/>^FS
+^XZ
+</t>
+    </template>
+
+    <template id="zpl_label_box_view">
+<t t-foreach="docs.filtered(lambda el: el.packaging_id.packing_type == 'box')" t-as="box">
+^XA
+^LL320
+^ML640
+^PW458
+
+^FO20,50
+^A0N,44,33^FD<t t-esc="box.name"/>^FS
+^FO20,120^BY<t t-esc="2 if box.name and len(box.name) > 10 else 3"/>
+^BCN,100,Y,N,N
+^FD<t t-esc="box.name"/>^FS
+^XZ
+</t>
+    </template>
+
+    <template id="stock.label_product_template_view">
+<t t-foreach="docs" t-as="product_tmpl">
+<t t-foreach="product_tmpl.product_variant_ids" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^Aa,14
+^FO15,30^FD<t t-esc="product.name"/>^FS
+<t t-if="product.barcode">
+^FO48,120^BY2
+^BCN,80,Y,Y,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+<t t-if="product.default_code">
+^Aa,14
+^FO135,240^FD<t t-esc="product.default_code"/>^FS
+</t>
+^XZ
+</t>
+</t>
+    </template>
+
+    <template id="stock.label_product_product_view">
+<t t-foreach="docs" t-as="product">
+^XA
+^LL320
+^ML640
+^PW458
+
+^Aa,14
+^FO15,30^FD<t t-esc="product.name"/>^FS
+<t t-if="product.barcode">
+^FO48,120^BY2
+^BCN,80,Y,Y,N
+^FD<t t-esc="product.barcode"/>^FS
+</t>
+<t t-if="product.default_code">
+^Aa,14
+^FO135,240^FD<t t-esc="product.default_code"/>^FS
+</t>
+^XZ
+</t>
+    </template>
+</odoo>

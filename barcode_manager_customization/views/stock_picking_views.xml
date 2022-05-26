@@ -26,7 +26,7 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock_barcode.stock_picking_barcode"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='move_lines']" position="after">
+            <xpath expr="//field[@name='move_lines']" position="before">
                 <field name="barcode_sale_order_ids"
                        readonly="1"
                        attrs="{'invisible': [('barcode_sale_order_ids', '=', False)]}"

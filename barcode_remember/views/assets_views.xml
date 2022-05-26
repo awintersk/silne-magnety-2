@@ -6,11 +6,13 @@
             <link type="text/scss" rel="stylesheet" href="/barcode_remember/static/src/scss/remember.scss"/>
         </xpath>
         <xpath expr="//script[last()]" position="after">
-            <script type="text/javascript" src="/barcode_remember/static/src/js/remember_lines.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_action.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_header.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_gift_dialog.js"/>
             <script type="text/javascript" src="/barcode_remember/static/src/js/remember_lang_warning_dialog.js"/>
+            <script type="text/javascript" src="/barcode_remember/static/src/js/remember_package_weight.js"/>
+            <script type="text/javascript" src="/barcode_remember/static/src/js/remember_tools.js"/>
+            <script type="text/javascript" src="/barcode_remember/static/src/js/remember_package_type.js"/>
         </xpath>
     </template>
 

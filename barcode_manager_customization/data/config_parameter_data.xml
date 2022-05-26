@@ -11,4 +11,9 @@
         <field name="value">60</field>
     </record>
 
+    <record id="use_barcode_picking_dialog" model="ir.config_parameter">
+        <field name="key">barcode_manager_customization.use_barcode_picking_dialog</field>
+        <field name="value">True</field>
+    </record>
+
 </odoo>

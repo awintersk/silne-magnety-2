@@ -199,6 +199,7 @@ class StockMoveLine(models.Model):
 
         if is_new_package:
             new_package = self._new_package(package_type_int_id, weight)
+            new_package._compute_weight()
             package_int_id = new_package.id
         elif package_int_id > 0 and type(weight) in (float, int):
             package_env.browse(package_int_id).write({'shipping_weight': weight})
@@ -238,29 +239,33 @@ class StockMoveLine(models.Model):
             rec.split_and_put_in_pack(rec.qty_done if use_qty_done else rec.product_uom_qty, package_int_id)
         return True
 
-    def split_move_line_for_order(self, qty, order_int_id, package_int_id=None, package_type_int_id=None):
+    def split_move_line_for_order(
+            self,
+            qty,
+            order_int_id,
+            package_int_id=None,
+            package_type_int_id=None,
+            location_dest_int_id=None
+    ):
         """
         Used for barcode customization
         :type qty float
         :type order_int_id int
-        :type package_int_id int
-        :type package_type_int_id int
+        :type package_int_id int | None
+        :type package_type_int_id int | None
+        :type location_dest_int_id int | None
         :rtype: dict
         """
         new_move_ids = None
-        location_env = self.env['stock.location']
         picking_env = self.env['stock.picking']
         package_env = self.env['stock.quant.package']
 
-        location_id = location_env.search([('barcode', '=', 'WH-OUTPUT')])
-
-        if not location_id:
-            _logger.warning(location_id)
-            return {}
+        if not location_dest_int_id:
+            location_dest_int_id = self.location_dest_id.id
 
         order_picking_id = picking_env.search([
             ('sale_id', '=', order_int_id),
-            ('location_dest_id', '=', location_id.id),
+            ('picking_type_id.sequence_code', '=', 'PICK'),
             ('state', 'in', ('waiting', 'confirmed', 'assigned'))
         ], limit=1)
 
@@ -274,7 +279,8 @@ class StockMoveLine(models.Model):
             'name': '/',
             'move_lines': [],
             'move_line_ids': [],
-            'purchase_id': self.picking_id.purchase_id.id
+            'purchase_id': self.picking_id.purchase_id.id,
+            'location_dest_id': location_dest_int_id,
         })
 
         if package_int_id is None:
@@ -294,6 +300,7 @@ class StockMoveLine(models.Model):
             self.write(dict(
                 picking_id=new_picking_id.id,
                 qty_done=normalized_qty,
+                location_dest_id=location_dest_int_id,
             ))
             if package_id:
                 self.write({'result_package_id': package_id.id})
@@ -305,6 +312,7 @@ class StockMoveLine(models.Model):
                 **move_data,
                 'picking_id': new_picking_id.id,
                 'quantity_done': normalized_qty,
+                'location_dest_id': location_dest_int_id,
             } for move_data in split_move])
 
             if package_id:
@@ -315,11 +323,15 @@ class StockMoveLine(models.Model):
 
         ctx.update({
             'dest_ids': new_move_ids.move_dest_ids if new_move_ids else self.move_id.move_dest_ids,
-            'dest_id': order_picking_id.move_ids_without_package.
-                filtered(lambda move: move.product_id.id == self.product_id.id)
+            'dest_id': order_picking_id.move_ids_without_package.filtered(
+                lambda move: move.product_id.id == self.product_id.id
+            )
         })
+
         new_picking_id.action_confirm()
         new_picking_id.with_context(ctx).button_validate()
+
+        order_picking_id.action_assign()
 
         if package_id:
             response_package = {'id': package_id.id, 'name': package_id.name}

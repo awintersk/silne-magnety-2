@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="account_move_view_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.view.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="amount_by_group" position="after">
+                <field name="amount_tax" string="Tax Amount" attrs="{'invisible': [('amount_tax', '=', 0)]}"/>
+            </field>
+            <xpath expr="//field[@name='line_ids']//field[@name='is_rounding_line']" position="after">
+                <field name="is_tax_rounding_line" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

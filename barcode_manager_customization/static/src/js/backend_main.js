@@ -61,6 +61,18 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
         },
 
         /**
+         * @param {String} name
+         * @returns {Promise<*>}
+         */
+        getParam(name) {
+            return this._rpc({
+                model: 'ir.config_parameter',
+                method: 'get_param',
+                args: [name],
+            })
+        },
+
+        /**
          * @param {String} barcode
          * @returns {Promise<{id: Number, quant_ids: Array[]}>}
          * @private
@@ -82,7 +94,7 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         _isAbleToCreateNewLine() {
-            return false;
+            return true;
         },
 
         _onDefaultBarcodeScanner({active}) {
@@ -101,15 +113,17 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
 
             const _super = this._super
             const isProductBarcode = Boolean(this.productsByBarcode[barcode])
+            /**@type{String}*/
+            const seqCode = this.initialState.picking_sequence_code
 
-            switch (this.mode) {
-                case 'receipt':
+            switch (seqCode) {
+                case 'IN':
                     if (isProductBarcode && await this._onBarcodeScannedReceipt(barcode)) return Promise.resolve();
                     break;
-                case 'internal':
+                case 'PICK':
                     if (isProductBarcode && await this._onBarcodeScannedInternal(barcode)) return Promise.resolve();
                     break;
-                case 'delivery':
+                case 'OUT':
                     if (!isProductBarcode && await this._onBarcodeScannedDelivery(barcode)) return Promise.resolve();
                     break;
             }
@@ -149,7 +163,6 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
             let items = await this._rpc({
                 route: '/product_order_dialog_data',
                 params: {
-                    product_int_id: product.id,
                     line_id: lineId.id,
                 }
             })
@@ -170,30 +183,48 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
          * @private
          */
         async _onBarcodeScannedInternal(barcode) {
-            const moveLineIds = this.currentState.move_line_ids
+            if (!await this.getParam('barcode_manager_customization.use_barcode_picking_dialog')) {
+                return false
+            }
 
-            /**@type{Object<*>|undefined}*/
-            const linesId = moveLineIds.find(rec => {
-                const getID = rec => rec ? rec[0] : null
-                if (rec.product_barcode !== barcode) return false;
-                if (rec.qty_done >= rec.product_uom_qty) return false
-                return !rec.result_package_id || getID(rec.package_id) === getID(rec.result_package_id)
-            })
+            /**@type{Object<*>[]}*/
+            const pageMoveLineIds = this.linesWidget.page.lines
+            /**@type{Object<*>[]}*/
+            const linesWithBarcode = pageMoveLineIds.filter(item => item.product_barcode === barcode)
 
-            if (!linesId) {
+            if (!linesWithBarcode.length) {
                 this.displayNotification({
                     type: 'danger',
                     title: 'Barcode',
                     message: `Product Barcode: <strong>${barcode}</strong> is not found.`
                 })
-                return true
+            }
+
+            /**@type{Object<*>|undefined}*/
+            const linesId = linesWithBarcode.find(rec => rec.qty_done < rec.product_uom_qty)
+
+            if (!linesId) {
+                return false
             }
 
             await this._save()
 
+            const packageList = []
+
+            for (let line of this.currentState.move_line_ids) {
+                if (!(line.result_package_id || line.package_id)) {
+                    continue
+                }
+                const [resultPackageID] = line.result_package_id || []
+                const [packageID] = line.package_id || []
+                packageList.push(resultPackageID || packageID)
+            }
+
             const internalBody = new ComponentWrapper(this, BarcodeInternalDialog, {
                 linesId,
-                moveLineIds,
+                pageMoveLineIds,
+                packageList,
+                moveLineIds: this.currentState.move_line_ids,
                 pickingIntId: this.currentState.id,
             })
 
@@ -278,7 +309,6 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                 let items = await this._rpc({
                     route: '/product_order_dialog_data',
                     params: {
-                        product_int_id: product.id,
                         line_id: lineId.id
                     }
                 })
@@ -341,7 +371,10 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                     confirmed: false,
                 })),
                 lineId,
+                locationDestID: this.linesWidget.page.location_dest_id,
+                pickingID: this.currentState.id,
             })
+
             await ntOrderDialogComponent.mount(content)
 
             this.ntOrderDialog = new Dialog(this, {
