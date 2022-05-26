@@ -2,8 +2,10 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+from collections import defaultdict
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger("WooCommerce")
 
@@ -168,3 +170,84 @@ class WooProductTemplateEpt(models.Model):
         self.env['woo.product.categ.ept'].update_product_categs_in_woo( instance, categories)
 
         return res
+
+    def _prepare_attributes_data(self, instance):
+        WooAttr = self.env['woo.product.attribute.ept']
+        attrs_to_update = self.product_tmpl_id.attribute_line_ids.attribute_id
+        woo_attrs = WooAttr.search([
+            ('woo_instance_id', '=', instance.id),
+            ('attribute_id', 'in', attrs_to_update.ids),
+            ('exported_in_woo', '=', True),
+        ])
+        return [{
+            'id': attr.woo_attribute_id,
+            'name': attr.name,
+            'slug': attr.slug,
+        } for attr in woo_attrs]
+
+    def _prepare_attribute_term_data(self, instance):
+        WooTerm = self.env['woo.product.attribute.term.ept']
+        terms_to_update = self.product_tmpl_id.attribute_line_ids.value_ids
+        # TODO: investigate term types
+        woo_terms_to_update = WooTerm.read_group(
+            domain=[
+                ('woo_instance_id', '=', self.woo_instance_id.id),
+                ('attribute_value_id', 'in', terms_to_update.ids),
+                ('exported_in_woo', '=', True),
+            ],
+            fields=['woo_attribute_id', 'ids:array_agg(id)'],
+            groupby=['woo_attribute_id'],
+        )
+        res = defaultdict(list)
+        for woo_attribute in woo_terms_to_update:
+            for woo_term_id in woo_attribute['ids']:
+                woo_term = WooTerm.browse(woo_term_id)
+                res[woo_term['woo_attribute_id']].append({
+                    'id': woo_term['woo_attribute_term_id'],
+                    'name': woo_term['name'],
+                    'slug': woo_term['slug'],
+                    'description': woo_term['description'],
+                })
+        return res
+
+    def update_woo_attributes(self, template, instance, common_log_id):
+        common_log_line_obj = self.env["common.log.lines.ept"]
+        model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
+        url = 'products/attributes/batch'
+        attribute_data = template._prepare_attributes_data(instance)
+        wc_api = instance.woo_connect()
+        try:
+            res = wc_api.put(url, data={'update': attribute_data})
+        except Exception as error:
+            raise UserError(_("Something went wrong while exporting Attribute Terms."
+                                "\n\nPlease Check your Connection and"
+                                "Instance Configuration.\n\n" + str(error)))
+        self.check_woocommerce_response(res, "Export Product Attributes", model_id,
+                                        common_log_id, template)
+
+    def update_woo_attribute_values(self, template, instance, common_log_id):
+        common_log_line_obj = self.env["common.log.lines.ept"]
+        model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
+        url = 'products/attributes/%s/terms/batch'
+        data = template._prepare_attribute_term_data(instance)
+        wc_api = instance.woo_connect()
+        for woo_attribute_id, term_data in data.items():
+            try:
+                res = wc_api.put(url % woo_attribute_id, data={'update': term_data})
+            except Exception as error:
+                raise UserError(_("Something went wrong while exporting Attribute Terms."
+                                  "\n\nPlease Check your Connection and"
+                                  "Instance Configuration.\n\n" + str(error)))
+            self.check_woocommerce_response(res, "Export Product Attribute Terms",
+                                            model_id, common_log_id, template)
+
+    def prepare_product_variant_dict(self, instance, template, data, basic_detail, update_price,
+                                     update_image, common_log_id, model_id):
+        self.env['woo.product.template.ept'].update_woo_attributes(
+            template, instance, common_log_id)
+        self.env['woo.product.template.ept'].update_woo_attribute_values(
+            template, instance, common_log_id)
+        return super().prepare_product_variant_dict(
+            instance, template, data, basic_detail,
+            update_price, update_image, common_log_id, model_id,
+        )

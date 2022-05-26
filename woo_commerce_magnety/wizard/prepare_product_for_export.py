@@ -34,6 +34,11 @@ class PrepareProductForExport(models.TransientModel):
                 categories.append(woo_categ.id)
             self.env["woo.product.template.ept"].browse(woo_template_id).write(
                 {'woo_categ_ids': [(4, c) for c in categories]})
+
+        # Trigger name recompution to except the name from translation
+        product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._compute_name()
+        product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._compute_name()
+
         return woo_template_id
 
     def prepare_product_for_export(self):
