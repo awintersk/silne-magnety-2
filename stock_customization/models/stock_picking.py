@@ -18,5 +18,10 @@
 #
 ################################################################################
 
-from . import stock_inventory
-from . import stock_picking
+from odoo import _, api, fields, models
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    move_type = fields.Selection(default='one')
