@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,20 +18,13 @@
 #
 ################################################################################
 
-{
-    'name': "Stock Customization",
-    'version': '14.0.1.0.1',
-    'category': 'Inventory/Inventory',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'sale',
-        'stock',
-    ],
-    'data': [
-        'views/stock_inventory_views.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import _, api, fields, models
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    def default_get(self, fields):
+        res = super().default_get(fields)
+        res['picking_policy'] = 'one'
+        return res
