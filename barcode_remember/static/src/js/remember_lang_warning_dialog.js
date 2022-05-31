@@ -1,6 +1,7 @@
 odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) {
     'use strict'
 
+    const {catchCommandBarcode, useBarcodeScanner} = require('barcode_remember.remember_tools')
     const patchMixin = require('web.patchMixin')
     const Dialog = require('web.OwlDialog')
     const {bus} = require('web.core')
@@ -31,6 +32,7 @@ odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) 
                 productList: [],
                 productId: {},
             })
+            useBarcodeScanner(this._onBarcodeScannedHandler)
         }
 
         async willStart() {
@@ -54,11 +56,6 @@ odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) 
             }
         }
 
-        mounted() {
-            this.trigger('listen_to_barcode_scanned', {'listen': false});
-            bus.on('barcode_scanned', this, this._onBarcodeScannedHandler);
-        }
-
         get notification() {
             return this.env.services.notification
         }
@@ -68,7 +65,17 @@ odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) 
          * @private
          */
         _onBarcodeScannedHandler(barcode) {
+            const useExit = catchCommandBarcode(barcode, {
+                validate: () => this._onValidate(),
+                discard: () => this.destroy(),
+            })
+
+            if (useExit) {
+                return
+            }
+
             const productId = this.state.productList.find(item => item.barcode === barcode)
+
             if (productId) {
                 this.state.productId = productId
                 this.notification.notify({
@@ -90,11 +97,6 @@ odoo.define('barcode_remember.remember_lang_warning_dialog', function (require) 
         _onValidate() {
             this.trigger('add_warning_product', {id: this.state.productId.id})
             this.destroy()
-        }
-
-        willUnmount() {
-            this.trigger('listen_to_barcode_scanned', {'listen': true});
-            bus.off('barcode_scanned', this, this._onBarcodeScannedHandler);
         }
     }
 

@@ -51,7 +51,7 @@
                         <div class="d-flex flex-row">
                             <input t-model.number="packageId.shipping_weight"
                                    type="number"
-                                   step="0.1"
+                                   step="0.001"
                                    min="0"
                                    class="o_input"
                                    style="outline: none;"/>
@@ -64,6 +64,36 @@
                     <button class="btn btn-primary" t-on-click="onSave">Validate</button>
                 </t>
             </table>
+        </Dialog>
+    </t>
+
+    <t t-name="barcode_remember.PackageTypeDialog" owl="1">
+        <Dialog title="'Type of Package is correct?'"
+                fullscreen="true"
+                size="'medium'"
+                contentClass="'barcode-remember-dialog-content'"
+                t-on-dialog-closed="onClose">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Package</th>
+                    <th>Type</th>
+                </tr>
+                <tr t-foreach="state.packageList" t-as="item" t-key="item.id">
+                    <td t-esc="item.name"/>
+                    <td>
+                        <select class="o_input" t-model.number="item.packagingID">
+                            <option value="0"/>
+                            <t t-foreach="state.packagingList" t-as="packaging" t-key="'packaging_' + packaging">
+                                <option t-att-value="packaging.id" t-esc="packaging.name"/>
+                            </t>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <t t-set-slot="buttons">
+                <button class="btn btn-secondary" t-on-click="onClose">Cancel</button>
+                <button class="btn btn-primary" t-on-click="onSave">Confirm</button>
+            </t>
         </Dialog>
     </t>
 

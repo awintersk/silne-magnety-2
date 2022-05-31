@@ -61,12 +61,17 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         async _onValidate(item) {
             await mount(SecondaryBody, {
                 target: this.el,
-                props: {item, product: this.props.product}
+                props: {
+                    item,
+                    product: this.props.product,
+                    locationDestID: this.props.locationDestID,
+                    pickingID: this.props.pickingID,
+                }
             })
         }
 
         /**
-         * @param detail.item
+         * @param {{item:Object, locationDestID:Number}} detail
          * @private
          * @returns Promise<void>
          */
@@ -84,7 +89,8 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
                         qty: detail.item.qty,
                         order_int_id: detail.item.id,
                         package_int_id: detail.item.boxIntId,
-                        package_type_int_id: detail.item.packageTypeIntId
+                        package_type_int_id: detail.item.packageTypeIntId,
+                        location_dest_int_id: detail.locationDestID,
                     }
                 })
 
@@ -100,14 +106,7 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
                     message: `${_t('Box')}: ${packageId.name}`,
                     sticky: false,
                 });
-            } catch (error) {
-                console.error(error)
-                services.notification.notify({
-                    type: "danger",
-                    title: this.env._t('Error'),
-                    message: this.env._t(error),
-                    sticky: false,
-                });
+            } catch {
             } finally {
                 services.unblockUI()
             }
@@ -157,11 +156,15 @@ odoo.define('barcode_manager_customization.BarcodeReceiptDialog', function (requ
         product: {},
         items: [],
         lineId: 0,
+        locationDestID: 0,
+        pickingID: 0
     }
     BarcodeReceiptDialog.props = {
         product: Object,
         items: Array,
         lineId: Number,
+        locationDestID: Number,
+        pickingID: Number,
     }
 
     return {BarcodeReceiptDialog}

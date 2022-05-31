@@ -1,0 +1,15 @@
+<tempaltes>
+    <t t-name="ModelRecordList" owl="1">
+        <span t-if="mode === 'readonly'" t-att-record_id="value" t-esc="textValue"/>
+        <div class="d-flex flex-row" t-if="mode !== 'readonly'">
+            <select class="o_input" t-att-name="name" t-att-id="dataPointId" t-on-change="_onChangeItem">
+                <option value=""/>
+                <option t-foreach="state.items" t-as="item" t-key="item.id"
+                        t-att-style="disabled ? 'display: none' : ''"
+                        t-att-selected="item.id === value"
+                        t-att-value="item.id"
+                        t-esc="item.display_name || item.name"/>
+            </select>
+        </div>
+    </t>
+</tempaltes>

@@ -48,7 +48,8 @@ class StockPicking(models.Model):
         """
         :param int product:
         :param str field:
-        :return: int
+        :return: New special sale.order.line
+        :rtype: int
         """
         special_fields = ('is_gift', 'is_lang_warning')
 
@@ -60,8 +61,15 @@ class StockPicking(models.Model):
         order_id = self.sale_id
         exists_domain = [('order_id', '=', order_id.id)]
 
-        if not product_env.browse(product).qty_available:
-            raise UserError(_('Product has zero available qty'))
+        quant_ids = self.env['stock.quant'].search([
+            ('product_id', '=', product),
+            ('location_id', 'child_of', self.move_lines.location_id.ids),
+        ])
+        free_product_qty = sum(quant_ids.mapped('available_quantity'))
+        product_name = product_env.browse(product).name
+
+        if not free_product_qty:
+            raise UserError(_('Product "%s" has zero available qty') % product_name)
 
         if field == 'is_gift':
             exists_domain.append(('product_id.is_gift', '=', True))
@@ -77,9 +85,32 @@ class StockPicking(models.Model):
             })
             order_line_id.product_id_change()
 
+            if self.picking_type_id.sequence_code == 'PICK':
+                move_line_ids = order_line_id.move_ids.move_orig_ids.move_line_ids
+                move_line_ids.result_package_id = self._package_for_special_product()
+
             return order_line_id.id
 
-        return 0
+        raise UserError(_('Product "%s" already exists in Sale Order "%s"') % (product_name, order_id.name))
+
+    def _package_for_special_product(self):
+        """
+        :return: Package for special product line
+        """
+
+        def product_move_line_filter(line):
+            if not (line.result_package_id or line.package_id):
+                return False
+            return not (line.product_id.is_gift or line.product_id.is_lang_warning)
+
+        line_ids = self.move_line_ids.filtered(product_move_line_filter)
+
+        if not line_ids:
+            return
+
+        line_id = line_ids[0]
+
+        return line_id.result_package_id or line_id.package_id
 
     def add_gift_line(self, product: int) -> int:
         return self._add_special_product(product, 'is_gift')

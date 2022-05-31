@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_backend" name="ZPL Template Assets" inherit_id="web.assets_backend">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/zpl_label_template/static/src/scss/main.scss"/>
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/zpl_label_template/static/src/js/utils.js"/>
+            <script type="text/javascript" src="/zpl_label_template/static/src/js/model_record_list.js"/>
+            <script type="text/javascript" src="/zpl_label_template/static/src/js/barcode.js"/>
+            <script type="text/javascript" src="/zpl_label_template/static/src/js/barcode_actions.js"/>
+        </xpath>
+    </template>
+
+</odoo>

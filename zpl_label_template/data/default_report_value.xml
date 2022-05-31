@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="default_report_value">
+&lt;t t-name="<t t-esc="name"/>"&gt;
+&lt;t t-foreach="docs" t-as="record"&gt;
+^XA
+&lt;t t-if="record.barcode"&gt;
+^FO10,70^BY1
+^BCN,70,Y,N,N
+^FD&lt;t t-esc="record.barcode"/&gt;^FS
+&lt;/t&gt;
+^XZ
+&lt;/t&gt;
+&lt;/t&gt;
+    </template>
+
+</odoo>

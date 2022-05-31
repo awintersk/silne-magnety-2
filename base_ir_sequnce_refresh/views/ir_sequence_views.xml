@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="ir_sequence_inherit_view_form_inherit" model="ir.ui.view">
+        <field name="name">ir.sequence.inherit.view.form</field>
+        <field name="model">ir.sequence</field>
+        <field name="inherit_id" ref="base.sequence_view"/>
+        <field name="arch" type="xml">
+            <field name="implementation" position="after">
+                <field name="refresh_rate"/>
+            </field>
+
+            <xpath expr="//page[@name='sequence']/group[2]/group[2]" position="inside">
+                <span colspan="2">Last digit of the Current Year: %%(yld)s</span>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

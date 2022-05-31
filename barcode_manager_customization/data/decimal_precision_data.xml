@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="decimal_package_weight" forcecreate="True" model="decimal.precision">
+        <field name="name">Package Weight</field>
+        <field name="digits">4</field>
+    </record>
+
+</odoo>

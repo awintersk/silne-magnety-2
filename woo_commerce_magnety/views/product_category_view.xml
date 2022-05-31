@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="woo_product_categ_ept_view_form_inherit" model="ir.ui.view">
+        <field name="name">WooCommerce categs</field>
+        <field name="model">woo.product.categ.ept</field>
+        <field name="inherit_id" ref="woo_commerce_ept.product_woo_categs_form_view_ept"/>
+        <field name="arch" type="xml">
+            <field name="woo_instance_id" position="after">
+                <field name="category_id" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

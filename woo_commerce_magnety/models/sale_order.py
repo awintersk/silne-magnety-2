@@ -19,10 +19,18 @@
 ################################################################################
 
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    def _prepare_invoice(self):
+        invoice_vals = super()._prepare_invoice()
+        invoice_vals.update({
+            'woo_instance_origin_id': self.woo_instance_id.id,
+        })
+        return invoice_vals
 
     def woo_order_billing_shipping_partner(self, order_data, woo_instance, queue_line, common_log_book_id):
         partner_obj = self.env['res.partner']
@@ -50,3 +58,15 @@ class SaleOrder(models.Model):
             shipping_partner = partner
 
         return partner, billing_partner, shipping_partner
+
+    def create_woo_orders(self, queue_lines, common_log_book_id):
+        res = super().create_woo_orders(queue_lines, common_log_book_id)
+        for order in res:
+            for partner in (order.partner_id | order.partner_invoice_id | order.partner_shipping_id):
+                try:
+                    partner.with_context(no_vat_validation=False).check_vat()
+                except ValidationError:
+                    order.activity_schedule('woo_commerce_magnety.mail_act_vat_check',
+                        user_id=order.user_id.id,
+                        note=_('Please check the VAT number of the customer %s.') % (partner.name))
+        return res

@@ -19,6 +19,7 @@
 ################################################################################
 
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 METADATA_FIELDS = {
     'billing_company_wi_tax': 'vat',
