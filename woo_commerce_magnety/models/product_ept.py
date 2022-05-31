@@ -5,6 +5,7 @@ import logging
 from collections import defaultdict
 
 from odoo import models, fields, api, _
+from .product_pricelist import NUMBER_OF_BULK
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger("WooCommerce")
@@ -107,8 +108,15 @@ class WooProductTemplateEpt(models.Model):
             })
         return data
 
-    def prepare_product_update_data(self, template, update_image, update_basic_detail, data):
-        flag, data = super(WooProductTemplateEpt, self).prepare_product_update_data(template, update_image, update_basic_detail, data)
+    def prepare_product_variant_dict(self, instance, template, data, basic_detail, update_price,
+                                     update_image, common_log_id, model_id):
+        self.env['woo.product.template.ept'].update_woo_attributes(
+            template, instance, common_log_id)
+        self.env['woo.product.template.ept'].update_woo_attribute_values(
+            template, instance, common_log_id)
+        data, flag = super(WooProductTemplateEpt, self).prepare_product_variant_dict(
+            instance, template, data, basic_detail, update_price, update_image, common_log_id, model_id)
+
         attributes = []
         if template.product_tmpl_id.attribute_line_ids and len(template.product_tmpl_id.product_variant_ids) == 1:
             position = 0
@@ -126,7 +134,45 @@ class WooProductTemplateEpt(models.Model):
                 position += 1
                 attributes.append(attribute_data)
         data['attributes'] = attributes
-        return flag, data
+
+        # Bulk Prices
+        if update_price and len(template.product_tmpl_id.product_variant_ids) == 1:
+            product = template.product_tmpl_id.product_variant_ids
+            bulk_data = []
+            Price = self.env['product.pricelist.item']
+            instance_price = template.woo_instance_id.woo_pricelist_id
+            bulk_prices = Price.search([
+                ('pricelist_id', '=', instance_price.id),
+                ('applied_on', '=', '0_product_variant'),
+                ('compute_price', '=', 'fixed'),
+                ('product_id', '=', product.id),
+                ('bulk_discount', '!=', 'base_price'),
+            ], order='bulk_discount')
+            if bulk_prices:
+                base_price = Price.search([
+                    ('pricelist_id', '=', instance_price.id),
+                    ('applied_on', '=', '0_product_variant'),
+                    ('compute_price', '=', 'fixed'),
+                    ('product_id', '=', product.id),
+                    ('bulk_discount', '=', 'base_price'),
+                ], limit=1)
+                for price in bulk_prices:
+                    bulk_data += [{
+                        'key': f'_bulkdiscount_quantity_{price.bulk_discount[-1]}',
+                        'value': price.min_quantity,
+                    }, {
+                        'key': f'_bulkdiscount_discount_fixed_{price.bulk_discount[-1]}',
+                        'value': round(base_price.fixed_price - price.fixed_price, 2),
+                    }]
+            if bulk_data:
+                bulk_data.append({'key': '_bulkdiscount_enabled', 'value': 'yes'})
+                if data.get('meta_data', False):
+                    data['meta_data'] += bulk_data
+                else:
+                    data['meta_data'] = bulk_data
+        else:
+            pass
+        return data, flag
 
     def simple_product_sync(self,
                             woo_instance,
@@ -152,6 +198,61 @@ class WooProductTemplateEpt(models.Model):
 
         if product_tmpl_id and not product_response.get('weight'):
             product_tmpl_id._pull_product_weight_from_attribute()
+
+        meta_data = product_response["meta_data"]
+        if woo_instance.sync_price_with_product and meta_data:
+            product_sku = product_response["sku"]
+            woo_product, odoo_product = self.search_odoo_product_variant(woo_instance, product_sku, product_response.get("id"))
+            def get_value(data_list, key):
+                for data in data_list:
+                    if data.get('key') == key:
+                        return data['value']
+                return False
+
+            if get_value(meta_data, '_bulkdiscount_enabled') == 'yes':
+                Price = self.env['product.pricelist.item']
+                product = woo_product.product_id
+                instance_price = woo_instance.woo_pricelist_id
+                price_data = []
+                base_price = Price.search([
+                    ('pricelist_id', '=', instance_price.id),
+                    ('applied_on', '=', '0_product_variant'),
+                    ('compute_price', '=', 'fixed'),
+                    ('product_id', '=', product.id),
+                    ('bulk_discount', '=', 'base_price'),
+                ], limit=1)
+                if base_price:
+                    for i in range(1, NUMBER_OF_BULK):
+                        min_quantity = get_value(meta_data, f'_bulkdiscount_quantity_{i}')
+                        discount = get_value(meta_data, f'_bulkdiscount_discount_fixed_{i}')
+                        if min_quantity and discount:
+                            min_quantity = int(min_quantity)
+                            discount = float(discount)
+                            bulk_price = base_price.fixed_price - discount
+                            exist_price = Price.search([
+                                ('pricelist_id', '=', instance_price.id),
+                                ('applied_on', '=', '0_product_variant'),
+                                ('compute_price', '=', 'fixed'),
+                                ('product_id', '=', product.id),
+                                ('bulk_discount', '=', f'bulk_discount_{i}'),
+                            ])
+                            if exist_price:
+                                exist_price.write({
+                                    'fixed_price': bulk_price,
+                                    'min_quantity': min_quantity,
+                                })
+                            else:
+                                price_data.append({
+                                    'product_id': product.id,
+                                    'applied_on': '0_product_variant',
+                                    'compute_price': 'fixed',
+                                    'min_quantity': min_quantity,
+                                    'fixed_price': bulk_price,
+                                    'pricelist_id': woo_instance.woo_pricelist_id.id,
+                                    'bulk_discount': f'bulk_discount_{i}',
+                                })
+                if price_data:
+                    Price.create(price_data)
 
         return woo_template_id
 
@@ -241,14 +342,3 @@ class WooProductTemplateEpt(models.Model):
                                   "Instance Configuration.\n\n" + str(error)))
             self.check_woocommerce_response(res, "Export Product Attribute Terms",
                                             model_id, common_log_id, template)
-
-    def prepare_product_variant_dict(self, instance, template, data, basic_detail, update_price,
-                                     update_image, common_log_id, model_id):
-        self.env['woo.product.template.ept'].update_woo_attributes(
-            template, instance, common_log_id)
-        self.env['woo.product.template.ept'].update_woo_attribute_values(
-            template, instance, common_log_id)
-        return super().prepare_product_variant_dict(
-            instance, template, data, basic_detail,
-            update_price, update_image, common_log_id, model_id,
-        )

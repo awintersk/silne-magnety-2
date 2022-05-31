@@ -22,6 +22,7 @@
         'views/product_template_view.xml',
         'views/product.xml',
         'views/sale_order_views.xml',
+        'views/product_pricelist_views.xml',
     ],
     'installable': True,
     'auto_install': False,
