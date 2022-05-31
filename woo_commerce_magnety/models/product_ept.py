@@ -110,6 +110,10 @@ class WooProductTemplateEpt(models.Model):
 
     def prepare_product_variant_dict(self, instance, template, data, basic_detail, update_price,
                                      update_image, common_log_id, model_id):
+        self.env['woo.product.template.ept'].update_woo_attributes(
+            template, instance, common_log_id)
+        self.env['woo.product.template.ept'].update_woo_attribute_values(
+            template, instance, common_log_id)
         data, flag = super(WooProductTemplateEpt, self).prepare_product_variant_dict(
             instance, template, data, basic_detail, update_price, update_image, common_log_id, model_id)
 
@@ -338,14 +342,3 @@ class WooProductTemplateEpt(models.Model):
                                   "Instance Configuration.\n\n" + str(error)))
             self.check_woocommerce_response(res, "Export Product Attribute Terms",
                                             model_id, common_log_id, template)
-
-    def prepare_product_variant_dict(self, instance, template, data, basic_detail, update_price,
-                                     update_image, common_log_id, model_id):
-        self.env['woo.product.template.ept'].update_woo_attributes(
-            template, instance, common_log_id)
-        self.env['woo.product.template.ept'].update_woo_attribute_values(
-            template, instance, common_log_id)
-        return super().prepare_product_variant_dict(
-            instance, template, data, basic_detail,
-            update_price, update_image, common_log_id, model_id,
-        )
