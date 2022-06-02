@@ -61,18 +61,27 @@
                 <attribute name="class" add="d-flex align-items-center justify-content-between" separator=" "/>
             </xpath>
             <xpath expr="//div[hasclass('o_kanban_record_top')]" position="inside">
-                <button name="action_documents"
-                        type="object"
-                        title="Generated"
-                        class="btn btn-link py-0 px-1 ml-2"
-                        attrs="{'invisible': [('document_ids', '=', [])]}">
-                    <i class="fa fa-file"/>
-                </button>
-                <button title="Not generated"
-                        class="btn btn-link py-0 px-1 ml-2"
-                        attrs="{'invisible': [('document_ids', '!=', [])]}">
-                    <i class="fa fa-file-o"/>
-                </button>
+                <div id="buttons_top">
+                    <button name="action_delivery_list"
+                            type="object"
+                            title="Delivery list"
+                            class="btn btn-link py-0 px-1 ml-2"
+                            attrs="{'invisible': [('sale_ids', '=', [])]}">
+                        <i class="fa fa-download"/>
+                    </button>
+                    <button name="action_documents"
+                            type="object"
+                            title="Generated"
+                            class="btn btn-link py-0 px-1 ml-2"
+                            attrs="{'invisible': [('document_ids', '=', [])]}">
+                        <i class="fa fa-file"/>
+                    </button>
+                    <button title="Not generated"
+                            class="btn btn-link py-0 px-1 ml-2"
+                            attrs="{'invisible': [('document_ids', '!=', [])]}">
+                        <i class="fa fa-file-o"/>
+                    </button>
+                </div>
             </xpath>
             <xpath expr="//div[hasclass('oe_kanban_global_click')]" position="inside">
                 <div class="row">

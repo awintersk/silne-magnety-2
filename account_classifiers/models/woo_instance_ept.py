@@ -1,9 +1,7 @@
-# -*- coding: UTF-8 -*-
-
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2019 SmartTek (<https://smartteksas.com/>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,25 +18,18 @@
 #
 ################################################################################
 
-
-from xlsxwriter import Workbook
-from logging import getLogger
-
-from odoo import models, _
-from odoo.exceptions import UserError
-
-_logger = getLogger(__name__)
+from odoo import _, api, fields, models
 
 
-class StockQuantPackageCurrierReport(models.AbstractModel):
-    _name = 'report.stock.quant.package.currier'
-    _description = 'Stock Quant Package Currier Report'
-    _inherit = 'report.report_xlsx.abstract'
+class WooInstanceEpt(models.Model):
+    _inherit = 'woo.instance.ept'
 
-    def generate_xlsx_report(self, workbook, data, package_ids):
-        """
-            :param Workbook workbook: Workbook
-            :param dict data: Dictionary
-            :param models.BaseModel package_ids:
-        """
-        pass
+    invoice_classifer_sequence_id = fields.Many2one(
+        'ir.sequence',
+        string='Invoice Classifier Sequence',
+    )
+    reversal_classifer_sequence_id = fields.Many2one(
+        'ir.sequence',
+        string='Credit Note Classifier Sequence',
+    )
+

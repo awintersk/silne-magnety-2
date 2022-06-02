@@ -6,11 +6,15 @@ odoo.define('barcode_remember.remember_action', function (require) {
     const {LanguageWarningDialog} = require('barcode_remember.remember_lang_warning_dialog')
     const {ComponentWrapper} = require('web.OwlCompatibility')
     const {PackageWeightDialog} = require('barcode_remember.remember_package_weight')
+    const {PackageTypeDialog} = require('barcode_remember.remember_package_type')
+    const {Component} = owl
 
     ClientAction.include({
         custom_events: Object.assign({}, ClientAction.prototype.custom_events, {
             add_gift_product: '_onAddGiftProduct',
             add_warning_product: '_onAddLangWarningProduct',
+            change_confirmed_package_type: '_onConfirmedPackageType',
+            change_confirmed_package_weight: '_onConfirmedPackageWeight'
         }),
 
         init() {
@@ -19,6 +23,8 @@ odoo.define('barcode_remember.remember_action', function (require) {
             this.containLangWarningProduct = false
             this.sequenceCode = ''
             this.useWarningFunc = false
+            this.isConfirmedPackageType = false
+            this.isConfirmedPackageWeight = false
         },
 
         async willStart() {
@@ -85,42 +91,56 @@ odoo.define('barcode_remember.remember_action', function (require) {
         },
 
         /**
-         * @param {MouseEvent} event
+         * @returns {Promise<Boolean>}
          * @private
          */
-        async _onValidate(event) {
-            event.stopPropagation()
-            /**@type{Boolean}*/
-            const preventDialog = event.data.preventDialog
-            /**@type{Function}*/
-            const superOnValidate = this._super.bind(this)
+        async _openWarningDialog() {
+            /**
+             * @param {Component} comp
+             * @param {Object} props
+             * @returns {Promise<*>}
+             */
+            const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
+            /**@type{Number}*/
+            const pickingID = this.initialState.id
 
-            if (this.useWarningFunc && !preventDialog) {
+            if (!this.containGiftProduct) {
+                await dialog(GiftDialog, {})
+                return true
+            } else if (!this.containLangWarningProduct) {
+                await dialog(LanguageWarningDialog, {pickingID})
+                return true
+            } else if (!this.isConfirmedPackageType) {
+                await dialog(PackageTypeDialog, {pickingID})
+                return true
+            } else if (!this.isConfirmedPackageWeight) {
+                await dialog(PackageWeightDialog, {pickingID})
+                return true
+            }
+            return false
+        },
+
+        async _validate() {
+            /**@type{Function}*/
+            const superValidate = this._super.bind(this)
+
+            if (this.useWarningFunc) {
                 if (await this._openWarningDialog()) {
                     return undefined
                 }
             }
 
-            superOnValidate(...arguments)
+            await superValidate(...arguments)
         },
 
-        /**
-         * @returns {Promise<Boolean>}
-         * @private
-         */
-        async _openWarningDialog() {
-            const dialog = async (comp, props) => await new ComponentWrapper(this, comp, props).mount(this.el)
-            if (!this.containGiftProduct) {
-                await dialog(GiftDialog, {})
-                return true
-            } else if (!this.containLangWarningProduct) {
-                await dialog(LanguageWarningDialog, {pickingID: this.initialState.id})
-                return true
-            } else {
-                await dialog(PackageWeightDialog, {pickingID: this.initialState.id})
-                return true
-            }
+        _onConfirmedPackageType({data}) {
+            this.isConfirmedPackageType = data.confirmed
         },
+
+        _onConfirmedPackageWeight({data}) {
+            this.isConfirmedPackageWeight = data.confirmed
+        },
+
     })
 
 });

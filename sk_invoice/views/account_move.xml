@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="account_move_delivery_date_form" model="ir.ui.view">
+            <field name="name">account.move.delivery.date.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_date']" position="after">
+                    <field name="delivery_date"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

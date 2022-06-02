@@ -20,4 +20,6 @@
 #
 ################################################################################
 
-from . import stock_quant_package_report
+from . import controllers
+from . import models
+from . import wizard

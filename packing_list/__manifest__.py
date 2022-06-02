@@ -40,6 +40,7 @@
         'delivery',
         'documents',
         'report_xlsx',
+        'sale_customization',
         'w_open_many2many_tags',
         'barcode_manager_customization',
     ],

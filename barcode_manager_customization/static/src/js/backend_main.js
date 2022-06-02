@@ -187,30 +187,44 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                 return false
             }
 
-            const moveLineIds = this.currentState.move_line_ids
+            /**@type{Object<*>[]}*/
+            const pageMoveLineIds = this.linesWidget.page.lines
+            /**@type{Object<*>[]}*/
+            const linesWithBarcode = pageMoveLineIds.filter(item => item.product_barcode === barcode)
 
-            /**@type{Object<*>|undefined}*/
-            const linesId = moveLineIds.find(rec => {
-                const getID = rec => rec ? rec[0] : null
-                if (rec.product_barcode !== barcode) return false;
-                if (rec.qty_done >= rec.product_uom_qty) return false
-                return !rec.result_package_id || getID(rec.package_id) === getID(rec.result_package_id)
-            })
-
-            if (!linesId) {
+            if (!linesWithBarcode.length) {
                 this.displayNotification({
                     type: 'danger',
                     title: 'Barcode',
                     message: `Product Barcode: <strong>${barcode}</strong> is not found.`
                 })
-                return true
+            }
+
+            /**@type{Object<*>|undefined}*/
+            const linesId = linesWithBarcode.find(rec => rec.qty_done < rec.product_uom_qty)
+
+            if (!linesId) {
+                return false
             }
 
             await this._save()
 
+            const packageList = []
+
+            for (let line of this.currentState.move_line_ids) {
+                if (!(line.result_package_id || line.package_id)) {
+                    continue
+                }
+                const [resultPackageID] = line.result_package_id || []
+                const [packageID] = line.package_id || []
+                packageList.push(resultPackageID || packageID)
+            }
+
             const internalBody = new ComponentWrapper(this, BarcodeInternalDialog, {
                 linesId,
-                moveLineIds,
+                pageMoveLineIds,
+                packageList,
+                moveLineIds: this.currentState.move_line_ids,
                 pickingIntId: this.currentState.id,
             })
 
@@ -357,7 +371,10 @@ odoo.define('barcode_manager_customization.backend_main', function (require) {
                     confirmed: false,
                 })),
                 lineId,
+                locationDestID: this.linesWidget.page.location_dest_id,
+                pickingID: this.currentState.id,
             })
+
             await ntOrderDialogComponent.mount(content)
 
             this.ntOrderDialog = new Dialog(this, {

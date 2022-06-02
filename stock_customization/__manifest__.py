@@ -25,6 +25,7 @@
     'author': 'Smart Tek Solutions and Services',
     'website': "https://smartteksas.com/",
     'depends': [
+        'sale',
         'stock',
     ],
     'data': [

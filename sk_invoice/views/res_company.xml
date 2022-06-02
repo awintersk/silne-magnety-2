@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <record id="add_vat_data_res_company" model="ir.ui.view">
+            <field name="name">add.vat.data.res.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='company_registry']" position="replace">
+                    </xpath>
+                    <xpath expr="//field[@name='vat']" position="replace">
+                        <field name="company_registry"/>
+                        <field name="vat_id"/>
+                        <field name="vat"/>
+                        <field name="vat_payer"/>
+                        <field name="rel_acc_number"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>

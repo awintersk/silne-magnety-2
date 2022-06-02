@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+        <record id="paper_format_smarttek" model="report.paperformat">
+            <field name="name">SmartTek</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">25</field>
+            <field name="margin_bottom">25</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">106</field>
+        </record>
+    </data>
+
+    <template id="smarttek_report_invoice_document" inherit_id="account.report_invoice_document"
+              name="SmartTek Invoice Document" priority="40">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-if="not company">
+                        <!-- Multicompany -->
+                        <t t-if="company_id">
+                            <t t-set="company" t-value="company_id"/>
+                        </t>
+                        <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                            <t t-set="company" t-value="o.company_id.sudo()"/>
+                        </t>
+                        <t t-else="else">
+                            <t t-set="company" t-value="res_company"/>
+                        </t>
+                    </t>
+                    <span name="company_address" style="width:50%;float:left;">
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.name"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.street"/>
+                        <p t-if="company.street2"
+                           style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.street2"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                            <t
+                                    t-esc="company.zip"/>
+                            <t t-esc="company.city"/>
+                        </p>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.country_id.name"/>
+                        <t t-if="company.company_registry">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Company Registry:
+                                <span t-field="company.company_registry"/>
+                            </p>
+                        </t>
+                        <t t-if="company.vat_id">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Tax ID:
+                                <span t-field="company.vat_id"/>
+                            </p>
+                        </t>
+                        <t t-if="company.vat">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                VAT ID:
+                                <span t-field="company.vat"/>
+                            </p>
+                        </t>
+                        <t t-if="company.rel_acc_number">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Bank:
+                                <span t-field="company.rel_acc_number.bank_id.name"/>
+                            </p>
+                        </t>
+                        <t t-if="company.rel_acc_number">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                IBAN:
+                                <span t-field="company.rel_acc_number.acc_number"/>
+                            </p>
+                        </t>
+                        <t t-if="company.rel_acc_number">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                SWIFT:
+                                <span t-field="company.rel_acc_number.bank_id.bic"/>
+                            </p>
+                        </t>
+
+
+                    </span>
+                    <span name="partner_address" style="width:40%;margin-bottom:50px;">
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="o.partner_id.name"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="o.partner_id.street"/>
+                        <p t-if="o.partner_id.street2"
+                           style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="o.partner_id.street2"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                            <t t-esc="o.partner_id.zip"/>
+                            <t t-esc="o.partner_id.city"/>
+                        </p>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="o.partner_id.country_id.name"/>
+                        <t t-if="o.partner_id.company_registry">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Company Registry:
+                                <span t-field="o.partner_id.company_registry"/>
+                            </p>
+                        </t>
+                        <t t-if="o.partner_id.vat_id">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Tax ID:
+                                <span t-field="o.partner_id.vat_id"/>
+                            </p>
+                        </t>
+                        <t t-if="o.partner_id.vat">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                VAT ID:
+                                <span t-field="o.partner_id.vat"/>
+                            </p>
+                        </t>
+                    </span>
+                    <div style="display: block;clear: both;content: '';"></div>
+
+                    <div style="margin-bottom:4px;margin-top:44px;">
+                        <span style="font-size:24px;line-height:30px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Invoice
+                        </span>
+                        <span style="font-size:24px;line-height:30px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            <t
+                                    t-esc="o.name"/>
+                        </span>
+                    </div>
+                    <div style="margin-bottom:4px;margin-top:44px;" t-if="o.invoice_date">
+                        <span style="font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;width:50%;float:left;">
+                            Invoice Date
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;"
+                              t-field="o.invoice_date"/>
+                    </div>
+                    <div style="display: block;clear: both;content: '';"></div>
+                    <div style="margin-bottom:4px;" t-if="o.delivery_date">
+                        <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Delivery Date
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;"
+                              t-field="o.delivery_date"/>
+                    </div>
+                    <div style="display: block;clear: both;content: '';"></div>
+                    <div style="margin-bottom:4px;" t-if="o.invoice_date_due">
+                        <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Due Date
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;"
+                              t-field="o.invoice_date_due"/>
+                    </div>
+                    <div style="display: block;clear: both;content: '';"></div>
+                    <div style="margin-bottom:4px;" t-if="o.invoice_origin">
+                        <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Related Order
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;">
+                            <t
+                                    t-esc="o.invoice_origin"/>
+                        </span>
+                    </div>
+                    <div style="display: block;clear: both;content: '';"></div>
+                    <div style="margin-bottom:44px;" t-if="o.ref">
+                        <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Customer Reference
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;">
+                            <t
+                                    t-esc="o.ref"/>
+                        </span>
+                    </div>
+                    <div style="display: block;clear: both;content: '';"></div>
+                    <table style="border-collapse: collapse;margin-top:44px; width:100%;">
+                        <thead>
+                            <tr>
+                                <th name="th_description"
+                                    style="padding:5px;text-align:left;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;max-width:300px;border-bottom: 1px solid #CEDDF3;">
+                                    Description
+                                </th>
+                                <th name="th_quantity"
+                                    style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
+                                    Quantity
+                                </th>
+                                <th name="th_priceunit"
+                                    style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
+                                    Unit Price
+                                </th>
+                                <th name="th_taxes"
+                                    style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
+                                    Taxes
+                                </th>
+                                <th name="th_subtotal"
+                                    style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+
+                            <t t-set="current_subtotal" t-value="0"/>
+
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
+                                   groups="account.group_show_line_subtotals_tax_excluded"/>
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
+                                   groups="account.group_show_line_subtotals_tax_included"/>
+
+                                <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td name="td_name" style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td name="td_quantity"
+                                            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
+                                            <span t-field="line.quantity" style="text-align:left;"/>
+                                        </td>
+                                        <td name="td_priceunit"
+                                            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
+                                            <span t-field="line.price_unit" style="text-align:left;"/>
+                                        </td>
+                                        <td name="td_taxes"
+                                            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
+                                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"
+                                                  style="text-align:left;"/>
+                                        </td>
+                                        <td name="td_subtotal"
+                                            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;"
+                                            class="text-right o_price_total">
+                                            <span t-field="line.price_subtotal" style="text-align:left;"
+                                                  groups="account.group_show_line_subtotals_tax_excluded"/>
+                                            <span t-field="line.price_total"
+                                                  groups="account.group_show_line_subtotals_tax_included"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <td name="td_section_line" colspan="99">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
+                                        <t t-set="current_subtotal" t-value="0"/>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_note'">
+                                        <td name="td_note_line" colspan="99">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section')">
+                                    <tr class="is-subtotal text-right">
+                                        <td name="td_section_subtotal" colspan="99">
+                                            <strong class="mr16">Subtotal</strong>
+                                            <span
+                                                    t-esc="current_subtotal"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
+                                            />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                    <div class="clearfix" name="so_total_summary">
+                        <p style="padding-top:40px;">
+                            <span style="vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3;display:inline-block;width:80%;float:left;">
+                                Subtotal
+                            </span>
+                            <span t-field="o.amount_untaxed"
+                                  style="vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;display:inline-block;width:20%;"/>
+                        </p>
+                        <div style="display: block;clear: both;content: '';"></div>
+                        <p t-foreach="o.amount_by_group" t-as="amount_by_group">
+                            <t t-if="len(o.line_ids.filtered(lambda line: line.tax_line_id)) in [0, 1] and float_compare(o.amount_untaxed, amount_by_group[2], precision_rounding=o.currency_id.rounding) == 0">
+                                <span style="vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3;display:inline-block;width:80%;float:left;">
+                                    <span class="text-nowrap" t-esc="amount_by_group[0]"/>
+                                </span>
+                                <span class="text-right o_price_total"
+                                      style="vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;">
+                                    <span class="text-nowrap" t-esc="amount_by_group[3]"/>
+                                </span>
+                            </t>
+                            <t t-else="">
+                                <span style="vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3;display:inline-block;width:80%;float:left;">
+                                    <span t-esc="amount_by_group[0]"/>
+                                    <!--                                    <span class="text-nowrap"> on-->
+                                    <!--                                        <t t-esc="amount_by_group[4]"/>-->
+                                    <!--                                    </span>-->
+                                </span>
+                                <span class="text-right o_price_total"
+                                      style="vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;">
+                                    <span class="text-nowrap" t-esc="amount_by_group[3]"/>
+                                </span>
+                            </t>
+                        </p>
+                        <div style="display: block;clear: both;content: '';"></div>
+                        <p style="">
+                            <span style="padding-bottom:20px;vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3; font-weight: bold;display:inline-block;width:80%;float:left;">
+                                Total
+                            </span>
+                            <span t-field="o.amount_total"
+                                  style="padding-bottom:20px;vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;"/>
+                        </p>
+                        <div style="display: block;clear: both;content: '';"></div>
+                        <p style="">
+                            <span style="border-bottom: 1px solid #CEDDF3;vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;min-width:50%;width:50%;float: right;"/>
+                        </p>
+                    </div>
+                </div>
+                <div id="total" style="display:none;">
+                    <div>
+                        <table></table>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
+    </template>
+
+
+</odoo>

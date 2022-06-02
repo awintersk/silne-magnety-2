@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_label_multi_print_form_extend" model="ir.ui.view">
+        <field name="name">product.label.multi.print.form.extend</field>
+        <field name="model">product.label.multi.print</field>
+        <field name="inherit_id" ref="printnode_base.product_label_multi_print_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='report_id']" position="replace">
+                <group>
+                    <field name="report_id" required="1" options="{'no_create': True}"/>
+                </group>
+                <group attrs="{'invisible': [('zpl_preview', '=', False)]}">
+                    <field name="zpl_preview"
+                           widget="image"
+                           options='{"size": [256, 256]}'
+                           class="zpl-template-image"
+                           nolabel="1"
+                           string="Preview"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

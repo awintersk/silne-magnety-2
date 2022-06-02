@@ -22,12 +22,14 @@
 
 
 from odoo import fields, models, _, api
+from odoo.osv import expression
 
 
 class ProductPackaging(models.Model):
     _inherit = 'product.packaging'
 
-    weight = fields.Float(default=0, help='Package weight without products')
+    weight = fields.Float(default=0, help='Package weight without products', digits='Package Weight')
+    max_weight = fields.Float(digits='Package Weight')
 
 
 class StockQuantPackage(models.Model):
@@ -72,10 +74,15 @@ class StockQuantPackage(models.Model):
         return response
 
     name = fields.Char(default=lambda self: self._default_name())
-    weight = fields.Float(compute='_compute_weight')
+    weight = fields.Float(compute='_compute_weight', digits='Package Weight')
+    shipping_weight = fields.Float(digits='Package Weight')
     packaging_weight = fields.Float(
         related='packaging_id.weight',
         string='Packaging Weight',
+    )
+    move_line_ids = fields.One2many(
+        comodel_name='stock.move.line',
+        compute='_compute_move_line_ids',
     )
 
     @property
@@ -88,3 +95,20 @@ class StockQuantPackage(models.Model):
         for rec_id in self:
             if rec_id.packaging_id:
                 rec_id.weight = rec_id.weight + rec_id.packaging_id.weight
+
+    @api.depends('quant_ids')
+    def _compute_move_line_ids(self):
+        for package_id in self:
+            move_line_domain = expression.OR([
+                [
+                    ('product_id', '=', quant_id.product_id.id),
+                    '|',
+                    ('location_id', '=', quant_id.location_id.id),
+                    ('location_dest_id', '=', quant_id.location_id.id),
+                    ('lot_id', '=', quant_id.lot_id.id),
+                    '|',
+                    ('package_id', '=', quant_id.package_id.id),
+                    ('result_package_id', '=', quant_id.package_id.id)
+                ] for quant_id in package_id.quant_ids
+            ])
+            package_id.move_line_ids = self.env['stock.move.line'].search(move_line_domain)
