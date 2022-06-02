@@ -296,12 +296,12 @@ class WooProductTemplateEpt(models.Model):
             'id': attr.woo_attribute_id,
             'name': attr.name,
             'slug': attr.slug,
+            'type': instance.woo_attribute_type,
         } for attr in woo_attrs]
 
     def _prepare_attribute_term_data(self, instance):
         WooTerm = self.env['woo.product.attribute.term.ept']
         terms_to_update = self.product_tmpl_id.attribute_line_ids.value_ids
-        # TODO: investigate term types
         woo_terms_to_update = WooTerm.read_group(
             domain=[
                 ('woo_instance_id', '=', self.woo_instance_id.id),
