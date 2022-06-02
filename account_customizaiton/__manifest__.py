@@ -20,13 +20,13 @@
 
 {
     'name': 'Account Customization',
-    'version': '14.0.1.0.0',
+    'version': '14.0.1.0.1',
     'category': 'Accounting/Accounting',
     'author': 'SmartTek',
     'website': 'https://www.smartteksas.com',
     'depends': [
         'account',
-        'purchase_customization',
+        'woo_commerce_magnety',
     ],
     'data': [
         'views/account_move_views.xml',

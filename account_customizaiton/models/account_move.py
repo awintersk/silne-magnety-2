@@ -24,8 +24,8 @@ from odoo import _, api, fields, models
 class AccountMove(models.Model):
     _inherit = 'account.move.line'
 
-    product_hs_code = fields.Char(related='product_id.hs_code')
-    product_origin_id = fields.Many2one(related='product_id.origin_id')
+    product_hs_code = fields.Char(related='product_id.hs_code', string='TARIC-Code')
+    product_origin = fields.Char(related='product_id.origin')
     total_weight = fields.Float(compute='_compute_total_weight')
 
     @api.depends('product_id.weight', 'quantity')

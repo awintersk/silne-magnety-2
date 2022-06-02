@@ -26,4 +26,3 @@ class ProductTemplate(models.Model):
 
     hs_code = fields.Char(string='HS Code')
     hs_description = fields.Text(string='HS Description')
-    origin_id = fields.Many2one('res.country', string='Origin')
