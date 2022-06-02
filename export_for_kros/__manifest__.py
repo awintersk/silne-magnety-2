@@ -14,7 +14,10 @@
     'category': 'Tools',
     'version': '0.1',
 
-    'depends': ['account'],
+    'depends': [
+        'account',
+        'sk_invoice',
+    ],
 
     'data': [
         # 'security/ir.model.access.csv',
