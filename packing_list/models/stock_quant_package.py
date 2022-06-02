@@ -37,6 +37,10 @@ class StockQuantPackage(models.Model):
         compute='_compute_sale_ids',
         store=True,
     )
+    sales_customer = fields.Char(
+        compute='_compute_sales_customer',
+        store=True,
+    )
     packaging_type = fields.Selection(
         related='packaging_id.packing_type',
         store=True,
@@ -61,7 +65,10 @@ class StockQuantPackage(models.Model):
         sale_order_env = self.env['sale.order']
         picking_int_ids = self._context.get('button_validate_picking_ids', [])
         for pack_id in self:
-            order_domain = [('picking_ids.state', '!=', 'cancel')]
+            order_domain = [
+                ('picking_ids.state', '!=', 'cancel'),
+                ('state', 'not in', ('cancel',))
+            ]
             if picking_int_ids:
                 order_domain += [('picking_ids', 'in', picking_int_ids)]
             else:
@@ -77,6 +84,14 @@ class StockQuantPackage(models.Model):
                 ('state', '!=', 'cancel'),
             ]).carrier_id
             pack_id.carrier_id = carrier_id[0] if carrier_id else False
+
+    @api.depends('sale_ids')
+    def _compute_sales_customer(self):
+        for pack_id in self:
+            if pack_id.sale_ids:
+                pack_id.sales_customer = ', '.join(pack_id.sale_ids.partner_id.mapped('name'))
+            else:
+                pack_id.sales_customer = False
 
     # --------- #
     #  Actions  #
