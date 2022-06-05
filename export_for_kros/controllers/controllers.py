@@ -1,4 +1,5 @@
 import io
+from locale import currency
 import xlwt
 from datetime import date, datetime
 from odoo import api, models
@@ -56,9 +57,6 @@ class ExportForKros(Controller):
                 newsheet.write(i, j, self.get_value(partner, field))
 
         # Invoices
-        def today(obj):
-            return date.today()
-
         def type_of_receipt(invoice):
             inv_types = {
                 'out_invoice': 0,
@@ -66,6 +64,14 @@ class ExportForKros(Controller):
                 'in_receipt': 14,
             }
             return inv_types.get(invoice.move_type, 'unknown')
+
+        def get_company_iban(invoice):
+            partner = invoice.company_id.partner_id
+            bank_acc = partner.bank_ids.filtered(
+                lambda b: b.use_in_kros \
+                    and b.acc_type == 'iban' \
+                    and b.currency_id == invoice.currency_id)[:1]
+            return bank_acc.acc_number or ''
 
         def invoice_vat_county_code(invoice):
             partner = invoice.partner_id
@@ -86,7 +92,7 @@ class ExportForKros(Controller):
                 return ''
 
         def user_company_invoice_vat_county_code(invoice):
-            partner = invoice.user_id.company_id.partner_id
+            partner = invoice.company_id.partner_id
             country_code = partner.vat and partner.vat[:2]
             if country_code and country_code.isalpha():
                 return country_code.upper()
@@ -95,14 +101,14 @@ class ExportForKros(Controller):
 
         invoice_fields = [
             'name', 'partner_id.name', 'partner_id.company_registry', 'invoice_date', 'invoice_date_due',
-            today, 0, 'amount_untaxed', 0, 0, 10, 20, 0, 'amount_tax', 0, 'amount_total', type_of_receipt,
+            'delivery_date', 0, 'amount_untaxed', 0, 0, 10, 20, 0, 'amount_tax', 0, 'amount_total', type_of_receipt,
             'OF', 'OFSM', 'partner_id.id', 'partner_id.commercial_partner_id.id', '', '', 'partner_id.street',
             'partner_id.zip', 'partner_id.city', 'partner_id.vat_id', '', '', '', '', '',
             'invoice_line_ids.sale_line_ids.order_id.woo_order_id', 'user_id.name', '', '',
             'invoice_line_ids.sale_line_ids.order_id.payment_gateway_id.name',
             'invoice_line_ids.sale_line_ids.order_id.carrier_id.name', 'currency_id.name', 1, 1, 'amount_total',
             '', '', 'narration', 'partner_id.country_id.name', 'partner_id.country_id.code', invoice_vat_county_code,
-            invoice_vat_serial, 'Fio banka (EUR)', '', 'partner_id.country_id.name', 'X', '', '', '',
+            invoice_vat_serial, 'Fio banka (EUR)', '', 'partner_id.country_id.name', 'X', '', '', get_company_iban,
             user_company_invoice_vat_county_code, 'user_id.company_id.partner_id.vat',
             'user_id.company_id.partner_id.country_id.name', -4, '3 netural',
             'user_id.company_id.partner_id.company_regestry', -4, '', 0, 0, 0, 0, '', '', '', '', '', '', '', '', '',
@@ -142,7 +148,13 @@ class ExportForKros(Controller):
         if not filecontent:
             return request.not_found()
         else:
-            filename = 'Zošit.xls'
+            report_date = date.today().strftime('%Y-%m-%d')
+            invoice_dates = invoices.mapped('invoice_date')
+            if invoice_dates:
+                period = f'_{min(invoice_dates).strftime("%Y-%m-%d")}_{max(invoice_dates).strftime("%Y-%m-%d")}'
+            else:
+                period = ''
+            filename = (f'{report_date}_Orodian_OdooExportToOmega{period}.xls')
             return request.make_response(filecontent, [('Content-Type', 'application/octet-stream'),
                                                        ('Content-Disposition', content_disposition(filename))])
 
@@ -162,5 +174,5 @@ class ExportForKros(Controller):
             except KeyError:
                 pass
         elif callable(data):
-            return data(obj)
+            return data(obj) or ''
         return data

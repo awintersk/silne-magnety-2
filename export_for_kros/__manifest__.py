@@ -12,7 +12,7 @@
     'website': "https://www.smartteksas.com",
 
     'category': 'Tools',
-    'version': '0.1',
+    'version': '0.2',
 
     'depends': [
         'account',
@@ -20,7 +20,7 @@
     ],
 
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
+        'views/account_move_views.xml',
+        'views/res_partner_bank_views.xml',
     ],
 }
