@@ -26,10 +26,12 @@
     'website': 'https://www.smartteksas.com',
     'depends': [
         'sale',
+        'product_template_tags',
     ],
     'data': [
         'report/sale_delivery_list_report.xml',
         'report/sale_delivery_list_report_templates.xml',
+        'views/menu.xml',
     ],
     'license': 'AGPL-3',
     'installable': True,

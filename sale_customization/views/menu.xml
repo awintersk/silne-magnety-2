@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="product_template_tag_purchase_menu"
+        name="Product Tags"
+        action="product_template_tags.product_template_tag_act_window"
+        parent="sale.prod_config_main"
+        sequence="8"/>
+
+</odoo>
