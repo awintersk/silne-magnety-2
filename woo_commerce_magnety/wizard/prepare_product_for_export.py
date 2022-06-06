@@ -26,18 +26,38 @@ class PrepareProductForExport(models.TransientModel):
     def create_update_woo_template(self, variant, woo_instance, woo_template_id, woo_category_dict):
         woo_template_id = super(PrepareProductForExport, self).create_update_woo_template(variant, woo_instance, woo_template_id, woo_category_dict)
         product_template = variant.product_tmpl_id
+        woo_template = self.env["woo.product.template.ept"].browse(woo_template_id)
         if product_template.categ_ids:
             categories = []
             for categ in product_template.categ_ids:
                 self.create_categ_in_woo(categ, woo_instance.id, woo_category_dict)
                 woo_categ = self.update_category_info(categ, woo_instance.id)
                 categories.append(woo_categ.id)
-            self.env["woo.product.template.ept"].browse(woo_template_id).write(
+            woo_template.write(
                 {'woo_categ_ids': [(4, c) for c in categories]})
+
+        if variant.tag_ids:
+            exported_tags = variant.tag_ids.filtered(lambda r: woo_instance in r.woo_tag_ids.woo_instance_id)
+            tag_vals_list = [{
+                'name': tag.name,
+                'woo_instance_id': woo_instance.id,
+                'tag_id': tag.id,
+                'slug': tag.name.lower().replace(' ', '-'),
+                'exported_in_woo': False,
+            } for tag in (variant.tag_ids - exported_tags)]
+            if tag_vals_list:
+                self.env['woo.tags.ept'].create(tag_vals_list)
+            woo_template.write({
+                'woo_tag_ids': [(6, 0, [
+                    tag.id
+                    for tag in variant.tag_ids.woo_tag_ids.filtered(lambda r: r.woo_instance_id == woo_instance)
+                ])],
+            })
 
         # Trigger name recompution to except the name from translation
         product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._compute_name()
         product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._compute_name()
+        variant.tag_ids.woo_tag_ids._compute_name()
 
         return woo_template_id
 
