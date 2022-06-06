@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+<template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document">
+    <xpath expr="//th[@name='th_quantity']" position="before">
+        <th name="th_hs_code" class="text-right"><span>TARIC-Code</span></th>
+        <th name="th_origin" class="text-right"><span>Origin</span></th>
+    </xpath>
+    <xpath expr="//th[@name='th_quantity']" position="after">
+        <th name="th_total_weight" class="text-right"><span>Total Weight</span></th>
+    </xpath>
+    <xpath expr="//span[@t-field='line.quantity']/.." position="before">
+        <td class="text-right"><span t-field="line.product_hs_code"/></td>
+        <td class="text-right"><span t-field="line.product_origin"/></td>
+    </xpath>
+    <xpath expr="//span[@t-field='line.quantity']/.." position="after">
+        <td class="text-right"><span t-field="line.total_weight"/></td>
+    </xpath>
+</template>
+
+</odoo>

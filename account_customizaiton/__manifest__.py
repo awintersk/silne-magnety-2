@@ -20,7 +20,7 @@
 
 {
     'name': 'Account Customization',
-    'version': '14.0.1.0.1',
+    'version': '14.0.1.0.2',
     'category': 'Accounting/Accounting',
     'author': 'SmartTek',
     'website': 'https://www.smartteksas.com',
@@ -29,7 +29,7 @@
         'woo_commerce_magnety',
     ],
     'data': [
-        'views/account_move_views.xml',
+        'report/account_move_templates.xml',
     ],
     'license': 'AGPL-3',
     'installable': True,
