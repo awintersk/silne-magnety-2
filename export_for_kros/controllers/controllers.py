@@ -149,7 +149,7 @@ class ExportForKros(Controller):
             return request.not_found()
         else:
             report_date = date.today().strftime('%Y-%m-%d')
-            invoice_dates = invoices.mapped('invoice_date')
+            invoice_dates = invoices.filtered('invoice_date').mapped('invoice_date')
             if invoice_dates:
                 period = f'_{min(invoice_dates).strftime("%Y-%m-%d")}_{max(invoice_dates).strftime("%Y-%m-%d")}'
             else:
