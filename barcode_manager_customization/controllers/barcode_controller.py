@@ -26,40 +26,20 @@ from odoo.http import route, Controller, request
 class BarcodeController(Controller):
 
     @route('/product_order_dialog_data', type='json', method='POST', auth='user')
-    def product_order_dialog_data(self, line_id: int) -> List[Dict[str, Any]]:
+    def product_order_dialog_data(self, line_id: int):
         move_line = request.env['stock.move.line'].browse(line_id)
-        order_ids = move_line.picking_id.barcode_sale_order_ids
-        move_ids = request.env['stock.move'].search([
-            ('picking_id.sale_id', 'in', order_ids.ids),
-            ('picking_type_id.sequence_code', '=', 'PICK'),
-            ('state', 'in', ('waiting', 'confirmed', 'partially_available')),
-        ])
 
-        response = {}
-
-        for move_id in move_ids:
-            qty2deliver = move_id.product_uom_qty - move_id.reserved_availability
-
-            if not qty2deliver:
-                continue
-
-            sale_id = move_id.picking_id.sale_id
-
-            if sale_id in response:
-                response[sale_id.id]['qtyToDeliver'] += qty2deliver
-                continue
-
-            response.update({
-                sale_id.id: {
-                    'id': sale_id.id,
-                    'name': sale_id.name,
-                    'partnerName': sale_id.partner_id.name,
-                    'qtyToDeliver': qty2deliver,
-                    'qty': 0,
-                }
-            })
-
-        return list(response.values())
+        return [
+            {
+                'id': move_id.picking_id.sale_id.id,
+                'name': move_id.picking_id.sale_id.name,
+                'partnerName': move_id.picking_id.sale_id.partner_id.name,
+                'qtyToDeliver': move_id.product_uom_qty - move_id.reserved_availability,
+                'qty': 0,
+            }
+            for move_id in move_line.move_id.move_dest_ids
+            if move_id.product_uom_qty - move_id.reserved_availability > 0
+        ]
 
     @route('/barcode/expected/weight', type='json', auth='user')
     def barcode_expected_weight(self, picking_int_id, package_int_id, target_line_int_id, qty):
