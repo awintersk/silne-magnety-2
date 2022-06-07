@@ -33,6 +33,7 @@ class BarcodeController(Controller):
             ('picking_id.sale_id', 'in', order_ids.ids),
             ('picking_type_id.sequence_code', '=', 'PICK'),
             ('state', 'in', ('waiting', 'confirmed', 'partially_available')),
+            ('product_id', 'in', move_line.product_id.ids),
         ])
 
         response = {}
