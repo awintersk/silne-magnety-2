@@ -6,4 +6,9 @@
         <field name="value">Hmotnosť,Hmotnost</field>
     </record>
 
+    <record id="product_origin_attribute_name" model="ir.config_parameter">
+        <field name="key">woo_commerce_magnety.product_origin_attribute_name</field>
+        <field name="value">Origin</field>
+    </record>
+
 </odoo>

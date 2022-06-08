@@ -14,6 +14,18 @@
         </field>
     </record>
 
+    <record id="pull_product_origin_from_attribute" model="ir.actions.server">
+        <field name="name">Fetch origin from attribute</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_product_template"/>
+        <field name="binding_model_id" ref="model_product_template"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+            records._pull_product_origin_from_attribute()
+        </field>
+    </record>
+
     <record id="action_wizard_woo_prepare_product_for_export_multi_instance" model="ir.actions.server">
         <field name="name">WooCommerce - Export Products (All instances)</field>
         <field name="type">ir.actions.server</field>

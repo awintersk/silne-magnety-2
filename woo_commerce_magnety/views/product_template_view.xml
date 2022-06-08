@@ -12,6 +12,9 @@
                     <field name="woo_short_description"/>
                 </group>
             </xpath>
+            <group name="group_general" position="inside">
+                <field name="origin"/>
+            </group>
         </field>
     </record>
 

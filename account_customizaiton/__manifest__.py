@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,26 +19,21 @@
 ################################################################################
 
 {
-    'name': "Purchase Customization",
-    'version': '14.0.1.1.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
+    'name': 'Account Customization',
+    'version': '14.0.1.0.2',
+    'category': 'Accounting/Accounting',
+    'author': 'SmartTek',
+    'website': 'https://www.smartteksas.com',
     'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
+        'account',
+        'woo_commerce_magnety',
     ],
     'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
+        'report/account_move_templates.xml',
     ],
-    'license': "AGPL-3",
+    'license': 'AGPL-3',
     'installable': True,
+    'auto_install': False,
     'application': False,
 }
+

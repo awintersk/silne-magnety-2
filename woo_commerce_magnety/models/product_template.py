@@ -37,6 +37,18 @@ class ProductTemplate(models.Model):
 
     woo_description = fields.Html("Description", translate=True)
     woo_short_description = fields.Html("Short Description", translate=True)
+    origin = fields.Char(string='Origin')
+
+    def _pull_product_origin_from_attribute(self):
+        get_param = self.env['ir.config_parameter'].get_param
+        origin_attr_name = get_param('woo_commerce_magnety.product_origin_attribute_name')
+
+        for product in self:
+            attr_line = product.attribute_line_ids.filtered(lambda l: origin_attr_name in l.mapped('attribute_id.name'))
+            if not attr_line:
+                continue
+            origin = attr_line.value_ids[:1].name
+            product.origin = origin or product.origin
 
     def _pull_product_weight_from_attribute(self):
         self.ensure_one()
@@ -45,7 +57,7 @@ class ProductTemplate(models.Model):
         weight_name_items = get_param('woo_commerce_magnety.product_weight_attribute_name')
         attribute_value_id = None
         value_ids = self.attribute_line_ids.value_ids
-        
+
         for name in weight_name_items.split(','):
             attribute_value_id = self.env['product.attribute.value'].search([
                 ('id', 'in', value_ids.ids),

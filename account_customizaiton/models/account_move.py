@@ -1,7 +1,7 @@
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2021 SmartTek (<https://smartteksas.com>).
+#    Copyright (C) 2019 SmartTek (<https://smartteksas.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,27 +18,17 @@
 #
 ################################################################################
 
-{
-    'name': "Purchase Customization",
-    'version': '14.0.1.1.1',
-    'category': 'Inventory/Purchase',
-    'author': 'Smart Tek Solutions and Services',
-    'website': "https://smartteksas.com/",
-    'depends': [
-        'purchase',
-        'purchase_stock',
-        'woo_commerce_ept',
-    ],
-    'data': [
-        'data/ir_exports.xml',
-        'views/assets.xml',
-        'views/product_supplierinfo_views.xml',
-        'views/product_template_views.xml',
-        'views/purchase_order_views.xml',
-        'report/purchase_order_report_templates.xml',
-        'report/purchase_order_report.xml',
-    ],
-    'license': "AGPL-3",
-    'installable': True,
-    'application': False,
-}
+from odoo import _, api, fields, models
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move.line'
+
+    product_hs_code = fields.Char(related='product_id.hs_code', string='TARIC-Code')
+    product_origin = fields.Char(related='product_id.origin')
+    total_weight = fields.Float(compute='_compute_total_weight')
+
+    @api.depends('product_id.weight', 'quantity')
+    def _compute_total_weight(self):
+        for r in self:
+            r.total_weight = r.product_id.weight * r.quantity
