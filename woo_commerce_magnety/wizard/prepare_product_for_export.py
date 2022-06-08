@@ -2,7 +2,7 @@
 # See LICENSE file for full copyright and licensing details.
 import logging
 from _collections import OrderedDict
-from odoo import models, fields, _
+from odoo import api, models, fields, _
 
 _logger = logging.getLogger("WooCommerce")
 
@@ -22,6 +22,14 @@ class PrepareProductForExport(models.TransientModel):
                 "woo_short_description": product_template.woo_short_description,
             })
         return data
+
+    @api.model
+    def _update_translations(self, variant):
+        # Trigger name recompution to except the name from translation
+        product_template = variant.product_tmpl_id
+        product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._compute_name()
+        product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._compute_name()
+        variant.tag_ids.woo_tag_ids._compute_name()
 
     def create_update_woo_template(self, variant, woo_instance, woo_template_id, woo_category_dict):
         woo_template_id = super(PrepareProductForExport, self).create_update_woo_template(variant, woo_instance, woo_template_id, woo_category_dict)
@@ -54,21 +62,12 @@ class PrepareProductForExport(models.TransientModel):
                 ])],
             })
 
-        # Trigger name recompution to except the name from translation
-        product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._compute_name()
-        product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._compute_name()
-        variant.tag_ids.woo_tag_ids._compute_name()
-
+        self._update_translations(variant)
         return woo_template_id
 
     def prepare_product_for_export(self):
         instance_lang = self.woo_instance_id.woo_lang_id
         return super(PrepareProductForExport, self.with_context(lang=instance_lang.code)).prepare_product_for_export()
-
-    def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=None):
-        if not ctg_list:
-            ctg_list = []
-        return super().create_categ_in_woo(category_id, instance, woo_category_dict, ctg_list)
 
     def create_woo_category(self, category_name, instance, parent_id=False, origin_id=False):
         res = self.env["woo.product.categ.ept"].search([
@@ -94,7 +93,7 @@ class PrepareProductForExport(models.TransientModel):
             woo_categ_id._compute_name()
         return woo_categ_id
 
-    def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=[]):
+    def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=None):
         """
         This method is used for find the parent category and its sub category based on category id and
         create or update the category in woo second layer of woo category model.
@@ -103,6 +102,8 @@ class PrepareProductForExport(models.TransientModel):
         :param ctg_list: It contain the category ids list
         :return: It will return True if the product category successful complete
         """
+        if not ctg_list:
+            ctg_list = []
         woo_product_categ = self.env['woo.product.categ.ept']
         product_category_obj = self.env['product.category']
         if category_id:
