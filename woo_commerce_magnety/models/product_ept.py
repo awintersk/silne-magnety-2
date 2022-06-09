@@ -226,8 +226,11 @@ class WooProductTemplateEpt(models.Model):
                         min_quantity = get_value(meta_data, f'_bulkdiscount_quantity_{i}')
                         discount = get_value(meta_data, f'_bulkdiscount_discount_fixed_{i}')
                         if min_quantity and discount:
-                            min_quantity = float(min_quantity)
-                            discount = float(discount)
+                            try:
+                                min_quantity = float(min_quantity)
+                                discount = float(discount)
+                            except ValueError:
+                                continue
                             bulk_price = base_price.fixed_price - discount
                             exist_price = Price.search([
                                 ('pricelist_id', '=', instance_price.id),
