@@ -10,3 +10,4 @@ class Company(models.Model):
     vat = fields.Char(related='partner_id.vat', string=_("Vat ID"), readonly=False, help="IČ DPH")
     vat_id = fields.Char(related='partner_id.vat_id', string=_('Tax ID'), readonly=False, help="DIČ")
     rel_acc_number = fields.Many2one('res.partner.bank', domain="[('partner_id', '=', partner_id)]")
+    register_message = fields.Char(string=_('Registration Message'))

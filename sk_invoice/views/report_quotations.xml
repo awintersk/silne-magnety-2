@@ -108,6 +108,11 @@
                             <span t-field="doc.partner_id.vat"/>
                         </p>
                     </t>
+                    <t t-if="company.register_message">
+                        <p style="font-size:12px;margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                            <span t-field="company.register_message"/>
+                        </p>
+                    </t>
                 </span>
                 <div style="display: block;clear: both;content: '';"></div>
 
@@ -201,7 +206,8 @@
 
                                 <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                     <t t-if="not line.display_type">
-                                        <td name="td_name" style="min-width:590px;padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;">
+                                        <td name="td_name"
+                                            style="min-width:590px;padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;">
                                             <span t-field="line.name"/>
                                         </td>
                                         <td name="td_quantity"

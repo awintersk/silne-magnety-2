@@ -87,6 +87,11 @@
                                 <span t-field="company.rel_acc_number.bank_id.bic"/>
                             </p>
                         </t>
+                        <t t-if="company.register_message">
+                            <p style="font-size:12px;margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                <span t-field="company.register_message"/>
+                            </p>
+                        </t>
 
 
                     </span>
@@ -176,6 +181,11 @@
                             <t
                                     t-esc="o.ref"/>
                         </span>
+                    </div>
+                    <div style="margin-bottom:4px;" t-if="o.narration_top">
+                        <p t-if="o.narration_top" name="comment_top">
+                            <span t-field="o.narration_top"/>
+                        </p>
                     </div>
                     <div style="display: block;clear: both;content: '';"></div>
                     <table style="border-collapse: collapse;margin-top:44px; width:100%;">
@@ -314,6 +324,12 @@
                             <span style="border-bottom: 1px solid #CEDDF3;vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;min-width:50%;width:50%;float: right;"/>
                         </p>
                     </div>
+                    <div style="margin-bottom:4px;" t-if="o.narration">
+                        <p t-if="o.narration" name="comment">
+                            <span t-field="o.narration"/>
+                        </p>
+                    </div>
+
                 </div>
                 <div id="total" style="display:none;">
                     <div>
