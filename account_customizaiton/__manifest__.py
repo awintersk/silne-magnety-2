@@ -29,6 +29,8 @@
         'woo_commerce_magnety',
     ],
     'data': [
+        'views/account_journal_views.xml',
+        'views/account_move_views.xml',
         'report/account_move_templates.xml',
     ],
     'license': 'AGPL-3',
@@ -36,4 +38,3 @@
     'auto_install': False,
     'application': False,
 }
-
