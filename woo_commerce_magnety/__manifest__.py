@@ -2,7 +2,7 @@
 # See LICENSE file for full copyright and licensing details.
 {
     'name': 'Odoo WooCommerce Customization',
-    'version': '14.0.2.0.6',
+    'version': '14.0.2.0.7',
     'category': 'Sales',
     'summary': 'Odoo Woocommerce Connector helps you automate your vital business processes at Odoo by enabling '
                'bi-directional data exchange between WooCommerce & Odoo.',
@@ -12,6 +12,7 @@
     'maintainer': 'SmartTekSas',
     'depends': [
         'woo_commerce_ept',
+        'product_template_tags',
     ],
     'data': [
         'data/ir_actions_server_data.xml',
@@ -23,6 +24,7 @@
         'views/product.xml',
         'views/sale_order_views.xml',
         'views/product_pricelist_views.xml',
+        'views/woo_tags_ept_views.xml',
     ],
     'installable': True,
     'auto_install': False,

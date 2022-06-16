@@ -257,6 +257,10 @@ class WooProductTemplateEpt(models.Model):
                 if price_data:
                     Price.create(price_data)
 
+        if woo_template_id and woo_template_id.woo_tag_ids:
+            woo_template_id.woo_tag_ids.update_product_template_tags()
+            product_tmpl_id.tag_ids = [(6, 0, woo_template_id.woo_tag_ids.tag_id.ids)]
+
         return woo_template_id
 
     @api.model
@@ -272,7 +276,11 @@ class WooProductTemplateEpt(models.Model):
         )
 
         categories = templates.woo_categ_ids.filtered('exported_in_woo')
-        self.env['woo.product.categ.ept'].update_product_categs_in_woo( instance, categories)
+        if categories:
+            self.env['woo.product.categ.ept'].update_product_categs_in_woo(instance, categories)
+        tags = templates.woo_tag_ids.filtered('exported_in_woo')
+        if tags:
+            self.env['woo.tags.ept'].woo_update_product_tags(instance, tags, common_log_id)
 
         return res
 

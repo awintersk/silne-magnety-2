@@ -1,3 +1,4 @@
+
 ################################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -18,23 +19,10 @@
 #
 ################################################################################
 
-{
-    'name': 'Sale Customization',
-    'version': '14.0.1.0.0',
-    'category': 'Sales/Sales',
-    'author': 'SmartTek',
-    'website': 'https://www.smartteksas.com',
-    'depends': [
-        'sale',
-        'product_template_tags',
-    ],
-    'data': [
-        'report/sale_delivery_list_report.xml',
-        'report/sale_delivery_list_report_templates.xml',
-        'views/menu.xml',
-    ],
-    'license': 'AGPL-3',
-    'installable': True,
-    'auto_install': False,
-    'application': False,
-}
+from odoo import fields, models
+
+
+class ProductTemplateTag(models.Model):
+    _inherit = "product.template.tag"
+
+    woo_tag_ids = fields.One2many('woo.tags.ept', 'tag_id', string='Woo Tags')

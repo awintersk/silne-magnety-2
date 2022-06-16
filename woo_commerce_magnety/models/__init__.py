@@ -11,3 +11,5 @@ from . import product_template
 from . import res_partner
 from . import sale_order
 from . import product_pricelist
+from . import product_tags_ept
+from . import product_template_tag
