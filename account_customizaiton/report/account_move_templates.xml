@@ -2,37 +2,22 @@
 <odoo>
 
 <template id="report_invoice_document_inherit" inherit_id="sk_invoice.smarttek_report_invoice_document">
-    <xpath expr="//th[@name='th_quantity']" position="before">
-        <th name="th_hs_code"
-            style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
-            TARIC-Code
-        </th>
-        <th name="th_origin"
-            style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
-            Origin
-        </th>
+    <xpath expr="//t[@t-if='not company']" position="after">
+        <t t-if="o.partner_id.vat_id or o.partner_id.vat or o.partner_id.company_registry" t-set="is_b2b" t-value="1"/>
     </xpath>
-    <xpath expr="//th[@name='th_quantity']" position="after">
-        <th name="th_total_weight"
-            style="padding:5px;font-family:arial,sans-serif;font-size:16px;line-height:25px;text-align:left;white-space:nowrap;color:#0857C3;min-width:100px;text-align:right;border-bottom: 1px solid #CEDDF3;">
-            Total Weight
-        </th>
-    </xpath>
-    <xpath expr="//span[@t-field='line.quantity']/.." position="before">
-        <td name="td_hs_code"
-            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
-            <span t-field="line.product_hs_code"/>
-        </td>
-        <td name="td_origin"
-            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
-            <span t-field="line.product_origin"/>
-        </td>
-    </xpath>
-    <xpath expr="//span[@t-field='line.quantity']/.." position="after">
-        <td name="td_total_weight"
-            style="padding:5px;min-width:100px;text-align:right;font-family:arial,sans-serif;font-size:16px;line-height:25px;color:#333333;vertical-align:top;">
-            <span t-field="line.total_weight"/>
-        </td>
+    <xpath expr="//span[@t-field='line.name']" position="after">
+        <br t-if="is_b2b"/>
+        <div t-if="is_b2b" style="font-weight: normal;font-size: 12px;">
+            <t t-if="line.product_hs_code">
+                TARIC-Code: <span t-field="line.product_hs_code"/>;
+            </t>
+            <t t-if="line.product_origin">
+                Origin: <span t-field="line.product_origin"/>;
+            </t>
+            <t t-if="line.total_weight">
+                Total Weight: <span t-field="line.total_weight"/>;
+            </t>
+        </div>
     </xpath>
 </template>
 
