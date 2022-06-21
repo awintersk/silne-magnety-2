@@ -3,6 +3,7 @@
     <template id="invoice_notes_on_report" inherit_id="account.report_invoice_document"
               name="Invoice Notes on Report" priority="40">
         <xpath expr="//span[@t-field='o.narration_top']/parent::p/parent::div" position="after">
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
             <div style="margin-bottom:4px;" t-if="o.invoice_message and not print_wo_notes">
                 <p t-if="o.invoice_message" name="invoice_message">
                     <span t-field="o.invoice_message"/>
