@@ -19,5 +19,6 @@
         'data/res_country_data.xml',
         'views/report_invoice.xml',
         'views/settings.xml',
+        'views/res_company.xml',
     ],
 }

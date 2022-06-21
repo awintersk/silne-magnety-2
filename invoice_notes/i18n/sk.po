@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-21 12:07+0000\n"
-"PO-Revision-Date: 2022-06-21 12:07+0000\n"
+"POT-Creation-Date: 2022-06-21 15:45+0000\n"
+"PO-Revision-Date: 2022-06-21 15:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,11 @@ msgid "Assign country groups to add invoice notes to invoice report"
 msgstr ""
 
 #. module: invoice_notes
+#: model:ir.model,name:invoice_notes.model_res_company
+msgid "Companies"
+msgstr "Spoločnosti"
+
+#. module: invoice_notes
 #: model:ir.model,name:invoice_notes.model_res_config_settings
 msgid "Config Settings"
 msgstr "Nastavenia konfigurácie"
@@ -60,23 +65,15 @@ msgid "Country Group Outside EU"
 msgstr ""
 
 #. module: invoice_notes
-#: code:addons/invoice_notes/models/invoice_notes.py:0
-#, python-format
-msgid ""
-"Delivery according to §47 of VAT act – VAT exempt export of goods and "
-"services to third country"
-msgstr ""
-"Dodanie je oslobodené od dane v zmysle § 47 zákona o DPH – dodanie tovarov a služieb "
-"do tretej krajiny."
-
-#. module: invoice_notes
 #: model:ir.model.fields,field_description:invoice_notes.field_account_move__display_name
+#: model:ir.model.fields,field_description:invoice_notes.field_res_company__display_name
 #: model:ir.model.fields,field_description:invoice_notes.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "Zobrazovaný názov"
 
 #. module: invoice_notes
 #: model:ir.model.fields,field_description:invoice_notes.field_account_move__id
+#: model:ir.model.fields,field_description:invoice_notes.field_res_company__id
 #: model:ir.model.fields,field_description:invoice_notes.field_res_config_settings__id
 msgid "ID"
 msgstr ""
@@ -86,6 +83,20 @@ msgstr ""
 #: model:ir.model.fields,field_description:invoice_notes.field_account_move__invoice_message
 #: model:ir.model.fields,field_description:invoice_notes.field_account_payment__invoice_message
 msgid "Invoice Message"
+msgstr ""
+
+#. module: invoice_notes
+#: code:addons/invoice_notes/models/res_company.py:0
+#: model:ir.model.fields,field_description:invoice_notes.field_res_company__inv_message_1
+#, python-format
+msgid "Invoice Message #1"
+msgstr ""
+
+#. module: invoice_notes
+#: code:addons/invoice_notes/models/res_company.py:0
+#: model:ir.model.fields,field_description:invoice_notes.field_res_company__inv_message_2
+#, python-format
+msgid "Invoice Message #2"
 msgstr ""
 
 #. module: invoice_notes
@@ -100,6 +111,7 @@ msgstr "Vstup účtovnej knihy"
 
 #. module: invoice_notes
 #: model:ir.model.fields,field_description:invoice_notes.field_account_move____last_update
+#: model:ir.model.fields,field_description:invoice_notes.field_res_company____last_update
 #: model:ir.model.fields,field_description:invoice_notes.field_res_config_settings____last_update
 msgid "Last Modified on"
 msgstr "Posledná úprava"
@@ -107,10 +119,4 @@ msgstr "Posledná úprava"
 #. module: invoice_notes
 #: model:res.country.group,name:invoice_notes.outside_eu
 msgid "Outside EU"
-msgstr ""
-
-#. module: invoice_notes
-#: code:addons/invoice_notes/models/invoice_notes.py:0
-#, python-format
-msgid "Supply of goods is exempt. Supply of services - VAT reverse charge."
-msgstr "Dodanie tovaru je oslobodené od dane. Dodanie služby podlieha preneseniu daňovej povinnosti."
+msgstr "Mimo EÚ"

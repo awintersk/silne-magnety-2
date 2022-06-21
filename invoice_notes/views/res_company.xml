@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <record id="add_invoice_notes_res_company" model="ir.ui.view">
+            <field name="name">add.invoice.notes.res.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='favicon']" position="after">
+                        <field name="inv_message_1"/>
+                        <field name="inv_message_2"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
