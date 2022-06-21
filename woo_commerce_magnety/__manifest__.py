@@ -11,6 +11,7 @@
     'website': "http://smartteksas.com",
     'maintainer': 'SmartTekSas',
     'depends': [
+        'base_vat',
         'woo_commerce_ept',
         'product_template_tags',
     ],
