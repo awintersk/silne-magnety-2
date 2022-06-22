@@ -272,13 +272,6 @@ class WooProductTemplateEpt(models.Model):
     def update_products_in_woo(self, instance, templates, update_price, publish, update_image,
                                update_basic_detail, common_log_id):
         templates = templates.with_context(lang=instance.woo_lang_id.code)
-        res = super(
-            WooProductTemplateEpt,
-            self.with_context(lang=instance.woo_lang_id.code)
-        ).update_products_in_woo(
-            instance, templates, update_price, publish, update_image,
-            update_basic_detail, common_log_id,
-        )
 
         categories = templates.woo_categ_ids.filtered('exported_in_woo')
         if categories:
@@ -286,6 +279,17 @@ class WooProductTemplateEpt(models.Model):
         tags = templates.woo_tag_ids.filtered('exported_in_woo')
         if tags:
             self.env['woo.tags.ept'].woo_update_product_tags(instance, tags, common_log_id)
+        if templates.product_tmpl_id.attribute_line_ids:
+            self.update_woo_attributes(templates, instance, common_log_id)
+            self.update_woo_attribute_values(templates, instance, common_log_id)
+
+        res = super(
+            WooProductTemplateEpt,
+            self.with_context(lang=instance.woo_lang_id.code)
+        ).update_products_in_woo(
+            instance, templates, update_price, publish, update_image,
+            update_basic_detail, common_log_id,
+        )
 
         return res
 
@@ -333,6 +337,8 @@ class WooProductTemplateEpt(models.Model):
         model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
         url = 'products/attributes/batch'
         attribute_data = template._prepare_attributes_data(instance)
+        if not attribute_data:
+            return
         wc_api = instance.woo_connect()
         try:
             res = wc_api.put(url, data={'update': attribute_data})
@@ -348,6 +354,8 @@ class WooProductTemplateEpt(models.Model):
         model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
         url = 'products/attributes/%s/terms/batch'
         data = template._prepare_attribute_term_data(instance)
+        if not data:
+            return
         wc_api = instance.woo_connect()
         for woo_attribute_id, term_data in data.items():
             try:
