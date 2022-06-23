@@ -1,0 +1,65 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* invoice_customs
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-23 12:20+0000\n"
+"PO-Revision-Date: 2022-06-23 12:20+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: invoice_customs
+#: model:ir.model.fields,field_description:invoice_customs.field_woo_instance_ept__display_name
+msgid "Display Name"
+msgstr "Zobrazované meno"
+
+#. module: invoice_customs
+#: model_terms:ir.ui.view,arch_db:invoice_customs.woo_invoice_details_settings
+msgid "Footer Info"
+msgstr ""
+
+#. module: invoice_customs
+#: code:addons/invoice_customs/models/woo_settings.py:0
+#: model:ir.model.fields,field_description:invoice_customs.field_woo_instance_ept__woo_email
+#, python-format
+msgid "Footer email"
+msgstr ""
+
+#. module: invoice_customs
+#: code:addons/invoice_customs/models/woo_settings.py:0
+#: model:ir.model.fields,field_description:invoice_customs.field_woo_instance_ept__woo_phone
+#, python-format
+msgid "Footer phone"
+msgstr "Pätička telefón"
+
+#. module: invoice_customs
+#: model:ir.model.fields,field_description:invoice_customs.field_woo_instance_ept__id
+msgid "ID"
+msgstr ""
+
+#. module: invoice_customs
+#: model_terms:ir.ui.view,arch_db:invoice_customs.external_layout_boxed
+msgid "Invoice created by:"
+msgstr "Faktúru vystavil:"
+
+#. module: invoice_customs
+#: model:ir.model.fields,field_description:invoice_customs.field_woo_instance_ept____last_update
+msgid "Last Modified on"
+msgstr "Naposledy upravené"
+
+#. module: invoice_customs
+#: model_terms:ir.ui.view,arch_db:invoice_customs.external_layout_boxed
+msgid "Page: <span class=\"page\"/> / <span class=\"topage\"/>"
+msgstr "Stránka: <span class=\"page\"/> / <span class=\"topage\"/>"
+
+#. module: invoice_customs
+#: model:ir.model,name:invoice_customs.model_woo_instance_ept
+msgid "WooCommerce Instance"
+msgstr "WooCommerce Inštancia"

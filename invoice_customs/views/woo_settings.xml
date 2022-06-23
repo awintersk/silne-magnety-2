@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+        <record id="woo_invoice_details_settings" model="ir.ui.view">
+            <field name="name">woo.invoice.details.settings</field>
+            <field name="model">woo.instance.ept</field>
+            <field name="inherit_id" ref="woo_commerce_ept.woo_instance_form_view_ept"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//page[@name='default_products']" position="after">
+                        <page string="Footer Info" groups="woo_commerce_ept.group_woo_manager_ept" name="footer_info">
+                            <group>
+                                <group>
+                                    <field name="woo_email"/>
+                                    <field name="woo_phone"/>
+                                </group>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
