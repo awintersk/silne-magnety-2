@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 13:14+0000\n"
-"PO-Revision-Date: 2022-04-20 13:14+0000\n"
+"POT-Creation-Date: 2022-06-23 12:16+0000\n"
+"PO-Revision-Date: 2022-06-23 12:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "/EUR"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
@@ -145,10 +150,14 @@ msgid "Amount"
 msgstr "Suma"
 
 #. module: sk_invoice
-#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Bank Account:"
 msgstr "Bankové spojenie"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Bank:"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model,name:sk_invoice.model_res_company
@@ -163,7 +172,7 @@ msgstr "Spoločnosti"
 #: model:ir.model.fields,field_description:sk_invoice.field_res_users__company_registry
 #, python-format
 msgid "Company Registry"
-msgstr "IČO"
+msgstr "Register Spoločnosti"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -204,6 +213,16 @@ msgid "Display Name"
 msgstr "Zobrazovaný názov"
 
 #. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Exchange rate"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "IBAN:"
+msgstr ""
+
+#. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move__id
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company__id
 #: model:ir.model.fields,field_description:sk_invoice.field_res_partner__id
@@ -225,7 +244,7 @@ msgstr ""
 #. module: sk_invoice
 #: model:ir.model,name:sk_invoice.model_account_move
 msgid "Journal Entry"
-msgstr "Vstup denníka"
+msgstr "Vstup účtovnej knihy"
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move____last_update
@@ -240,6 +259,18 @@ msgid "Logo"
 msgstr ""
 
 #. module: sk_invoice
+#: model:ir.model.fields,field_description:sk_invoice.field_account_bank_statement_line__narration_top
+#: model:ir.model.fields,field_description:sk_invoice.field_account_move__narration_top
+#: model:ir.model.fields,field_description:sk_invoice.field_account_payment__narration_top
+msgid "Narration Top"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.account_move_delivery_date_form
+msgid "Note Top"
+msgstr "Poznámka horná"
+
+#. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Order"
 msgstr ""
@@ -251,13 +282,29 @@ msgstr "VAT payer"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Qty"
+msgstr "Množstvo"
+
+#. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Quantity"
 msgstr "Množstvo"
 
 #. module: sk_invoice
+#: code:addons/sk_invoice/models/res_company.py:0
+#: model:ir.model.fields,field_description:sk_invoice.field_res_company__register_message
+#, python-format
+msgid "Registration Message"
+msgstr "Zaregistrované na"
+
+#. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company__rel_acc_number
 msgid "Rel Acc Number"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "SWIFT:"
 msgstr ""
 
 #. module: sk_invoice
@@ -277,7 +324,6 @@ msgid "Tax ID:"
 msgstr "IČ DPH:"
 
 #. module: sk_invoice
-#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Taxes"
 msgstr "Dane"
@@ -289,14 +335,27 @@ msgid ""
 "The Tax Identification Number (IČ DPH). Complete it if the contact is "
 "subjected to government taxes. Used in some legal statements."
 msgstr ""
-"Daňové identifikačné číslo. Vyplňte ho v prípade že spoločnosť podlieha "
-"daniam. Používa sa pre niektoré z právnych vyhlásení."
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Unit"
+msgstr "Jednotka"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Unit Price"
 msgstr "Jed. cena"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Unit Price with VAT"
+msgstr "Jednotková cena bez DPH"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "VAT"
+msgstr "DPH"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
