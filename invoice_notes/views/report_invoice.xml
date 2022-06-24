@@ -4,9 +4,9 @@
               name="Invoice Notes on Report" priority="40">
         <xpath expr="//span[@t-field='o.narration_top']/parent::p/parent::div" position="after">
             <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
-            <div style="margin-bottom:4px;" t-if="o.invoice_message and not print_wo_notes">
-                <p t-if="o.invoice_message" name="invoice_message">
-                    <span t-field="o.invoice_message"/>
+            <div style="margin-bottom:4px;" t-if="o.fiscal_position_id and not print_wo_notes">
+                <p t-if="o.fiscal_position_id.note" name="note">
+                        <span t-field="o.fiscal_position_id.note"/>
                 </p>
             </div>
             <div style="display: block;clear: both;content: '';"></div>

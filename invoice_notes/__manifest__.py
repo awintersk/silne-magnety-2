@@ -12,13 +12,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sk_invoice'],
+    'depends': ['base', 'account', 'sk_invoice'],
 
     # always loaded
     'data': [
         'data/res_country_data.xml',
         'views/report_invoice.xml',
-        'views/settings.xml',
-        'views/res_company.xml',
     ],
 }
