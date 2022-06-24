@@ -25,11 +25,14 @@ class PrepareProductForExport(models.TransientModel):
 
     @api.model
     def _update_translations(self, variant):
-        # Trigger name recompution to except the name from translation
+        # Trigger name recompution to update the name from translation
         product_template = variant.product_tmpl_id
-        product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._compute_name()
-        product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._compute_name()
-        variant.tag_ids.woo_tag_ids._compute_name()
+        variant.woo_product_ids._update_translations()
+        product_template.woo_product_template_ids._update_translations()
+        (product_template.categ_ids | product_template.categ_id).woo_category_ids._update_translations()
+        product_template.attribute_line_ids.attribute_id.woo_attribute_line_ids._update_translations()
+        product_template.attribute_line_ids.value_ids.woo_attribute_value_ids._update_translations()
+        variant.tag_ids.woo_tag_ids._update_translations()
 
     def create_update_woo_template(self, variant, woo_instance, woo_template_id, woo_category_dict):
         woo_template_id = super(PrepareProductForExport, self).create_update_woo_template(variant, woo_instance, woo_template_id, woo_category_dict)
@@ -89,8 +92,6 @@ class PrepareProductForExport(models.TransientModel):
                 'woo_instance_id': instance_id,
                 'category_id': categ_obj.id,
             })
-        else:
-            woo_categ_id._compute_name()
         return woo_categ_id
 
     def create_categ_in_woo(self, category_id, instance, woo_category_dict, ctg_list=None):

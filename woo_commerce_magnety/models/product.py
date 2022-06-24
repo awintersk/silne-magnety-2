@@ -18,14 +18,14 @@
 #
 ################################################################################
 
-from odoo import api, fields, models, _
+from odoo import _, api, fields, models
 
 
-class WooProductAttributeTermEpt(models.Model):
-    _inherit = "woo.product.attribute.term.ept"
+class Product(models.Model):
+    _inherit = 'product.product'
 
-    name = fields.Char(compute=False, store=True, translate=False)
-
-    def _update_translations(self):
-        for r in self.filtered(lambda r: r.attribute_value_id and r.woo_instance_id.woo_lang_id):
-            r.name = r.attribute_value_id.with_context(lang=r.woo_instance_id.woo_lang_id.code).name
+    woo_product_ids = fields.One2many(
+        'woo.product.product.ept',
+        'product_id',
+        string='Woo Products',
+    )

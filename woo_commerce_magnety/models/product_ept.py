@@ -14,7 +14,12 @@ _logger = logging.getLogger("WooCommerce")
 class WooProductTemplateEpt(models.Model):
     _inherit = "woo.product.template.ept"
 
-    name = fields.Char(related='product_tmpl_id.name')
+    name = fields.Char(translate=False, related=False, readonly=True)
+
+    def _update_translations(self):
+        for r in self.filtered(lambda r: r.product_tmpl_id and r.woo_instance_id.woo_lang_id):
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.name = r.product_tmpl_id.with_context(lang=instance_lang.code).name
 
     @api.model
     def sync_products(self, *args, **kwargs):
@@ -431,3 +436,14 @@ class WooProductTemplateEpt(models.Model):
                     'exported_in_woo': True,
                     'count': attribute_term.get('count')})
         return True
+
+
+class WooProductEpt(models.Model):
+    _inherit = "woo.product.product.ept"
+
+    name = fields.Char(translate=False, readonly=True)
+
+    def _update_translations(self):
+        for r in self.filtered(lambda r: r.product_id and r.woo_instance_id.woo_lang_id):
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.name = r.product_id.with_context(lang=instance_lang.code).name

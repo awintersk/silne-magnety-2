@@ -31,6 +31,11 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    woo_product_template_ids = fields.One2many(
+        'woo.product.template.ept',
+        'product_tmpl_id',
+        string='Woo Product Templates',
+    )
     categ_ids = fields.Many2many(
         'product.category', string='Product Categories',
         help="Select category for the current product")

@@ -10,6 +10,11 @@ class ProductCategory(models.Model):
     name = fields.Char(
         translate=True,
     )
+    woo_category_ids = fields.One2many(
+        'woo.product.categ.ept',
+        'category_id',
+        string='Woo Categories',
+    )
 
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):

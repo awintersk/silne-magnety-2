@@ -24,9 +24,8 @@ from odoo import api, fields, models, _
 class WooProductAttributeEpt(models.Model):
     _inherit = "woo.product.attribute.ept"
 
-    name = fields.Char(compute='_compute_name', store=True, translate=False)
+    name = fields.Char(compute=False, store=True, translate=False)
 
-    @api.depends('attribute_id.name', 'woo_instance_id.woo_lang_id.code')
-    def _compute_name(self):
+    def _update_translations(self):
         for r in self.filtered(lambda r: r.attribute_id and r.woo_instance_id.woo_lang_id):
             r.name = r.attribute_id.with_context(lang=r.woo_instance_id.woo_lang_id.code).name
