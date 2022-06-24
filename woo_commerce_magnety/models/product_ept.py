@@ -353,3 +353,81 @@ class WooProductTemplateEpt(models.Model):
                                   "Instance Configuration.\n\n" + str(error)))
             self.check_woocommerce_response(res, "Export Product Attribute Terms",
                                             model_id, common_log_id, template)
+
+    def find_or_create_woo_attribute(self, attributes_data, instance):
+        obj_woo_attribute = self.env['woo.product.attribute.ept']
+        odoo_attribute_obj = self.env['product.attribute']
+
+        for attribute in attributes_data:
+            woo_attribute = obj_woo_attribute.search([('woo_attribute_id', '=', attribute.get('id')),
+                                                      ('woo_instance_id', '=', instance.id),
+                                                      ('exported_in_woo', '=', True)], limit=1)
+            if woo_attribute:
+                continue
+            odoo_attribute = odoo_attribute_obj.get_attribute_by_slug(
+                attribute,
+                auto_create=True,
+            )[:1]
+            woo_attribute = obj_woo_attribute.search([('attribute_id', '=', odoo_attribute.id),
+                                                      ('woo_instance_id', '=', instance.id),
+                                                      ('exported_in_woo', '=', False)], limit=1)
+            if woo_attribute:
+                woo_attribute.write({
+                    'woo_attribute_id': attribute.get('id'), 'order_by': attribute.get('order_by'),
+                    'slug': attribute.get('slug'), 'exported_in_woo': True,
+                    'has_archives': attribute.get('has_archives')
+                })
+            else:
+                obj_woo_attribute.create({
+                    'name': attribute.get('name'),
+                    'woo_attribute_id': attribute.get('id'),
+                    'order_by': attribute.get('order_by'),
+                    'slug': attribute.get('slug'),
+                    'woo_instance_id': instance.id,
+                    'attribute_id': odoo_attribute.id,
+                    'exported_in_woo': True,
+                    'has_archives': attribute.get('has_archives'),
+                })
+        return True
+
+    def find_or_create_woo_attribute_term(self, attributes_term_data, instance, woo_attribute):
+        obj_woo_attribute_term = self.env['woo.product.attribute.term.ept']
+        odoo_attribute_value_obj = self.env['product.attribute.value']
+
+        for attribute_term in attributes_term_data:
+            woo_attribute_term = obj_woo_attribute_term.search([
+                ('woo_attribute_term_id', '=', attribute_term.get('id')),
+                ('exported_in_woo', '=', True),
+                ('woo_instance_id', '=', instance.id),
+            ], limit=1)
+            if woo_attribute_term:
+                continue
+            odoo_attribute_value = odoo_attribute_value_obj.get_attribute_values_by_slug(
+                attribute_term,
+                woo_attribute.attribute_id.id,
+                auto_create=True,
+            )[:1]
+            woo_attribute_term = obj_woo_attribute_term.search(
+                [('attribute_value_id', '=', odoo_attribute_value.id),
+                 ('attribute_id', '=', woo_attribute.attribute_id.id),
+                 ('woo_attribute_id', '=', woo_attribute.id), ('woo_instance_id', '=', instance.id),
+                 ('exported_in_woo', '=', False)], limit=1)
+            if woo_attribute_term:
+                woo_attribute_term.write({
+                    'woo_attribute_term_id': attribute_term.get('id'),
+                    'count': attribute_term.get('count'),
+                    'slug': attribute_term.get('slug'),
+                    'exported_in_woo': True,
+                })
+            else:
+                obj_woo_attribute_term.create({
+                    'name': attribute_term.get('name'),
+                    'woo_attribute_term_id': attribute_term.get('id'),
+                    'slug': attribute_term.get('slug'),
+                    'woo_instance_id': instance.id,
+                    'attribute_value_id': odoo_attribute_value.id,
+                    'woo_attribute_id': woo_attribute.woo_attribute_id,
+                    'attribute_id': woo_attribute.attribute_id.id,
+                    'exported_in_woo': True,
+                    'count': attribute_term.get('count')})
+        return True

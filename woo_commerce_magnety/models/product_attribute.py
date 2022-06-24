@@ -30,6 +30,19 @@ class ProductAttribute(models.Model):
         string='Woo Attribute Lines',
     )
 
+    def get_attribute_by_slug(self, attribute_dict, attribute_type='radio', create_variant='always',
+                              auto_create=False):
+        attribute = self.env['woo.product.attribute.ept'].search([
+            ('slug', '=', attribute_dict['slug']),
+        ], limit=1).attribute_id
+        if not attribute and auto_create:
+            attribute = self.create({
+                'name': attribute_dict['name'],
+                'create_variant': create_variant,
+                'display_type': attribute_type,
+            })
+        return attribute
+
 
 class ProductAttributeValue(models.Model):
     _inherit = 'product.attribute.value'
@@ -39,3 +52,30 @@ class ProductAttributeValue(models.Model):
         'attribute_value_id',
         string='Woo Attribute Lines',
     )
+
+    def get_attribute_values_by_slug(self, attribute_term_dict, attribute_id, auto_create=False):
+        attribute = self.env['woo.product.attribute.term.ept'].search([
+            ('slug', '=', attribute_term_dict['slug']),
+            ('attribute_id', '=', attribute_id),
+        ], limit=1).attribute_value_id
+
+        if not attribute:
+            attribute = self.env['woo.product.attribute.term.ept'].search([
+                ('name', '=', attribute_term_dict['name']),
+                ('slug', '=', False),
+                ('attribute_id', '=', attribute_id),
+            ], limit=1).attribute_value_id
+
+        if not attribute:
+            attribute = self.search([
+                ('name', '=', attribute_term_dict['name']),
+                ('attribute_id', '=', attribute_id)
+            ], limit=1)
+
+        if not attribute and auto_create:
+            return self.create({
+                'name': attribute_term_dict['name'],
+                'attribute_id': attribute_id,
+            })
+
+        return attribute
