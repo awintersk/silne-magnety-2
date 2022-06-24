@@ -24,33 +24,6 @@ from odoo import _, api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    partner_is_vat_payer = fields.Boolean(string='Partner is VAT Payer')
-    partner_is_company = fields.Boolean(string='Partner is company')
-
-    def update_woo_order_vals(self, order_data, woo_order_number, woo_instance,
-                              workflow_config, shipping_partner):
-        def get_meta_line(meta, key, get_value=True):
-            for line in meta:
-                if line.get('key') == key:
-                    return line.get('value') if get_value else True
-            return False
-        vals = super().update_woo_order_vals(order_data, woo_order_number,
-                                             woo_instance, workflow_config,
-                                             shipping_partner)
-
-        partner_is_vat_payer = bool(
-            get_meta_line(order_data.get('meta_data', []), '_billing_company_wi_vat_enabled'),
-        )
-        partner_is_company = bool(
-            get_meta_line(order_data.get('meta_data', []), 'billing_company_wi_id', get_value=False),
-        )
-        vals.update({
-            'partner_is_vat_payer': partner_is_vat_payer,
-            'partner_is_company': partner_is_company,
-        })
-
-        return vals
-
     def _prepare_invoice(self):
         invoice_vals = super()._prepare_invoice()
         fiscal_position = self.env['account.fiscal.position'] \
