@@ -17,11 +17,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ################################################################################
-
 from odoo import _, api, fields, models
 
 
-class WooPaymentGateway(models.Model):
-    _inherit = "woo.payment.gateway"
+class AccountMoveReversal(models.TransientModel):
+    _inherit = 'account.move.reversal'
 
-    with_oss = fields.Boolean(string='With OSS', default=False)
+    def _prepare_default_reversal(self, move):
+        vals = super()._prepare_default_reversal(move)
+        vals['oss'] = move.oss
+        return vals

@@ -18,6 +18,4 @@
 #
 ################################################################################
 
-from . import account_fiscal_position
-from . import account_move
-from . import sale_order
+from . import account_move_reversal
