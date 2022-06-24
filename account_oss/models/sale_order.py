@@ -53,9 +53,9 @@ class SaleOrder(models.Model):
 
     def _prepare_invoice(self):
         invoice_vals = super()._prepare_invoice()
+        fiscal_position = self.env['account.fiscal.position'] \
+            .browse(invoice_vals.get('fiscal_position_id', False))
         invoice_vals.update({
-            'oss': self.payment_gateway_id.with_oss \
-                and self.partner_is_company \
-                and not self.partner_is_vat_payer,
+            'oss': fiscal_position.oss
         })
         return invoice_vals

@@ -18,6 +18,10 @@
 #
 ################################################################################
 
-from . import account_fiscal_position
-from . import account_move
-from . import sale_order
+from odoo import _, api, fields, models
+
+
+class AccountFiscalPosition(models.Model):
+    _inherit = 'account.fiscal.position'
+
+    oss = fields.Boolean(string='OSS')
