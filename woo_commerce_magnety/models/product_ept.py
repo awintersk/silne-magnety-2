@@ -3,6 +3,7 @@
 
 import logging
 from collections import defaultdict
+from datetime import datetime
 
 from odoo import models, fields, api, _
 from .product_pricelist import NUMBER_OF_BULK
@@ -188,16 +189,104 @@ class WooProductTemplateEpt(models.Model):
                             template_updated,
                             skip_existing_products,
                             order_queue_line):
-        woo_template_id = super(WooProductTemplateEpt, self).simple_product_sync(
-            woo_instance,
-            product_response,
-            common_log_book_id,
-            product_queue_id,
-            product_data_queue_line,
-            template_updated,
-            skip_existing_products,
-            order_queue_line
-        )
+        self = self.with_context(lang=woo_instance.woo_lang_id.code)
+
+        common_log_line_obj = self.env["common.log.lines.ept"]
+        woo_template_id = odoo_template = sync_category_and_tags = False
+        model_id = common_log_line_obj.get_model_id(self._name)
+        update_price = woo_instance.sync_price_with_product
+        update_images = woo_instance.sync_images_with_product
+        template_title = product_response.get("name")
+        woo_product_template_id = product_response.get("id")
+        product_sku = product_response["sku"]
+        variant_price = product_response.get("regular_price") or product_response.get("sale_price") or 0.0
+        template_info = self.prepare_template_vals(woo_instance, product_response)
+
+        if order_queue_line:
+            sync_category_and_tags = True
+        if not product_sku:
+            message = """Value of SKU/Internal Reference is not set for product '%s', in the Woocommerce store.""", \
+                      template_title
+            common_log_line_obj.woo_create_product_log_line(message, model_id,
+                                                            product_data_queue_line if not order_queue_line
+                                                            else order_queue_line, common_log_book_id)
+            _logger.info("Process Failed of Product %s||Queue %s||Reason is %s", woo_product_template_id,
+                         product_queue_id, message)
+            if not order_queue_line:
+                product_data_queue_line.write({"state": "failed", "last_process_date": datetime.now()})
+            return False
+
+        woo_product, odoo_product = self.search_odoo_product_variant(woo_instance, product_sku, woo_product_template_id)
+
+        if woo_product and not odoo_product:
+            woo_template_id = woo_product.woo_template_id
+            odoo_product = woo_product.product_id
+            if skip_existing_products:
+                product_data_queue_line.state = "done"
+                return False
+
+        if odoo_product:
+            odoo_template = odoo_product.product_tmpl_id
+
+        is_importable, message = self.is_product_importable(product_response, odoo_product, woo_product)
+        if not is_importable:
+            common_log_line_obj.woo_create_product_log_line(message, model_id,
+                                                            product_data_queue_line if not order_queue_line else
+                                                            order_queue_line, common_log_book_id)
+            _logger.info("Process Failed of Product %s||Queue %s||Reason is %s", woo_product_template_id,
+                         product_queue_id, message)
+            if not order_queue_line:
+                product_data_queue_line.state = "failed"
+            return False
+        variant_info = self.prepare_woo_variant_vals(woo_instance, product_response)
+        if not woo_product:
+            if not woo_template_id:
+                if not odoo_template and woo_instance.auto_import_product:
+                    woo_weight = float(product_response.get("weight") or "0.0")
+                    weight = self.convert_weight_by_uom(woo_weight, woo_instance, import_process=True)
+                    template_vals = {
+                        "name": template_title, "type": "product", "default_code": product_response["sku"],
+                        "weight": weight, "invoice_policy": "order"
+                    }
+                    if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
+                        template_vals.update({"woo_description": product_response.get("description", ""),
+                                              "woo_short_description": product_response.get("short_description", "")})
+                    if product_response["virtual"]:
+                        template_vals.update({"type": "service"})
+                    odoo_template = self.env["product.template"].create(template_vals)
+                    odoo_product = odoo_template.product_variant_ids
+                if not odoo_template:
+                    message = "%s Template Not found for sku %s in Odoo." % (template_title, product_sku)
+                    common_log_line_obj.woo_create_product_log_line(message, model_id,
+                                                                    product_data_queue_line if not order_queue_line
+                                                                    else order_queue_line, common_log_book_id)
+                    _logger.info("Process Failed of Product %s||Queue %s||Reason is %s", woo_product_template_id,
+                                 product_queue_id, message)
+                    if not order_queue_line:
+                        product_data_queue_line.state = "failed"
+                    return False
+
+                woo_template_vals = self.prepare_woo_template_vals(template_info, odoo_template.id,
+                                                                   sync_category_and_tags, woo_instance,
+                                                                   common_log_book_id)
+                if product_response["virtual"] and odoo_template.type == 'service':
+                    woo_template_vals.update({"is_virtual_product": True})
+                    odoo_template.write({"type": "service"})
+                woo_template_id = self.create(woo_template_vals)
+
+            variant_info.update({"product_id": odoo_product.id, "woo_template_id": woo_template_id.id})
+            woo_product = self.env["woo.product.product.ept"].create(variant_info)
+        else:
+            if not template_updated:
+                woo_template_vals = self.prepare_woo_template_vals(template_info, woo_template_id.product_tmpl_id.id,
+                                                                   sync_category_and_tags, woo_instance,
+                                                                   common_log_book_id)
+                woo_template_id.write(woo_template_vals)
+            woo_product.write(variant_info)
+        if update_price:
+            woo_instance.woo_pricelist_id.set_product_price_ept(woo_product.product_id.id, variant_price)
+        if update_images and isinstance(product_queue_id, str) and product_queue_id == 'from Order':
+            self.update_product_images(product_response["images"], {}, woo_template_id, woo_product, woo_instance, False)
 
         product_tmpl_id = woo_template_id.product_tmpl_id if woo_template_id else None
 
@@ -267,6 +356,94 @@ class WooProductTemplateEpt(models.Model):
             product_tmpl_id.tag_ids = [(6, 0, woo_template_id.woo_tag_ids.tag_id.ids)]
 
         return woo_template_id
+
+    def woo_create_variant_product(self, product_template_dict, woo_instance):
+        ir_config_parameter_obj = self.env["ir.config_parameter"]
+        product_template_obj = self.env['product.template']
+
+        template_title = ""
+        if product_template_dict.get('title'):
+            template_title = product_template_dict.get('title')
+        elif product_template_dict.get('name'):
+            template_title = product_template_dict.get('name')
+
+        attrib_line_vals = self.prepare_woo_attribute_line_vals(product_template_dict.get('attributes'))
+
+        if attrib_line_vals:
+            product_template_values = {'name': template_title, 'type': 'product', "invoice_policy": "order",
+                                       'attribute_line_ids': attrib_line_vals}
+            if ir_config_parameter_obj.sudo().get_param("woo_commerce_ept.set_sales_description"):
+                product_template_values.update({"woo_description": product_template_dict.get("description", ""),
+                                                "woo_short_description": product_template_dict.get("short_description", "")})
+
+            product_template = product_template_obj.create(product_template_values)
+            available_odoo_products = self.woo_set_variant_sku(woo_instance, product_template_dict, product_template,
+                                                               woo_instance.sync_price_with_product)
+        return product_template, available_odoo_products
+
+    def template_attribute_process(self, woo_instance, odoo_template, variant, template_title, common_log_book_id, data,
+                                   product_data_queue_line, order_queue_line):
+        """
+        This method use to create new attribute if customer only add the attribute value other wise it will create a mismatch logs.
+        @param :self,woo_instance,odoo_template,variant,template_title,common_log_book_id,data,product_data_queue_line,order_queue_line
+        @return: odoo_product, True
+        @author: Haresh Mori @Emipro Technologies Pvt. Ltd on date 21 August 2020.
+        Task_id:165892
+        """
+        common_log_line_obj = self.env["common.log.lines.ept"]
+        model_id = common_log_line_obj.get_model_id(self._name)
+        if odoo_template.attribute_line_ids:
+            # If the new variant has other attribute than available in odoo template, then exception activity will be
+            # generated. otherwise it will add new value in current attribute, and will relate with the new odoo
+            # variant.
+            woo_attribute_ids = []
+            odoo_attributes = odoo_template.attribute_line_ids.attribute_id.ids
+            for attribute in variant.get("attributes"):
+                attribute = self.env["product.attribute"].get_attribute(attribute["name"])
+                woo_attribute_ids.append(attribute.id)
+            woo_attribute_ids.sort()
+            odoo_attributes.sort()
+            if odoo_attributes != woo_attribute_ids:
+                message = """- Product %s has tried adding a new attribute for sku '%s' in Odoo.
+                          - System will not allow adding new attributes to a product.""" % (
+                    template_title, variant.get("sku"))
+                common_log_line_obj.woo_create_product_log_line(message, model_id,
+                                                                product_data_queue_line if not order_queue_line else
+                                                                order_queue_line, common_log_book_id)
+
+                if not order_queue_line:
+                    product_data_queue_line.state = "failed"
+                if woo_instance.is_create_schedule_activity:
+                    common_log_book_id.create_woo_schedule_activity()
+                return False
+
+            template_attribute_value_domain = self.find_template_attribute_values(data.get("attributes"),
+                                                                                  variant.get("attributes"),
+                                                                                  odoo_template)
+            if not template_attribute_value_domain:
+                for woo_attribute in variant.get("attributes"):
+                    attribute_id = self.env["product.attribute"].get_attribute(woo_attribute["name"], auto_create=True)
+                    value_id = self.env["product.attribute.value"].get_attribute_values(woo_attribute["option"],
+                                                                                        attribute_id.id, True)
+                    attribute_line = odoo_template.attribute_line_ids.filtered(
+                        lambda x: x.attribute_id.id == attribute_id.id)
+                    if value_id.id not in attribute_line.value_ids.ids:
+                        attribute_line.value_ids = [(4, value_id.id, False)]
+                odoo_template._create_variant_ids()
+                template_attribute_value_domain = self.find_template_attribute_values(data.get("attributes"),
+                                                                                      variant.get("attributes"),
+                                                                                      odoo_template)
+            odoo_product = self.env["product.product"].search(template_attribute_value_domain)
+            if not odoo_product.default_code:
+                odoo_product.default_code = variant["sku"]
+            return odoo_product
+
+        template_vals = {"name": template_title, "type": "product", "default_code": variant["sku"]}
+        if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
+            template_vals.update({"woo_description": variant.get("description", "")})
+
+        odoo_product = self.env["product.product"].create(template_vals)
+        return odoo_product
 
     @api.model
     def update_products_in_woo(self, instance, templates, update_price, publish, update_image,

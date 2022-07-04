@@ -22,7 +22,6 @@
         'data/product_data.xml',
         'views/product_category_view.xml',
         'views/product_template_view.xml',
-        'views/product.xml',
         'views/sale_order_views.xml',
         'views/product_pricelist_views.xml',
         'views/woo_tags_ept_views.xml',

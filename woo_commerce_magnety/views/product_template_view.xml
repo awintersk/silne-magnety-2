@@ -1,16 +1,30 @@
 <?xml version="1.0" ?>
 <odoo>
 
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">product.template.product.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales']//group[@name='sale']" position="after">
+                <group name="woo_description">
+                    <field name="woo_description"/>
+                </group>
+            </xpath>
+            <field name="categ_id" position="before">
+                <field name="categ_ids" widget="many2many_tags"/>
+            </field>
+        </field>
+    </record>
+
     <record id="product_product_template_only_form_view" model="ir.ui.view">
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="priority">10</field>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='sales']//group[@name='sale']" position="after">
-                <group name="woo_description">
-                    <field name="woo_description"/>
-                    <field name="woo_short_description"/>
-                </group>
+            <xpath expr="//page[@name='sales']//group[@name='woo_description']" position="inside">
+                <field name="woo_short_description"/>
             </xpath>
             <group name="group_general" position="inside">
                 <field name="origin"/>
