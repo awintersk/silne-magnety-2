@@ -8,6 +8,7 @@ class AccountMove(models.Model):
 
     delivery_date = fields.Date(string="Delivery date", copy=False)
     narration_top = fields.Text()
+    invoice_date = fields.Date(default=fields.Date.today())
 
     def _post(self, soft=True):
         res = super()._post(soft=soft)
