@@ -18,7 +18,11 @@
 #
 ################################################################################
 
+import re
+
 from odoo import _, api, fields, models
+
+sequence_ref_pattern = re.compile(r'\d+$')
 
 
 class AccountMove(models.Model):
@@ -36,6 +40,25 @@ class AccountMove(models.Model):
         for move in self.filtered(lambda m: m.name != '/' and m.kros_classifier):
             move.name = move.kros_classifier
 
+        return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            ref = False
+            if vals.get('move_type') == 'out_invoice':
+                if 'invoice_origin' not in vals:
+                    continue
+                ref = sequence_ref_pattern.findall(vals['invoice_origin'])
+                vals['payment_reference'] = ref and ref[0] or vals.get('payment_reference', False)
+        return super().create(vals_list)
+
+    def _recompute_payment_terms_lines(self):
+        res = super()._recompute_payment_terms_lines()
+        if self.move_type == 'out_refund' and self.kros_classifier:
+            ref = sequence_ref_pattern.findall(self.kros_classifier)
+            if ref:
+                self.payment_reference = ref[0]
         return res
 
     def _get_last_sequence_domain(self, relaxed=False):
