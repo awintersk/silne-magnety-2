@@ -43,7 +43,7 @@ class ExportForKros(Controller):
                 return ''
 
         partner_fields = [
-            'name', 'company_registry', 'street', 'zip', 'city', '', 'country_id.name', '', '', '', '', 'vat_payer',
+            'name', 'company_registry', 'street', 'zip', 'city', '', 'country_id.name', '', '', '', '',
             'email', 'website', 'bank_ids.acc_number', 'bank_ids.bank_id.bic', 'bank_ids.bank_id.name',
             'phone', 'mobile', '', '', 'comment', '', vat_county_code, vat_serial, 'vat_id', '', '', '', '',
             '', '', '', '']
