@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 13:15+0000\n"
-"PO-Revision-Date: 2022-04-20 13:15+0000\n"
+"POT-Creation-Date: 2022-07-11 13:19+0000\n"
+"PO-Revision-Date: 2022-07-11 13:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,15 +16,17 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "/EUR"
+msgstr ""
+
+#. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid ""
 "<span style=\"font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;display:inline-block;width:50%;float:left;\">\n"
 "                                Delivery Date\n"
 "                            </span>"
 msgstr ""
-"<span style=\"font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;display:inline-block;width:50%;float:left;\">\n"
-"                                Lieferdatum\n"
-"                            </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
@@ -33,9 +35,6 @@ msgid ""
 "                                Order Date\n"
 "                            </span>"
 msgstr ""
-"<span style=\"font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;display:inline-block;width:50%;float:left;\">\n"
-"                                Bestelldatum\n"
-"                            </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -44,9 +43,6 @@ msgid ""
 "                            Invoice Date\n"
 "                        </span>"
 msgstr ""
-"<span style=\"font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;width:50%;float:left;\">\n"
-"                            Ausstellungsdatum\n"
-"                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -55,9 +51,6 @@ msgid ""
 "                            Invoice\n"
 "                        </span>"
 msgstr ""
-"<span style=\"font-size:24px;line-height:30px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Rechnung\n"
-"                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -67,9 +60,6 @@ msgid ""
 "                                Total\n"
 "                            </span>"
 msgstr ""
-"<span style=\"padding-bottom:20px;vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3; font-weight: bold;display:inline-block;width:80%;float:left;\">\n"
-"                                Gesamtbetrag\n"
-"                            </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -79,9 +69,6 @@ msgid ""
 "                                Subtotal\n"
 "                            </span>"
 msgstr ""
-"<span style=\"vertical-align:top;font-family:arial, sans-serif;  font-size:16px;line-height: 28px; text-align:right; color:#0857C3;display:inline-block;width:80%;float:left;\">\n"
-"                                Betrag ohne MwSt.\n"
-"                            </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -90,10 +77,6 @@ msgid ""
 "                            Customer Reference\n"
 "                        </span>"
 msgstr ""
-"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Ihr Zeichen\n"
-"                        </span>"
-
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -102,9 +85,6 @@ msgid ""
 "                            Delivery Date\n"
 "                        </span>"
 msgstr ""
-"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Lieferdatum\n"
-"                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -113,9 +93,6 @@ msgid ""
 "                            Due Date\n"
 "                        </span>"
 msgstr ""
-"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Fällig am\n"
-"                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -124,9 +101,6 @@ msgid ""
 "                            Related Order\n"
 "                        </span>"
 msgstr ""
-"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Verwandte Bestellung\n"
-"                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
@@ -136,36 +110,40 @@ msgid ""
 "                        </span>"
 msgstr ""
 "<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
-"                            Ihre interne Referenz\n"
+"                            Az Ön saját rendelési száma\n"
 "                        </span>"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "<span>Pro-Forma Invoice #</span>"
-msgstr "<span>Proforma-Rechnung #</span>"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "<strong class=\"mr16\">Subtotal</strong>"
-msgstr "<strong class=\"mr16\">Betrag ohne MwSt.</strong>"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Amount"
-msgstr "Preis"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
+msgid "Bank Account:"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
-#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
-msgid "Bank Account:"
-msgstr "Bankkonto"
+msgid "Bank:"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model,name:sk_invoice.model_res_company
 msgid "Companies"
-msgstr "Unternehmen"
+msgstr "Vállalatok"
 
 #. module: sk_invoice
 #: code:addons/sk_invoice/models/res_company.py:0
@@ -175,76 +153,86 @@ msgstr "Unternehmen"
 #: model:ir.model.fields,field_description:sk_invoice.field_res_users__company_registry
 #, python-format
 msgid "Company Registry"
-msgstr "Registernr."
+msgstr "Vállalat regisztálás"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Company Registry:"
-msgstr "Registernr.:"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model,name:sk_invoice.model_res_partner
 msgid "Contact"
-msgstr "Kontakt"
+msgstr "Kapcsolat"
 
 #. module: sk_invoice
 #: model:ir.model.fields,help:sk_invoice.field_res_company__vat_id
 #: model:ir.model.fields,help:sk_invoice.field_res_partner__vat_id
 #: model:ir.model.fields,help:sk_invoice.field_res_users__vat_id
 msgid "DIČ"
-msgstr "Steuer-Nr."
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_bank_statement_line__delivery_date
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move__delivery_date
 #: model:ir.model.fields,field_description:sk_invoice.field_account_payment__delivery_date
 msgid "Delivery date"
-msgstr "Lieferdatum"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Description"
-msgstr "Rechnungsgegenstand"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move__display_name
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company__display_name
 #: model:ir.model.fields,field_description:sk_invoice.field_res_partner__display_name
 msgid "Display Name"
-msgstr "Anzeigename"
+msgstr "Név megjelenítése"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Exchange rate"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "IBAN:"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move__id
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company__id
 #: model:ir.model.fields,field_description:sk_invoice.field_res_partner__id
 msgid "ID"
-msgstr ""
+msgstr "Azonosító"
 
 #. module: sk_invoice
 #: model:ir.model.fields,help:sk_invoice.field_res_company__vat
 msgid "IČ DPH"
-msgstr "USt.-ID-Nr."
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,help:sk_invoice.field_res_company__company_registry
 #: model:ir.model.fields,help:sk_invoice.field_res_partner__company_registry
 #: model:ir.model.fields,help:sk_invoice.field_res_users__company_registry
 msgid "IČO"
-msgstr "Registernr."
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model,name:sk_invoice.model_account_move
 msgid "Journal Entry"
-msgstr "Buchungssatz"
+msgstr "Könyvelési tétel"
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_account_move____last_update
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company____last_update
 #: model:ir.model.fields,field_description:sk_invoice.field_res_partner____last_update
 msgid "Last Modified on"
-msgstr "Zuletzt geändert am"
+msgstr "Legutóbb módosítva"
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_external_layout_standard
@@ -252,24 +240,52 @@ msgid "Logo"
 msgstr ""
 
 #. module: sk_invoice
+#: model:ir.model.fields,field_description:sk_invoice.field_account_bank_statement_line__narration_top
+#: model:ir.model.fields,field_description:sk_invoice.field_account_move__narration_top
+#: model:ir.model.fields,field_description:sk_invoice.field_account_payment__narration_top
+msgid "Narration Top"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.account_move_delivery_date_form
+msgid "Note Top"
+msgstr ""
+
+#. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Order"
-msgstr "Verkaufsauftrag"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,help:sk_invoice.field_res_company__vat_payer
 msgid "Platca DPH"
-msgstr "Mehrwertsteuerzahler"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Qty"
+msgstr ""
+
+#. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Quantity"
-msgstr "Menge"
+msgstr ""
+
+#. module: sk_invoice
+#: code:addons/sk_invoice/models/res_company.py:0
+#: model:ir.model.fields,field_description:sk_invoice.field_res_company__register_message
+#, python-format
+msgid "Registration Message"
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,field_description:sk_invoice.field_res_company__rel_acc_number
 msgid "Rel Acc Number"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "SWIFT:"
 msgstr ""
 
 #. module: sk_invoice
@@ -280,19 +296,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:sk_invoice.field_res_users__vat_id
 #, python-format
 msgid "Tax ID"
-msgstr "Steuernr."
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Tax ID:"
-msgstr "Steuernr.:"
+msgstr ""
 
 #. module: sk_invoice
-#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Taxes"
-msgstr "MwSt."
+msgstr ""
 
 #. module: sk_invoice
 #: model:ir.model.fields,help:sk_invoice.field_res_partner__vat
@@ -304,15 +319,30 @@ msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Unit"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "Unit Price"
-msgstr "Einzelpreis"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "Unit Price with VAT"
+msgstr ""
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid "VAT"
+msgstr ""
 
 #. module: sk_invoice
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_quotation_document
 msgid "VAT ID:"
-msgstr "USt-IdNr.:"
+msgstr ""
 
 #. module: sk_invoice
 #: code:addons/sk_invoice/models/res_company.py:0
@@ -322,7 +352,7 @@ msgstr "USt-IdNr.:"
 #: model:ir.model.fields,field_description:sk_invoice.field_res_users__vat_payer
 #, python-format
 msgid "VAT payer"
-msgstr "Mehrwertsteuerzahler"
+msgstr ""
 
 #. module: sk_invoice
 #: code:addons/sk_invoice/models/res_company.py:0
@@ -332,4 +362,4 @@ msgstr "Mehrwertsteuerzahler"
 #: model:ir.model.fields,field_description:sk_invoice.field_res_users__vat
 #, python-format
 msgid "Vat ID"
-msgstr "USt-IdNr."
+msgstr ""
