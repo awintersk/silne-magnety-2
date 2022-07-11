@@ -24,9 +24,9 @@
             <xpath expr="//group[@name='sale_info']" position="inside">
                 <field name="partner_is_vat_payer"/>
             </xpath>
-            <field name="payment_term" position="after">
+            <group name="order_details" position="inside">
                 <field name="billing_company_mark"/>
-            </field>
+            </group>
         </field>
     </record>
 
