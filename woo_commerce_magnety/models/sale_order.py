@@ -63,10 +63,7 @@ class SaleOrder(models.Model):
         # search/create the company
         company_partner = partner_obj._woo_search_create_company(order_data.get('billing'))
         if company_partner:
-            if partner:
-                partner.parent_id = company_partner
-            else:
-                (billing_partner | shipping_partner).parent_id = company_partner
+            (billing_partner | shipping_partner).parent_id = company_partner
         return partner, billing_partner, shipping_partner
 
     def create_woo_orders(self, queue_lines, common_log_book_id):
