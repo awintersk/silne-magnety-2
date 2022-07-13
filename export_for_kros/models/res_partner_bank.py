@@ -25,3 +25,13 @@ class ResPartnerBank(models.Model):
     _inherit = 'res.partner.bank'
 
     use_in_kros = fields.Boolean(string='Use in Kros')
+
+    @api.constrains('use_in_kros', 'currency_id')
+    def _check_use_in_kros(self):
+        for r in self.filtered(lambda r: r.use_in_kros):
+            if self.env['res.partner.bank'].search_count([
+                ('id', '!=', r.id),
+                ('use_in_kros', '=', True),
+                ('currency_id', '=', r.currency_id.id),
+            ]):
+                raise models.ValidationError(_('Bank Account used in KROS must be unique per currency.'))
