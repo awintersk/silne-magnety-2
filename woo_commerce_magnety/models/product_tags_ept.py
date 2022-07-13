@@ -26,7 +26,12 @@ class WooTagsEpt(models.Model):
     _inherit = 'woo.tags.ept'
 
     tag_id = fields.Many2one('product.template.tag', string='Tag')
-    name = fields.Char(compute=False, store=True, translate=False)
+    name = fields.Char(
+        compute=False,
+        store=True,
+        translate=False,
+        inverse='_set_name',
+    )
     woo_product_template_ids = fields.Many2many(
         'woo.product.template.ept',
         'woo_template_tags_rel',
@@ -39,6 +44,11 @@ class WooTagsEpt(models.Model):
         for r in self.filtered(lambda r: r.tag_id and r.woo_instance_id.woo_lang_id):
             instance_lang = r.woo_instance_id.woo_lang_id
             r.name = r.tag_id.with_context(lang=instance_lang.code).name
+
+    def _set_name(self):
+        for r in self:
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.tag_id.with_context(lang=instance_lang.code).name = r.name
 
     def woo_sync_product_tags(self, instance, woo_common_log_id):
         """

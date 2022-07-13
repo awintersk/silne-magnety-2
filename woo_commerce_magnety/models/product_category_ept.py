@@ -9,13 +9,23 @@ _logger = logging.getLogger("WooCommerce")
 class WooProductCategoryEpt(models.Model):
     _inherit = 'woo.product.categ.ept'
 
-    name = fields.Char(compute=False, store=True, translate=False)
+    name = fields.Char(
+        compute=False,
+        store=True,
+        translate=False,
+        inverse='_set_name',
+    )
     category_id = fields.Many2one('product.category', string='Origin category')
 
     def _update_translations(self):
         for r in self.filtered(lambda r: r.category_id and r.woo_instance_id.woo_lang_id):
             instance_lang = r.woo_instance_id.woo_lang_id
             r.name = r.category_id.with_context(lang=instance_lang.code).name
+
+    def _set_name(self):
+        for r in self.filtered(lambda r: r.category_id):
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.category_id.with_context(lang=instance_lang.code).name = r.name
 
     def create_or_update_woo_category(self, category, sync_images_with_product, instance):
         category = super(WooProductCategoryEpt, self).create_or_update_woo_category(category, sync_images_with_product, instance)

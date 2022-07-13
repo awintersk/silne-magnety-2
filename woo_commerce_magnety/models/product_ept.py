@@ -15,17 +15,26 @@ _logger = logging.getLogger("WooCommerce")
 class WooProductTemplateEpt(models.Model):
     _inherit = "woo.product.template.ept"
 
-    name = fields.Char(translate=False, related=False, readonly=True)
+    name = fields.Char(
+        compute=False,
+        store=True,
+        translate=False,
+        inverse='_set_name',
+    )
 
     def _update_translations(self):
         for r in self.filtered(lambda r: r.product_tmpl_id and r.woo_instance_id.woo_lang_id):
             instance_lang = r.woo_instance_id.woo_lang_id
             r.name = r.product_tmpl_id.with_context(lang=instance_lang.code).name
 
+    def _set_name(self):
+        for r in self:
+            r.product_tmpl_id.name = r.name
+
     @api.model
     def sync_products(self, *args, **kwargs):
-        self = self.with_context(lang=self.woo_instance_id.woo_lang_id.code)
         product_data_queue_lines, woo_instance, common_log_book_id = args[:3]
+        self = self.with_context(lang=woo_instance.woo_lang_id.code)
         order_queue_line = kwargs.get('order_queue_line')
         skip_existing_products = kwargs.get('skip_existing_products')
         res = super(WooProductTemplateEpt, self).sync_products(product_data_queue_lines, woo_instance, common_log_book_id, skip_existing_products, **kwargs)

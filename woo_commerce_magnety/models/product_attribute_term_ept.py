@@ -24,8 +24,18 @@ from odoo import api, fields, models, _
 class WooProductAttributeTermEpt(models.Model):
     _inherit = "woo.product.attribute.term.ept"
 
-    name = fields.Char(compute=False, store=True, translate=False)
+    name = fields.Char(
+        compute='False',
+        store=True,
+        translate=False,
+        inverse='_set_name',
+    )
 
     def _update_translations(self):
         for r in self.filtered(lambda r: r.attribute_value_id and r.woo_instance_id.woo_lang_id):
             r.name = r.attribute_value_id.with_context(lang=r.woo_instance_id.woo_lang_id.code).name
+
+    def _set_name(self):
+        for r in self:
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.attribute_value_id.with_context(lang=instance_lang.code).name = r.name
