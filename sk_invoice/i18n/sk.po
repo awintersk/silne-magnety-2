@@ -103,6 +103,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
 msgid ""
 "<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
+"                            Your Mark\n"
+"                        </span>"
+msgstr ""
+"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
+"                            Vaša značka\n"
+"                        </span>"
+
+#. module: sk_invoice
+#: model_terms:ir.ui.view,arch_db:sk_invoice.smarttek_report_invoice_document
+msgid ""
+"<span style=\"width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;\">\n"
 "                            Delivery Date\n"
 "                        </span>"
 msgstr ""

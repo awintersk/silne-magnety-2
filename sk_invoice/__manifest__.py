@@ -12,7 +12,12 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'sale'],
+    'depends': [
+        'base',
+        'account',
+        'sale',
+        'woo_commerce_magnety',
+    ],
 
     # always loaded
     'data': [

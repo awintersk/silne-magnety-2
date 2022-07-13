@@ -178,7 +178,7 @@
                         </span>
                     </div>
                     <div style="display: block;clear: both;content: '';"></div>
-                    <div style="margin-bottom:44px;" t-if="o.ref">
+                    <div style="margin-bottom:4px;" t-if="o.ref">
                         <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
                             Customer Reference
                         </span>
@@ -188,13 +188,22 @@
                         </span>
                     </div>
                     <div style="display: block;clear: both;content: '';"></div>
-                    <div style="margin-bottom:44px;" t-if="o.payment_reference">
+                    <div style="margin-bottom:4px;" t-if="o.payment_reference">
                         <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
                             Payment Reference
                         </span>
                         <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;">
                             <t
                                     t-esc="o.payment_reference"/>
+                        </span>
+                    </div>
+                    <div style="margin-bottom:4px;" t-if="o.billing_company_mark">
+                        <span style="width:50%;float:left;font-size:16px;line-height:20px;font-family:Arial,sans-serif;font-weight:bold; font-style: italic;text-align:left;color:#0857C3;">
+                            Your Mark
+                        </span>
+                        <span style="width:50%;font-family:arial, sans-serif;  font-size:16px;line-height: 20px; text-align:left; white-space: nowrap;color:#333333;">
+                            <t
+                                    t-esc="o.billing_company_mark"/>
                         </span>
                     </div>
                     <div style="margin-bottom:4px;" t-if="o.narration_top">

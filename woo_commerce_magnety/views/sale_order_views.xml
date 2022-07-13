@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
-    <record id="sale_order_view_form_inherit" model="ir.ui.view">
+    <record id="sale_order_view_form_woo_inherit" model="ir.ui.view">
         <field name="name">sale.order.view.form.inherit</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="woo_commerce_ept.view_woo_order_form"/>
@@ -13,6 +13,20 @@
             <xpath expr="//notebook//field[@name='woo_instance_id']/../../.." position="attributes">
                 <attribute name="attrs"/>
             </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_info']" position="inside">
+                <field name="partner_is_vat_payer"/>
+            </xpath>
+            <group name="order_details" position="inside">
+                <field name="billing_company_mark"/>
+            </group>
         </field>
     </record>
 

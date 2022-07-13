@@ -25,10 +25,41 @@ from odoo.exceptions import ValidationError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    partner_is_vat_payer = fields.Boolean(string='Partner is VAT Payer')
+    partner_is_company = fields.Boolean(string='Partner is company')
+    billing_company_mark = fields.Char(string='Billing Company Mark')
+
+    def update_woo_order_vals(self, order_data, woo_order_number, woo_instance,
+                              workflow_config, shipping_partner):
+        def get_meta_line(meta, key, get_value=True):
+            for line in meta:
+                if line.get('key') == key:
+                    return line.get('value') if get_value else True
+            return False
+        vals = super().update_woo_order_vals(order_data, woo_order_number,
+                                             woo_instance, workflow_config,
+                                             shipping_partner)
+
+        partner_is_vat_payer = bool(
+            get_meta_line(order_data.get('meta_data', []), '_billing_company_wi_vat_enabled'),
+        )
+        partner_is_company = bool(
+            get_meta_line(order_data.get('meta_data', []), 'billing_company_wi_id', get_value=False),
+        )
+        billing_company_mark = get_meta_line(order_data.get('meta_data', []), '_billing_company_mark')
+        vals.update({
+            'partner_is_vat_payer': partner_is_vat_payer,
+            'partner_is_company': partner_is_company,
+            'billing_company_mark': billing_company_mark,
+        })
+
+        return vals
+
     def _prepare_invoice(self):
         invoice_vals = super()._prepare_invoice()
         invoice_vals.update({
             'woo_instance_origin_id': self.woo_instance_id.id,
+            'billing_company_mark': self.billing_company_mark,
         })
         return invoice_vals
 
