@@ -10,7 +10,6 @@
                         <field name="company_registry"/>
                         <field name="vat_id"/>
                         <field name="vat"/>
-                        <field name="vat_payer"/>
                     </xpath>
                 </data>
             </field>

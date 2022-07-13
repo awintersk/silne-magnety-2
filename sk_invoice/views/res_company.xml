@@ -12,7 +12,6 @@
                         <field name="company_registry"/>
                         <field name="vat_id"/>
                         <field name="vat"/>
-                        <field name="vat_payer"/>
                         <field name="rel_acc_number"/>
                         <field name="register_message"/>
                     </xpath>
