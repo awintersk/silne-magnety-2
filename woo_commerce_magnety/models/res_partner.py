@@ -29,6 +29,38 @@ METADATA_FIELDS = {
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    def _woo_search_create_company(self, customer_vals):
+        company_name = customer_vals.get('company')
+        if not company_name:
+            return False
+
+        partner = self.env['res.partner'].search([
+            ('name', '=', company_name),
+            ('is_company', '=', True),
+        ])
+        if partner:
+            return partner
+
+        state_code = customer_vals.get('state', False)
+        country_code = customer_vals.get('country', False)
+        country = self.get_country(country_code)
+        state = self.create_or_update_state_ept(country_code, state_code, False, country)
+
+        company_vals = {
+            'name': company_name,
+            'is_company': True,
+            'is_woo_customer': True,
+            'email': customer_vals.get("email", False),
+            'phone': customer_vals.get('phone', False),
+            'street': customer_vals.get('address_1', False),
+            'street2': customer_vals.get('address_2', False),
+            'city': customer_vals.get('city', False),
+            'zip': customer_vals.get('postcode', False),
+            'state_id': state and state.id,
+            'country_id': country and country.id,
+        }
+        return self.env['res.partner'].create(company_vals)
+
     def woo_create_or_update_customer(self, customer_val, instance, parent_id, partner_type, customer_id=False, meta_data={}):
         def get_meta_line(meta, key):
             for line in meta:
