@@ -19,6 +19,7 @@
 ################################################################################
 
 from odoo import _, api, fields, models
+from odoo.osv.expression import AND, OR
 from odoo.exceptions import ValidationError
 
 METADATA_FIELDS = {
@@ -61,6 +62,25 @@ class ResPartner(models.Model):
         }
         return self.env['res.partner'].create(company_vals)
 
+    def _find_partner_ept(self, vals, key_list=[], extra_domain=[]):
+        if not key_list or not vals:
+            return False
+        _domain = [] + extra_domain
+        for key in key_list:
+            if key not in vals:
+                continue
+            if key == 'company_name':
+                _domain = AND([_domain, OR([
+                    [('company_name', '=', vals[key])],
+                    [('parent_id.commercial_partner_id.name', '=', vals[key])],
+                ])])
+            elif isinstance(vals[key], str):
+                _domain = AND([_domain, [(key, 'ilike', vals[key])]])
+            else:
+                _domain = AND([_domain, [(key, '=', vals[key])]])
+        partner = self.search(_domain, limit=1) if _domain else False
+        return partner
+
     def woo_create_or_update_customer(self, customer_val, instance, parent_id, partner_type, customer_id=False, meta_data={}):
         def get_meta_line(meta, key):
             for line in meta:
@@ -85,7 +105,12 @@ class ResPartner(models.Model):
         woo_partner_values = {'woo_customer_id': customer_id, 'woo_instance_id': instance.id}
 
         if partner_type == 'delivery':
-            address_key_list.remove("phone")
+            if 'phone' in address_key_list:
+                address_key_list.remove("phone")
+            if 'email' in address_key_list:
+                address_key_list.remove("email")
+            if 'vat' in address_key_list:
+                address_key_list.remove("vat")
         if company_name:
             address_key_list.append('company_name')
             partner_vals.update({'company_name': company_name})
@@ -135,3 +160,7 @@ class ResPartner(models.Model):
         update_partner_vals = self.remove_special_chars_from_partner_vals(partner_vals)
         return update_partner_vals
 
+    def _commercial_fields(self):
+        res = super()._commercial_fields()
+        res.remove('vat')
+        return res

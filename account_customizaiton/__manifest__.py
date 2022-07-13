@@ -20,13 +20,14 @@
 
 {
     'name': 'Account Customization',
-    'version': '14.0.1.0.2',
+    'version': '14.0.1.0.3',
     'category': 'Accounting/Accounting',
     'author': 'SmartTek',
     'website': 'https://www.smartteksas.com',
     'depends': [
         'account',
         'woo_commerce_magnety',
+        'sk_invoice',
     ],
     'data': [
         'views/account_journal_views.xml',
