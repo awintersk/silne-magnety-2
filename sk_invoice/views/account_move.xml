@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_date']" position="after">
-                    <field name="delivery_date"/>
+                    <field name="delivery_date" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='invoice_date']" position="attributes">
                     <attribute name="required">1</attribute>

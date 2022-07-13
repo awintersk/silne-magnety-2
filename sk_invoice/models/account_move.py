@@ -6,7 +6,7 @@ from odoo import models, fields, api, _
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    delivery_date = fields.Date(string="Delivery date", copy=False)
+    delivery_date = fields.Date(string="Delivery date", copy=False, default=fields.Date.today())
     narration_top = fields.Text()
     invoice_date = fields.Date(default=fields.Date.today())
 
