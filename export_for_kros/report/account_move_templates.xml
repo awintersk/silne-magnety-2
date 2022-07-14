@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+<template id="report_invoice_document_inherit" inherit_id="sk_invoice.smarttek_report_invoice_document">
+    <xpath expr="//span[@name='company_address']/t[@t-if='company.rel_acc_number']" position="replace">
+        <t t-if="o.company_bank_acc">
+            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                Bank:
+                <span t-field="o.company_bank_acc.bank_id.name"/>
+            </p>
+            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                <span t-if="o.company_bank_acc.acc_type == 'iban'">
+                    IBAN:
+                </span>
+                <span t-else="">
+                    Bank Account:
+                </span>
+                <span t-field="o.company_bank_acc.acc_number"/>
+            </p>
+            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                SWIFT:
+                <span t-field="o.company_bank_acc.bank_id.bic"/>
+            </p>
+        </t>
+    </xpath>
+</template>
+
+</odoo>

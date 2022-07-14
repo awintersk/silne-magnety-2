@@ -22,5 +22,6 @@
     'data': [
         'views/account_move_views.xml',
         'views/res_partner_bank_views.xml',
+        'report/account_move_templates.xml',
     ],
 }
