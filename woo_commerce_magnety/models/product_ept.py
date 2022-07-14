@@ -487,14 +487,25 @@ class WooProductTemplateEpt(models.Model):
         woo_attrs = WooAttr.search([
             ('woo_instance_id', '=', instance.id),
             ('attribute_id', 'in', attrs_to_update.ids),
-            ('exported_in_woo', '=', True),
         ])
-        return [{
-            'id': attr.woo_attribute_id,
-            'name': attr.name,
-            'slug': attr.slug,
-            'type': instance.woo_attribute_type,
-        } for attr in woo_attrs]
+        data = {'create': [], 'update': []}
+        for woo_attr in woo_attrs:
+            if woo_attr.exported_in_woo:
+                data['update'].append({
+                    'id': woo_attr.woo_attribute_id,
+                    'name': woo_attr.attribute_id.name,
+                    'slug': woo_attr.slug,
+                    'type': instance.woo_attribute_type,
+                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
+                })
+            else:
+                data['create'].append({
+                    'name': woo_attr.attribute_id.name,
+                    'slug': woo_attr.slug,
+                    'type': instance.woo_attribute_type,
+                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
+                })
+        return data, woo_attrs
 
     def _prepare_attribute_term_data(self, instance):
         WooTerm = self.env['woo.product.attribute.term.ept']
@@ -503,57 +514,79 @@ class WooProductTemplateEpt(models.Model):
             domain=[
                 ('woo_instance_id', '=', self.woo_instance_id.id),
                 ('attribute_value_id', 'in', terms_to_update.ids),
-                ('exported_in_woo', '=', True),
             ],
             fields=['woo_attribute_id', 'ids:array_agg(id)'],
             groupby=['woo_attribute_id'],
         )
-        res = defaultdict(list)
+        data = {}
         for woo_attribute in woo_terms_to_update:
-            for woo_term_id in woo_attribute['ids']:
-                woo_term = WooTerm.browse(woo_term_id)
-                res[woo_term['woo_attribute_id']].append({
-                    'id': woo_term['woo_attribute_term_id'],
-                    'name': woo_term['name'],
-                    'slug': woo_term['slug'],
-                    'description': woo_term['description'],
-                })
-        return res
+            data[woo_attribute['woo_attribute_id']] = {'create': [], 'update': []}
+            for woo_term in WooTerm.browse(woo_attribute['ids']):
+                if woo_term.exported_in_woo:
+                    data[woo_attribute['woo_attribute_id']]['update'].append({
+                        'id': woo_term.woo_attribute_term_id,
+                        'name': woo_term.attribute_value_id.name,
+                        'slug': woo_term.slug,
+                        'description': woo_term.description,
+                    })
+                else:
+                    data[woo_attribute['woo_attribute_id']]['create'].append({
+                        'name': woo_term.attribute_value_id.name,
+                        'slug': woo_term.slug,
+                        'description': woo_term.description,
+                    })
+        return data, WooTerm.browse(
+            attr_id for woo_attribute in woo_terms_to_update
+                    for attr_id in woo_attribute['ids']
+        )
 
     def update_woo_attributes(self, template, instance, common_log_id):
         common_log_line_obj = self.env["common.log.lines.ept"]
         model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
         url = 'products/attributes/batch'
-        attribute_data = template._prepare_attributes_data(instance)
+        attribute_data, woo_attrs = template._prepare_attributes_data(instance)
         if not attribute_data:
             return
         wc_api = instance.woo_connect()
         try:
-            res = wc_api.put(url, data={'update': attribute_data})
+            res = wc_api.post(url, data=attribute_data)
         except Exception as error:
             raise UserError(_("Something went wrong while exporting Attribute Terms."
                                 "\n\nPlease Check your Connection and"
                                 "Instance Configuration.\n\n" + str(error)))
-        self.check_woocommerce_response(res, "Export Product Attributes", model_id,
-                                        common_log_id, template)
+        response_data = self.check_woocommerce_response(res, "Export Product Attributes", model_id,
+                                                        common_log_id, template)
+
+        if 'create' not in response_data:
+            return
+
+        for attribute in response_data['create']:
+            woo_attr = woo_attrs.filtered(lambda x: x.slug == attribute['slug'])
+            woo_attr.id = attribute.get('id', False)
 
     def update_woo_attribute_values(self, template, instance, common_log_id):
         common_log_line_obj = self.env["common.log.lines.ept"]
         model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
         url = 'products/attributes/%s/terms/batch'
-        data = template._prepare_attribute_term_data(instance)
+        data, woo_terms = template._prepare_attribute_term_data(instance)
         if not data:
             return
         wc_api = instance.woo_connect()
         for woo_attribute_id, term_data in data.items():
             try:
-                res = wc_api.put(url % woo_attribute_id, data={'update': term_data})
+                res = wc_api.post(url % woo_attribute_id, data=term_data)
             except Exception as error:
                 raise UserError(_("Something went wrong while exporting Attribute Terms."
                                   "\n\nPlease Check your Connection and"
                                   "Instance Configuration.\n\n" + str(error)))
-            self.check_woocommerce_response(res, "Export Product Attribute Terms",
-                                            model_id, common_log_id, template)
+            response_data = self.check_woocommerce_response(res, "Export Product Attribute Terms",
+                                                            model_id, common_log_id, template)
+
+            if 'create' not in response_data:
+                continue
+            for term in response_data['create']:
+                woo_term = woo_terms.filtered(lambda x: x.slug == term['slug'])
+                woo_term.id = term.get('id', False)
 
     def find_or_create_woo_attribute(self, attributes_data, instance):
         obj_woo_attribute = self.env['woo.product.attribute.ept']
