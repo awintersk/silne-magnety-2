@@ -369,6 +369,8 @@ class WooProductTemplateEpt(models.Model):
     def woo_create_variant_product(self, product_template_dict, woo_instance):
         ir_config_parameter_obj = self.env["ir.config_parameter"]
         product_template_obj = self.env['product.template']
+        product_template = False
+        available_odoo_products = {}
 
         template_title = ""
         if product_template_dict.get('title'):
