@@ -28,3 +28,4 @@ class AccountMove(models.Model):
         'woo.instance.ept',
         string='Woo Instance',
     )
+    billing_company_mark = fields.Char(string='Billing Company Mark')
