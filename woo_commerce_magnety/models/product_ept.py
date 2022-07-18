@@ -29,7 +29,8 @@ class WooProductTemplateEpt(models.Model):
 
     def _set_name(self):
         for r in self:
-            r.product_tmpl_id.name = r.name
+            instance_lang = r.woo_instance_id.woo_lang_id
+            r.product_tmpl_id.with_context(lang=instance_lang.code).name = r.name
 
     @api.model
     def sync_products(self, *args, **kwargs):
