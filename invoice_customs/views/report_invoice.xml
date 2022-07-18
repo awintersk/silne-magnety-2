@@ -7,17 +7,38 @@
             <div class="text-center">
                 <ul style="list-style: none;padding: 0; margin: 0; display: flex; justify-content: space-around;">
                     <t t-if="o">
-                        <li t-if="o.invoice_user_id.name" class="list-inline-item">Invoice created by: <span t-field="o.invoice_user_id.name"/></li>
-                        <t t-if="o.woo_instance_origin_id">
-                            <li t-if="o.woo_instance_origin_id.woo_phone" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_origin_id.woo_phone"/></li>
-                            <li t-if="o.woo_instance_origin_id.woo_host" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_origin_id.woo_host"/></li>
-                            <li t-if="o.woo_instance_origin_id.woo_email" class="list-inline-item"><span t-field="o.woo_instance_origin_id.woo_email"/></li>
+                        <t t-if="'invoice_user_id' in o.fields_get()">
+                            <li t-if="o.invoice_user_id.name" class="list-inline-item">Invoice created by: <span t-field="o.invoice_user_id.name"/></li>
                         </t>
-                        <t t-if="not o.woo_instance_origin_id">
-                            <li t-if="company.phone" class="list-inline-item"><span class="o_force_ltr" t-field="company.phone"/></li>
-                            <li t-if="company.website" class="list-inline-item"><span t-field="company.website"/></li>
-                            <li t-if="company.email" class="list-inline-item"><span t-field="company.email"/></li>
+                        <t t-if="'invoice_user_id' not in o.fields_get() and is_pro_forma">
+                            <li t-if="o.user_id.name" class="list-inline-item">Invoice created by: <span t-field="o.user_id.name"/></li>
                         </t>
+                        <t t-if="'woo_instance_origin_id' in o.fields_get()">
+                            <t t-if="o.woo_instance_origin_id">
+                                <li t-if="o.woo_instance_origin_id.woo_phone" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_origin_id.woo_phone"/></li>
+                                <li t-if="o.woo_instance_origin_id.woo_host" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_origin_id.woo_host"/></li>
+                                <li t-if="o.woo_instance_origin_id.woo_email" class="list-inline-item"><span t-field="o.woo_instance_origin_id.woo_email"/></li>
+                            </t>
+                            <t t-if="not o.woo_instance_origin_id">
+                                <li t-if="company.phone" class="list-inline-item"><span class="o_force_ltr" t-field="company.phone"/></li>
+                                <li t-if="company.website" class="list-inline-item"><span t-field="company.website"/></li>
+                                <li t-if="company.email" class="list-inline-item"><span t-field="company.email"/></li>
+                            </t>
+                        </t>
+                        <t t-if="'woo_instance_origin_id' not in o.fields_get()">
+                            <t t-if="o.woo_instance_id">
+                                <li t-if="o.woo_instance_id.woo_phone" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_id.woo_phone"/></li>
+                                <li t-if="o.woo_instance_id.woo_host" class="list-inline-item"><span class="o_force_ltr" t-field="o.woo_instance_id.woo_host"/></li>
+                                <li t-if="o.woo_instance_id.woo_email" class="list-inline-item"><span t-field="o.woo_instance_id.woo_email"/></li>
+                            </t>
+                            <t t-if="not o.woo_instance_id">
+                                <li t-if="company.phone" class="list-inline-item"><span class="o_force_ltr" t-field="company.phone"/></li>
+                                <li t-if="company.website" class="list-inline-item"><span t-field="company.website"/></li>
+                                <li t-if="company.email" class="list-inline-item"><span t-field="company.email"/></li>
+                            </t>
+                        </t>
+
+
                     </t>
                     <t t-if="not o">
                         <li t-if="company.phone" class="list-inline-item"><span class="o_force_ltr" t-field="company.phone"/></li>
