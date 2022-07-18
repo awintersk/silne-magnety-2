@@ -221,6 +221,30 @@ class WooProductTemplateEpt(models.Model):
 
             self.sync_woo_attribute_term(instance, common_log_id)
 
+        # Remove the variants in woocommerce that don't exist in odoo
+        try:
+            res = wc_api.get('products/%s/variations' % (data.get('id')))
+        except Exception as error:
+            raise UserError(_("Something went wrong while getting variants.\n\nPlease Check your Connection and "
+                              "Instance Configuration.\n\n" + str(error)))
+        try:
+            response = res.json()
+        except Exception as error:
+            message = "Json Error: While removing outdated products from WooCommerce for instance %s. \n%s" % (
+                instance.name, error)
+            common_log_line_obj.woo_product_export_log_line(message, model_id, common_log_id, False)
+            return data, True
+
+        woo_variants = {str(variant.get('id')) for variant in response}
+        products_to_delete = woo_variants - set(template.woo_product_ids.mapped('variant_id'))
+
+        if products_to_delete:
+            try:
+                wc_api.post('products/%s/variations/batch' % (data.get('id')), {'delete': list(products_to_delete)})
+            except Exception as error:
+                raise UserError(_("Something went wrong while deleting variants.\n\nPlease Check your Connection and "
+                                "Instance Configuration.\n\n" + str(error)))
+
         if template.product_tmpl_id.attribute_line_ids and len(template.product_tmpl_id.product_variant_ids) == 1:
             attributes = []
             position = 0
