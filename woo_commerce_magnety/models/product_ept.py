@@ -130,11 +130,99 @@ class WooProductTemplateEpt(models.Model):
             template, instance, common_log_id)
         self.env['woo.product.template.ept'].update_woo_attribute_values(
             template, instance, common_log_id)
-        data, flag = super(WooProductTemplateEpt, self).prepare_product_variant_dict(
-            instance, template, data, basic_detail, update_price, update_image, common_log_id, model_id)
 
-        attributes = []
+        common_log_line_obj = self.env['common.log.lines.ept']
+        variants_to_create = []
+
+        wc_api = instance.woo_connect()
+        for variant in template.woo_product_ids:
+            price = 0.0
+            if variant.variant_id:
+                info = {'id': variant.variant_id}
+
+                if basic_detail:
+                    weight = self.convert_weight_by_uom(variant.product_id.weight, instance)
+                    info.update({'sku': variant.default_code, 'weight': str(weight),
+                                 "manage_stock": variant.woo_is_manage_stock})
+            else:
+                attributes = self.get_product_attribute(template.product_tmpl_id, instance, common_log_id, model_id)[0]
+                info = self.get_variant_data(variant, instance, False)
+
+            if update_image:
+                info.update(self.get_variant_image(instance, variant))
+
+            if update_price:
+                price = instance.woo_pricelist_id.get_product_price(variant.product_id, 1.0, partner=False,
+                                                                    uom_id=variant.product_id.uom_id.id)
+                info.update({'regular_price': str(price), 'sale_price': str(price)})
+
+            if template.woo_tmpl_id != variant.variant_id:
+                if variant.variant_id:
+                    data.get('variations').append(info)
+                else:
+                    variants_to_create.append(info)
+            else:
+                del data['variations']
+                if basic_detail:
+                    data.update({'sku': variant.default_code, "manage_stock": variant.woo_is_manage_stock})
+                if update_price:
+                    data.update({'regular_price': str(price), 'sale_price': str(price)})
+
+        if data.get('variations'):
+            variant_batches = self.prepare_batches(data.get('variations'))
+            for woo_variants in variant_batches:
+                _logger.info('variations batch processing')
+                try:
+                    res = wc_api.post('products/%s/variations/batch' % (data.get('id')), {'update': woo_variants})
+                except Exception as error:
+                    raise UserError(_("Something went wrong while Updating Variants.\n\nPlease Check your Connection "
+                                      "and Instance Configuration.\n\n" + str(error)))
+                _logger.info('variations batch process completed [status: %s]', res.status_code)
+                if res.status_code in [200, 201]:
+                    data['variations'] = [{'id': variation['id']} for variation in data['variations']]
+                if res.status_code not in [200, 201]:
+                    message = "Update Product Variations\n%s" % res.content
+                    common_log_line_obj.woo_product_export_log_line(message, model_id, common_log_id, False)
+        if variants_to_create:
+            """Needed to update the attributes of template for adding new variant, while update
+            process."""
+            _logger.info("Updating attributes of %s in Woo.." % template.name)
+            if data.get("variations"):
+                del data['variations']
+            data.update({"attributes": attributes})
+            try:
+                wc_api.put("products/%s" % (data.get("id")), data)
+            except Exception as error:
+                raise UserError(_("Something went wrong while Updating product.\n\nPlease Check your Connection and "
+                                  "Instance Configuration.\n\n" + str(error)))
+
+            _logger.info("Creating variants in Woo..")
+            try:
+                res = wc_api.post('products/%s/variations/batch' % (data.get('id')), {'create': variants_to_create})
+            except Exception as error:
+                raise UserError(_("Something went wrong while Creating Variants.\n\nPlease Check your Connection and "
+                                  "Instance Configuration.\n\n" + str(error)))
+            try:
+                response = res.json()
+            except Exception as error:
+                message = "Json Error : While update products to WooCommerce for instance %s. \n%s" % (
+                    instance.name, error)
+                common_log_line_obj.woo_product_export_log_line(message, model_id, common_log_id, False)
+                return data, True
+            for product in response.get("create"):
+                if product.get("error"):
+                    message = "Update Product \n%s" % (product.get("error").get('message'))
+                    common_log_line_obj.woo_product_export_log_line(message, model_id, common_log_id, False)
+                else:
+                    variant_id = product.get("id")
+                    variant = template.woo_product_ids.filtered(lambda x: x.default_code == product.get("sku"))
+                    if variant:
+                        variant.write({"variant_id": variant_id, "exported_in_woo": True})
+
+            self.sync_woo_attribute_term(instance, common_log_id)
+
         if template.product_tmpl_id.attribute_line_ids and len(template.product_tmpl_id.product_variant_ids) == 1:
+            attributes = []
             position = 0
             for attribute_line in template.product_tmpl_id.attribute_line_ids:
                 options = []
@@ -149,7 +237,7 @@ class WooProductTemplateEpt(models.Model):
                 }
                 position += 1
                 attributes.append(attribute_data)
-        data['attributes'] = attributes
+            data['attributes'] = attributes
 
         # Bulk Prices
         if update_price and len(template.product_tmpl_id.product_variant_ids) == 1:
@@ -188,7 +276,7 @@ class WooProductTemplateEpt(models.Model):
                     data['meta_data'] = bulk_data
         else:
             pass
-        return data, flag
+        return data, True
 
     def simple_product_sync(self,
                             woo_instance,
