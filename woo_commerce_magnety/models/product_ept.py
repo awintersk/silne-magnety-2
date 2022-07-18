@@ -162,7 +162,6 @@ class WooProductTemplateEpt(models.Model):
                 else:
                     variants_to_create.append(info)
             else:
-                del data['variations']
                 if basic_detail:
                     data.update({'sku': variant.default_code, "manage_stock": variant.woo_is_manage_stock})
                 if update_price:
@@ -245,23 +244,19 @@ class WooProductTemplateEpt(models.Model):
                 raise UserError(_("Something went wrong while deleting variants.\n\nPlease Check your Connection and "
                                 "Instance Configuration.\n\n" + str(error)))
 
-        if template.product_tmpl_id.attribute_line_ids and len(template.product_tmpl_id.product_variant_ids) == 1:
-            attributes = []
-            position = 0
-            for attribute_line in template.product_tmpl_id.attribute_line_ids:
-                options = []
-                for option in attribute_line.value_ids:
-                    options.append(option.name)
-                variation = False
-                if attribute_line.attribute_id.create_variant in ['always', 'dynamic']:
-                    variation = True
-                attribute_data = {
-                    'name': attribute_line.attribute_id.name, 'slug': attribute_line.attribute_id.name.lower(),
-                    'position': position, 'visible': True, 'variation': variation, 'options': options
-                }
-                position += 1
-                attributes.append(attribute_data)
-            data['attributes'] = attributes
+        attributes = []
+        for attribute_line in template.product_tmpl_id.attribute_line_ids:
+            woo_attribute = attribute_line.attribute_id.woo_attribute_line_ids \
+                .filtered(lambda x: x.woo_instance_id == instance)
+            woo_terms = attribute_line.value_ids.woo_attribute_value_ids \
+                .filtered(lambda x: x.woo_instance_id == instance)
+            attributes.append({
+                'id': woo_attribute.woo_attribute_id,
+                'options': woo_terms.mapped('name'),
+                'variation': woo_attribute.attribute_id.create_variant in ['always', 'dynamic'],
+                'visible': True,
+            })
+        data['attributes'] = attributes
 
         # Bulk Prices
         if update_price and len(template.product_tmpl_id.product_variant_ids) == 1:
@@ -609,14 +604,11 @@ class WooProductTemplateEpt(models.Model):
                     'name': woo_attr.attribute_id.name,
                     'slug': woo_attr.slug,
                     'type': instance.woo_attribute_type,
-                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
                 })
             else:
                 data['create'].append({
                     'name': woo_attr.attribute_id.name,
-                    'slug': woo_attr.slug,
                     'type': instance.woo_attribute_type,
-                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
                 })
         return data, woo_attrs
 
@@ -628,24 +620,26 @@ class WooProductTemplateEpt(models.Model):
                 ('woo_instance_id', '=', self.woo_instance_id.id),
                 ('attribute_value_id', 'in', terms_to_update.ids),
             ],
-            fields=['woo_attribute_id', 'ids:array_agg(id)'],
-            groupby=['woo_attribute_id'],
+            fields=['attribute_id', 'ids:array_agg(id)'],
+            groupby=['attribute_id'],
         )
         data = {}
         for woo_attribute in woo_terms_to_update:
-            data[woo_attribute['woo_attribute_id']] = {'create': [], 'update': []}
+            attribute = self.env['product.attribute'].browse(woo_attribute['attribute_id'][0])
+            woo_attribute_id = attribute.woo_attribute_line_ids \
+                .filtered(lambda r: r.woo_instance_id == instance).woo_attribute_id
+            data[woo_attribute_id] = {'create': [], 'update': []}
             for woo_term in WooTerm.browse(woo_attribute['ids']):
                 if woo_term.exported_in_woo:
-                    data[woo_attribute['woo_attribute_id']]['update'].append({
+                    data[woo_attribute_id]['update'].append({
                         'id': woo_term.woo_attribute_term_id,
                         'name': woo_term.attribute_value_id.name,
                         'slug': woo_term.slug,
                         'description': woo_term.description,
                     })
                 else:
-                    data[woo_attribute['woo_attribute_id']]['create'].append({
+                    data[woo_attribute_id]['create'].append({
                         'name': woo_term.attribute_value_id.name,
-                        'slug': woo_term.slug,
                         'description': woo_term.description,
                     })
         return data, WooTerm.browse(
@@ -658,7 +652,7 @@ class WooProductTemplateEpt(models.Model):
         model_id = common_log_line_obj.get_model_id('woo.product.attribute.term.ept')
         url = 'products/attributes/batch'
         attribute_data, woo_attrs = template._prepare_attributes_data(instance)
-        if not attribute_data:
+        if not attribute_data['create'] and not attribute_data['update']:
             return
         wc_api = instance.woo_connect()
         try:
@@ -674,8 +668,17 @@ class WooProductTemplateEpt(models.Model):
             return
 
         for attribute in response_data['create']:
-            woo_attr = woo_attrs.filtered(lambda x: x.slug == attribute['slug'])
-            woo_attr.id = attribute.get('id', False)
+            if 'error' in attribute:
+                message = "Update Attribute \n%s" % (attribute['error'].get('message', ''))
+                common_log_line_obj.woo_product_export_log_line(message, model_id, common_log_id, False)
+                continue
+
+            woo_attr = woo_attrs.filtered(lambda x: x.name == attribute['name'])
+            woo_attr.write({
+                'woo_attribute_id': attribute.get('id', False),
+                'slug': attribute.get('slug', False),
+                'exported_in_woo': True,
+            })
 
     def update_woo_attribute_values(self, template, instance, common_log_id):
         common_log_line_obj = self.env["common.log.lines.ept"]
@@ -698,8 +701,12 @@ class WooProductTemplateEpt(models.Model):
             if 'create' not in response_data:
                 continue
             for term in response_data['create']:
-                woo_term = woo_terms.filtered(lambda x: x.slug == term['slug'])
-                woo_term.id = term.get('id', False)
+                woo_term = woo_terms.filtered(lambda x: x.name == term['name'])
+                woo_term.write({
+                    'woo_attribute_id': woo_attribute_id,
+                    'woo_attribute_term_id': term.get('id', False),
+                    'exported_in_woo': True,
+                })
 
     def find_or_create_woo_attribute(self, attributes_data, instance):
         obj_woo_attribute = self.env['woo.product.attribute.ept']

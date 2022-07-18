@@ -65,6 +65,40 @@ class PrepareProductForExport(models.TransientModel):
                 ])],
             })
 
+        # Create new attributes and terms
+        product_attributes = product_template.attribute_line_ids.attribute_id
+        pruduct_attribute_values = product_template.attribute_line_ids.value_ids
+
+        not_exported_attributes = product_attributes.filtered(
+            lambda r: woo_instance not in r.woo_attribute_line_ids.woo_instance_id)
+        attribute_vals = []
+        for attribute in not_exported_attributes:
+            attribute_vals.append({
+                'name': attribute.name,
+                'woo_instance_id': woo_instance.id,
+                'attribute_type': woo_instance.woo_attribute_type,
+                'attribute_id': attribute.id,
+                'exported_in_woo': False,
+            })
+
+        if attribute_vals:
+            self.env['woo.product.attribute.ept'].create(attribute_vals)
+
+        not_exported_attribute_values = pruduct_attribute_values.filtered(
+            lambda r: woo_instance not in r.woo_attribute_value_ids.woo_instance_id)
+        attribute_value_vals = []
+        for attribute_value in not_exported_attribute_values:
+            attribute_value_vals.append({
+                'name': attribute_value.name,
+                'woo_instance_id': woo_instance.id,
+                'attribute_id': attribute_value.attribute_id.id,
+                'attribute_value_id': attribute_value.id,
+                'exported_in_woo': False,
+            })
+
+        if attribute_value_vals:
+            self.env['woo.product.attribute.term.ept'].create(attribute_value_vals)
+
         self._update_translations(variant)
         return woo_template_id
 
