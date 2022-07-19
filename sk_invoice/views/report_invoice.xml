@@ -19,6 +19,7 @@
         </record>
     </data>
 
+    <data noupdate="0">
     <template id="smarttek_report_invoice_document" inherit_id="account.report_invoice_document"
               name="SmartTek Invoice Document" priority="40">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
@@ -244,8 +245,9 @@
                         <tbody class="sale_tbody">
 
                             <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
 
-                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                            <t t-foreach="lines" t-as="line">
 
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
                                    groups="account.group_show_line_subtotals_tax_excluded"/>
@@ -302,18 +304,6 @@
                                         </td>
                                     </t>
                                 </tr>
-
-                                <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section')">
-                                    <tr class="is-subtotal text-right">
-                                        <td name="td_section_subtotal" colspan="99">
-                                            <strong class="mr16">Subtotal</strong>
-                                            <span
-                                                    t-esc="current_subtotal"
-                                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
-                                            />
-                                        </td>
-                                    </tr>
-                                </t>
                             </t>
                         </tbody>
                     </table>
@@ -391,6 +381,7 @@
         </xpath>
 
     </template>
+    </data>
 
 
 </odoo>
