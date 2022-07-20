@@ -58,6 +58,11 @@ class WooProductTemplateEpt(models.Model):
                 woo_template.product_tmpl_id.categ_id = categories[0]
             if data["attributes"]:
                 woo_template.sync_attributes(data["attributes"])
+
+            if woo_template and woo_template.woo_tag_ids:
+                woo_template.woo_tag_ids.update_product_template_tags()
+                woo_template.product_tmpl_id.tag_ids = [(6, 0, woo_template.woo_tag_ids.tag_id.ids)]
+
         return res
 
     @api.model
@@ -467,10 +472,6 @@ class WooProductTemplateEpt(models.Model):
                                 })
                 if price_data:
                     Price.create(price_data)
-
-        if woo_template_id and woo_template_id.woo_tag_ids:
-            woo_template_id.woo_tag_ids.update_product_template_tags()
-            product_tmpl_id.tag_ids = [(6, 0, woo_template_id.woo_tag_ids.tag_id.ids)]
 
         return woo_template_id
 
