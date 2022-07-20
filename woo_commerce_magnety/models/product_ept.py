@@ -8,6 +8,7 @@ from datetime import datetime
 from odoo import models, fields, api, _
 from .product_pricelist import NUMBER_OF_BULK
 from odoo.exceptions import UserError
+from odoo.tools import groupby
 
 _logger = logging.getLogger("WooCommerce")
 
@@ -108,7 +109,23 @@ class WooProductTemplateEpt(models.Model):
                 })
 
     def get_product_attribute(self, template, instance, common_log_id, model_id):
-        attributes, is_variable = super(WooProductTemplateEpt, self).get_product_attribute(template, instance, common_log_id, model_id)
+        woo_template = template.woo_product_template_ids \
+            .filtered(lambda r: r.woo_instance_id == instance)
+        self.env['woo.product.template.ept'].update_woo_attributes(
+            woo_template, instance, common_log_id)
+        self.env['woo.product.template.ept'].update_woo_attribute_values(
+            woo_template, instance, common_log_id)
+        is_variable = True
+        attributes = []
+        woo_attribute_values = template.attribute_line_ids.value_ids.woo_attribute_value_ids \
+            .filtered(lambda r: r.woo_instance_id == instance)
+        for woo_attribute_id, woo_values in groupby(woo_attribute_values,
+                                                    lambda r: r.woo_attribute_id):
+            attributes.append({
+                'id': woo_attribute_id,
+                'options': [value.name for value in woo_values],
+            })
+
         if len(template.product_variant_ids) == 1:
             for attribute in attributes:
                 attribute.update({
