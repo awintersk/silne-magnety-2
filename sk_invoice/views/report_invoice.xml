@@ -315,6 +315,15 @@
                             <span t-field="o.amount_untaxed"
                                   style="vertical-align:top;font-family:arial,sans-serif;font-size:16px;line-height:28px;text-align:right;color:#333333;white-space: nowrap;display:inline-block;width:20%;"/>
                         </p>
+                        <t t-if="o.currency_id != o.company_id.currency_id">
+                            <t t-set="total_untaxed_in_def_currency" t-value="o.amount_untaxed / o.currency_id.rate"/>
+                            <p style="">
+                                <span/>
+                                <span t-esc="total_untaxed_in_def_currency"
+                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                      style="float:right;padding-bottom:20px;margin-top:-16px;vertical-align:top;font-family:arial,sans-serif;font-size:13px;line-height:15px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;"/>
+                            </p>
+                        </t>
                         <div style="display: block;clear: both;content: '';"></div>
                         <p t-foreach="o.amount_by_group" t-as="amount_by_group">
                             <t t-if="len(o.line_ids.filtered(lambda line: line.tax_line_id)) in [0, 1] and float_compare(o.amount_untaxed, amount_by_group[2], precision_rounding=o.currency_id.rounding) == 0">
@@ -338,6 +347,15 @@
                                     <span class="text-nowrap" t-esc="amount_by_group[3]"/>
                                 </span>
                             </t>
+                            <t t-if="o.currency_id != o.company_id.currency_id">
+                                <t t-set="total_by_group_in_def_currency" t-value="float(amount_by_group[1]) / o.currency_id.rate"/>
+                                <p style="">
+                                    <span/>
+                                    <span t-esc="total_by_group_in_def_currency"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
+                                          style="float:right;padding-bottom:20px;margin-top:-16px;vertical-align:top;font-family:arial,sans-serif;font-size:13px;line-height:15px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;"/>
+                                </p>
+                            </t>
                         </p>
                         <div style="display: block;clear: both;content: '';"></div>
                         <p style="">
@@ -349,15 +367,16 @@
                         </p>
                         <t t-if="o.currency_id != o.company_id.currency_id">
                             <t t-set="total_in_def_currency" t-value="o.amount_total / o.currency_id.rate"/>
-                            <p style="">
-                                <span style="padding-bottom:20px;vertical-align:top;font-family:arial, sans-serif;  font-size:13px;line-height: 20px; text-align:right; color:#333333; font-weight: bold;display:inline-block;width:80%;float:left;">
+                            <p style="margin-top:-24px;">
+                                <div style="display: block;clear: both;content: '';"></div>
+                                <span style="padding-bottom:20px;vertical-align:top;font-family:arial,sans-serif;font-size:13px;font-weight: bold;line-height:15px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:80%;float:left;">
                                     Exchange rate
                                     <span t-esc="o.currency_id.rate"/>
                                     <span t-esc="o.currency_id.name"/>/EUR
                                 </span>
                                 <span t-esc="total_in_def_currency"
                                       t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'
-                                      style="padding-bottom:20px;vertical-align:top;font-family:arial,sans-serif;font-size:13px;line-height:20px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;"/>
+                                      style="padding-bottom:20px;vertical-align:top;font-family:arial,sans-serif;font-size:13px;line-height:15px;text-align:right;color:#333333;white-space: nowrap;text-align:right;display:inline-block;width:20%;"/>
                             </p>
                         </t>
                         <div style="display: block;clear: both;content: '';"></div>
