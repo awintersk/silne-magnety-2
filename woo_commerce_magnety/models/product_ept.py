@@ -387,11 +387,9 @@ class WooProductTemplateEpt(models.Model):
                         "name": template_title, "type": "product", "default_code": product_response["sku"],
                         "weight": weight, "invoice_policy": "order"
                     }
-                    if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
-                        template_vals.update({"woo_description": product_response.get("description", ""),
-                                              "woo_short_description": product_response.get("short_description", "")})
                     if product_response["virtual"]:
                         template_vals.update({"type": "service"})
+
                     odoo_template = self.env["product.template"].create(template_vals)
                     odoo_product = odoo_template.product_variant_ids
                 if not odoo_template:
@@ -428,6 +426,12 @@ class WooProductTemplateEpt(models.Model):
             self.update_product_images(product_response["images"], {}, woo_template_id, woo_product, woo_instance, False)
 
         product_tmpl_id = woo_template_id.product_tmpl_id if woo_template_id else None
+        # Update odoo template description
+        if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
+            product_tmpl_id.update({
+                "woo_description": product_response.get("description", ""),
+                "woo_short_description": product_response.get("short_description", ""),
+            })
 
         if product_tmpl_id and not product_response.get('weight'):
             product_tmpl_id._pull_product_weight_from_attribute()
@@ -492,6 +496,25 @@ class WooProductTemplateEpt(models.Model):
 
         return woo_template_id
 
+    def variation_product_sync(self, woo_instance, product_response, common_log_book_id, product_data_queue_line,
+                               order_queue_line, woo_template, product_queue_id, sync_category_and_tags,
+                               skip_existing_products):
+
+        self = self.with_context(lang=woo_instance.woo_lang_id.code)
+
+        woo_template = super(WooProductTemplateEpt, self).variation_product_sync(
+            woo_instance, product_response, common_log_book_id, product_data_queue_line,
+            order_queue_line, woo_template, product_queue_id, sync_category_and_tags,
+            skip_existing_products)
+
+        # Update template description
+        woo_template.product_tmpl_id.write({
+            "woo_description": product_response.get("description", ""),
+            "woo_short_description": product_response.get("short_description", ""),
+        })
+
+        return woo_template
+
     def woo_create_variant_product(self, product_template_dict, woo_instance):
         ir_config_parameter_obj = self.env["ir.config_parameter"]
         product_template_obj = self.env['product.template']
@@ -510,8 +533,8 @@ class WooProductTemplateEpt(models.Model):
             product_template_values = {'name': template_title, 'type': 'product', "invoice_policy": "order",
                                        'attribute_line_ids': attrib_line_vals}
             if ir_config_parameter_obj.sudo().get_param("woo_commerce_ept.set_sales_description"):
-                product_template_values.update({"woo_description": product_template_dict.get("description", ""),
-                                                "woo_short_description": product_template_dict.get("short_description", "")})
+                product_template_values.update({"woo_description": product_template_dict.get("woo_description", ""),
+                                                "woo_short_description": product_template_dict.get("woo_short_description", "")})
 
             product_template = product_template_obj.create(product_template_values)
             available_odoo_products = self.woo_set_variant_sku(woo_instance, product_template_dict, product_template,
@@ -803,6 +826,21 @@ class WooProductTemplateEpt(models.Model):
                     'exported_in_woo': True,
                     'count': attribute_term.get('count')})
         return True
+
+    def prepare_woo_template_vals(self, template_data, odoo_template_id, import_for_order, woo_instance,
+                                  common_log_book_id):
+        vals = super().prepare_woo_template_vals(
+            template_data, odoo_template_id, import_for_order, woo_instance,
+            common_log_book_id,
+        )
+
+        if self.env["ir.config_parameter"].sudo().get_param("woo_commerce_ept.set_sales_description"):
+            vals.update({
+                "woo_description": template_data.get("woo_description", ""),
+                "woo_short_description": template_data.get("woo_short_description", ""),
+            })
+
+        return vals
 
 
 class WooProductEpt(models.Model):
