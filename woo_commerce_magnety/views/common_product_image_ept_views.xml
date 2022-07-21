@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="common_product_image_ept_view_form_inherit" model="ir.ui.view">
+        <field name="name">common.product.image.ept.view.form.inherit</field>
+        <field name="model">common.product.image.ept</field>
+        <field name="inherit_id" ref="common_connector_library.view_common_product_image_ept_form"/>
+        <field name="arch" type="xml">
+            <field name="url" position="after">
+                <field name="alt_text"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

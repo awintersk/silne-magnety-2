@@ -2,11 +2,13 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+import hashlib
 from collections import defaultdict
 
 from odoo import models, fields, api, _
 from .product_pricelist import NUMBER_OF_BULK
 from odoo.exceptions import UserError
+from odoo.addons.woo_commerce_ept.img_upload import img_file_upload
 
 _logger = logging.getLogger("WooCommerce")
 
@@ -353,3 +355,37 @@ class WooProductTemplateEpt(models.Model):
                                   "Instance Configuration.\n\n" + str(error)))
             self.check_woocommerce_response(res, "Export Product Attribute Terms",
                                             model_id, common_log_id, template)
+
+    @api.model
+    def get_gallery_images(self, instance, woo_template, template):
+        tmpl_images = []
+        position = 0
+        gallery_img_keys = {}
+
+        # TODO: remove after MAGN-0055 is merged
+        lang = woo_template.woo_instance_id.woo_lang_id
+        woo_template = woo_template.woo_instance_id.with_context(lang=lang.code)
+
+        gallery_images = woo_template.woo_image_ids.filtered(lambda x: not x.woo_variant_id)
+        for br_gallery_image in gallery_images:
+            image_id = br_gallery_image.woo_image_id
+            if br_gallery_image.image and not image_id:
+                key = hashlib.md5(br_gallery_image.image).hexdigest()
+                if not key:
+                    continue
+                if key in gallery_img_keys:
+                    continue
+                else:
+                    gallery_img_keys.update({key: br_gallery_image.id})
+                res = img_file_upload.upload_image(
+                    instance,
+                    br_gallery_image.image,
+                    br_gallery_image.name,
+                    br_gallery_image.image_mime_type,
+                )
+                image_id = res and res.get('id', False) or ''
+            if image_id:
+                tmpl_images.append({'id': image_id, 'position': position, 'alt': br_gallery_image.alt_text})
+                position += 1
+                br_gallery_image.woo_image_id = image_id
+        return tmpl_images

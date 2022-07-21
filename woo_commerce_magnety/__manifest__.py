@@ -21,6 +21,7 @@
         'data/mail_activity.xml',
         'data/product_data.xml',
         'views/account_move_views.xml',
+        'views/common_product_image_ept_views.xml',
         'views/product_category_view.xml',
         'views/product_template_view.xml',
         'views/product.xml',
