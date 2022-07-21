@@ -645,11 +645,15 @@ class WooProductTemplateEpt(models.Model):
                     'name': woo_attr.attribute_id.name,
                     'slug': woo_attr.slug,
                     'type': instance.woo_attribute_type,
+                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
+                    'visible': True,
                 })
             else:
                 data['create'].append({
                     'name': woo_attr.attribute_id.name,
                     'type': instance.woo_attribute_type,
+                    'variation': woo_attr.attribute_id.create_variant in ['always', 'dynamic'],
+                    'visible': True,
                 })
         return data, woo_attrs
 
