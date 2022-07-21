@@ -54,4 +54,97 @@
         </div>
         </div>
     </template>
+
+    <template id="bank_per_woocommerce_on_invoice" inherit_id="sk_invoice.smarttek_report_invoice_document"
+              name="Bank per Woo" priority="30">
+        <xpath expr="//span[@name='company_address']" position="replace">
+            <span name="company_address" style="width:50%;float:left;">
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.name"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.street"/>
+                        <p t-if="company.street2"
+                           style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.street2"/>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                            <t
+                                    t-esc="company.zip"/>
+                            <t t-esc="company.city"/>
+                        </p>
+                        <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;"
+                           t-esc="company.country_id.name"/>
+                        <t t-if="company.company_registry">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Company Registry:
+                                <span t-field="company.company_registry"/>
+                            </p>
+                        </t>
+                        <t t-if="company.vat_id">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Tax ID:
+                                <span t-field="company.vat_id"/>
+                            </p>
+                        </t>
+                        <t t-if="company.vat">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                VAT ID:
+                                <span t-field="company.vat"/>
+                            </p>
+                        </t>
+
+                        <t t-if="o.woo_instance_id and o.woo_instance_id.rel_acc_number">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Bank:
+                                <span t-field="o.woo_instance_id.rel_acc_number.bank_id.name"/>
+                            </p>
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                <span t-if="o.woo_instance_id.rel_acc_number.acc_type == 'iban'">
+                                    IBAN:
+                                </span>
+                                <span t-else="">
+                                    Bank Account:
+                                </span>
+                                <span t-field="o.woo_instance_id.rel_acc_number.acc_number"/>
+                            </p>
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                SWIFT:
+                                <span t-field="o.woo_instance_id.rel_acc_number.bank_id.bic"/>
+                            </p>
+                        </t>
+                        <t t-if="company.register_message">
+                            <p style="font-size:12px;margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                <span t-field="company.register_message"/>
+                            </p>
+                        </t>
+                <t t-if="company.rel_acc_number and not (o.woo_instance_id and o.woo_instance_id.rel_acc_number)">
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                Bank:
+                                <span t-field="company.rel_acc_number.bank_id.name"/>
+                            </p>
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                <span t-if="company.rel_acc_number.acc_type == 'iban'">
+                                    IBAN:
+                                </span>
+                                <span t-else="">
+                                    Bank Account:
+                                </span>
+                                <span t-field="company.rel_acc_number.acc_number"/>
+                            </p>
+                            <p style="margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                SWIFT:
+                                <span t-field="company.rel_acc_number.bank_id.bic"/>
+                            </p>
+                        </t>
+                        <t t-if="company.register_message">
+                            <p style="font-size:12px;margin:0;font-family:arial, sans-serif;  font-size:16px;line-height: 25px; text-align:left; color:#333333;">
+                                <span t-field="company.register_message"/>
+                            </p>
+                        </t>
+
+
+                    </span>
+
+        </xpath>
+    </template>
+
 </odoo>

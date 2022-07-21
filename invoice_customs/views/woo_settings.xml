@@ -7,11 +7,16 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//page[@name='default_products']" position="after">
-                        <page string="Footer Info" groups="woo_commerce_ept.group_woo_manager_ept" name="footer_info">
+                        <page string="Report Settings" groups="woo_commerce_ept.group_woo_manager_ept" name="report_settings">
                             <group>
                                 <group>
                                     <field name="woo_email"/>
                                     <field name="woo_phone"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="rel_acc_number"/>
                                 </group>
                             </group>
                         </page>
