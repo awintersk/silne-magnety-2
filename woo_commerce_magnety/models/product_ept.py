@@ -124,6 +124,9 @@ class WooProductTemplateEpt(models.Model):
             attributes.append({
                 'id': woo_attribute_id,
                 'options': [value.name for value in woo_values],
+                'visible': True,
+                'variation': woo_values[:1] and \
+                    woo_values[0].attribute_id.create_variant in ['always', 'dynamic'],
             })
 
         if len(template.product_variant_ids) == 1:
